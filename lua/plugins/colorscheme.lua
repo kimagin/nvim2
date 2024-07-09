@@ -65,12 +65,12 @@ return {
     },
     custom_highlights = {},
     integrations = {
-      cmp = false,
-      gitsigns = false,
-      nvimtree = false,
-      telescope = false,
-      notify = false,
-      mini = false,
+      cmp = true,
+      gitsigns = true,
+      nvimtree = true,
+      telescope = true,
+      notify = true,
+      mini = true,
       -- For more plugins integrations please scroll down (https://github.com/catppuccin/nvim#integrations)
     },
   },
