@@ -28,7 +28,7 @@ return {
   -- { "nvim-lua/plenary.nvim", enabled = false },
   -- { "RRethy/vim-illuminate", enabled = false },
   { "goolord/alpha-nvim", enabled = false },
-  -- { "akinsho/bufferline.nvim", enabled = false },
+  { "akinsho/bufferline.nvim", enabled = false },
   -- { "lewis6991/gitsigns.nvim", enabled = false },
   -- { "williamboman/mason.nvim", enabled = false },
   -- { "williamboman/mason-lspconfig.nvim", enabled = false },
