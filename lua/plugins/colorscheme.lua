@@ -1,12 +1,13 @@
+local frappe = require("catppuccin.palettes.frappe")
 return {
   "catppuccin/nvim",
   name = "catppuccin",
   priority = 1000,
   opts = {
-    flavour = "mocha", -- latte, frappe, macchiato, mocha
+    flavour = "frappe", -- latte, frappe, macchiato, mocha
     background = { -- :h background
-      light = "latte",
-      dark = "mocha",
+      light = "frappe",
+      dark = "frappe",
     },
     transparent_background = true, -- disables setting the background color.
     show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
@@ -34,11 +35,11 @@ return {
       operators = {},
     },
     color_overrides = {
-      mocha = {
+      frappe = {
         -- Background and foreground
-        base = "#1a1a1a",
-        text = "#ffffff",
-        -- surface0 = "#252525",
+        -- base = "#1a1a1a",
+        -- text = "#ffffff",
+        surface0 = "#252525",
         surface1 = "#323439",
         -- surface2 = "#404040",
         -- -- Vibrant colors
@@ -52,22 +53,22 @@ return {
         -- mauve = "#9370db",   -- Medium Purple
         -- sky = "#87cefa",     -- Light Sky Blue
         yellow = "#CABEFF", -- Bright Yellow
-        peach = "#C0C0CC", -- Light Salmon
+        peach = "#C0C0C0", -- Light Salmon
         -- teal = "#008080",    -- Teal
         -- -- Softer accents
         -- rosewater = "#ffe4e1", -- Misty Rose
         -- sapphire = "#4169e1",  -- Royal Blue
-        -- overlay0 = "#505050",
-        -- overlay1 = "#606060",
-        -- overlay2 = "#707070",
+        -- overlay0 = "#ffffff",
+        -- overlay1 = "#ffffff",
+        -- overlay2 = "#ffffff",
       },
     },
     custom_highlights = {},
     integrations = {
-      cmp = true,
-      gitsigns = true,
-      nvimtree = true,
-      telescope = true,
+      cmp = false,
+      gitsigns = false,
+      nvimtree = false,
+      telescope = false,
       notify = false,
       mini = false,
       -- For more plugins integrations please scroll down (https://github.com/catppuccin/nvim#integrations)
