@@ -10,4 +10,4 @@ vim.opt.showtabline = 0 -- Hide tabs
 
 --- Instant appearance of Which key
 vim.o.timeout = true
-vim.o.timeoutlen = 0
+vim.o.timeoutlen = 150
