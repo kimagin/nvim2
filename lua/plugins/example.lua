@@ -20,23 +20,14 @@ return {
     },
   },
 
--- {
---   "neovim/nvim-lspconfig",
---   opts = {
---     servers = {
---       harper_ls = {
---         filetypes = { "markdown" },
---       },
---     },
---   },
+
+--  {
+--   "mason.nvim",
+--   opts = function(_, opts)
+--     opts.ensure_installed = opts.ensure_installed or {}
+--     vim.list_extend(opts.ensure_installed, { "harper-ls" })
+--   end,
 -- },
- {
-  "mason.nvim",
-  opts = function(_, opts)
-    opts.ensure_installed = opts.ensure_installed or {}
-    vim.list_extend(opts.ensure_installed, { "harper-ls" })
-  end,
-},
 
 
 
