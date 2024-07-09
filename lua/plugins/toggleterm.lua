@@ -3,17 +3,20 @@ return {
     "akinsho/toggleterm.nvim",
     version = "*",
     opts = {
-      size = 20,
+      size = 10,
       open_mapping = [[<c-\>]],
       direction = "float",
+      highlights = {
+        -- highlights which map to a highlight group name and a table of it's values
+        -- NOTE: this is only a subset of values, any group placed here will be set for the terminal window split
+
+        FloatBorder = {
+          guifg = "#6F7072",
+        },
+      },
+      winblend = 50,
       float_opts = {
         border = "single",
-        highlights = {
-          highlights = {
-            border = "@error",
-            background = "@error",
-          },
-        },
       },
     },
     config = function(_, opts)
