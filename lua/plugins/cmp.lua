@@ -5,13 +5,9 @@ return {
       local cmp = require("cmp")
 
       opts.completion = vim.tbl_extend("force", opts.completion or {}, {
-        timeout = 300, -- Adjust this value (in milliseconds) as needed
+        timeout = 0, -- Adjust this value (in milliseconds) as needed
       })
-      opts.performance = {
-        debounce = 300,
-        throttle = 60,
-        fetching_timeout = 200,
-      }
+
       opts.window = {
         completion = {
           border = "single",
