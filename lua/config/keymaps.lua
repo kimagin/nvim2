@@ -35,18 +35,14 @@ end
 
 vim.keymap.set("n", "<leader>bn", function()
   cycle_buffers("next")
-end, { noremap = true, silent = true, desc = "Next buffer" })
+end, { desc = "Next buffer" })
+
 vim.keymap.set("n", "<leader>bb", function()
   cycle_buffers("prev")
-end, { noremap = true, silent = true, desc = "Previous buffer" })
+end, { desc = "Previous buffer" })
 
-vim.api.nvim_set_keymap("n", "<C-a>", "ggVG", { desc = "Select All" })
+vim.keymap.set("n", "<C-a>", "ggVG", { desc = "Select All" })
 
-vim.api.nvim_set_keymap(
-  "n",
-  "<leader>qq",
-  "<cmd>:w | bdelete<CR>",
-  { noremap = true, silent = true, desc = "Delete Current Buffer" }
-)
+vim.keymap.set("n", "<leader>qq", "<cmd>w | bdelete<CR>", { desc = "Save and close buffer" })
 
-vim.api.nvim_set_keymap("n", "<leader>ww", "<cmd>:w<CR>", { noremap = true, desc = "Save Current Buffer" })
+vim.keymap.set("n", "<leader>ww", "<cmd>w<CR>", { desc = "Save current buffer" })
