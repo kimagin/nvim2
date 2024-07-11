@@ -113,15 +113,15 @@ return {
       else
         -- For non-daily notes, keep the existing frontmatter logic
         local current_time = os.time()
-        local date_str = os.date("%d-%m-%Y", current_time)
-        local time_str = os.date("%I-%M-%p", current_time)
+        local date_str = os.date("%B %d, %Y", current_time)
+        local time_str = os.date("%Ih %Mm %p", current_time)
         local suffix = os.date("%d%m%y%H%M%S", current_time)
 
         local out = {
           udid = string.sub(note.id:gsub(" ", "-"):gsub("[^A-Za-z0-9-]", ""):lower() .. suffix, 1, 14) .. suffix,
           tags = note.tags,
           title = note.title,
-          creation = { "date:" .. date_str, "time:" .. time_str },
+          catalogued = { date_str, time_str },
           source = "-",
         }
 
