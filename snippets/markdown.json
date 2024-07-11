@@ -1,0 +1,27 @@
+{
+    "important": {
+        "prefix": "quote: important",
+        "body": ["> 🔥 Important", "> $1"],
+        "description": "Markdown Blockquote Important"
+    },
+    "warning": {
+        "prefix": "quote: warning",
+        "body": ["> 🔶 Warning", "> $1"],
+        "description": "Markdown Blockquote Warning"
+    },
+    "note": {
+        "prefix": "quote: note",
+        "body": ["> ✨ Note", "> $1"],
+        "description": "Markdown Blockquote Note"
+    },
+    "success": {
+        "prefix": "quote: success",
+        "body": ["> 🎉 Success", "> $1"],
+        "description": "Markdown Blockquote Success"
+    },
+    "prohibited": {
+        "prefix": "quote: prohibited",
+        "body": ["> ⛔ Never do this", "> $1"],
+        "description": "Markdown Blockquote Prohibited"
+    }
+}
