@@ -2,24 +2,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = {
-      servers = {
-        ltex = {
-          cmd = { "/opt/homebrew/bin/ltex-ls" }, -- Update the command to use the Homebrew-installed ltex-ls
-          filetypes = { "markdown", "tex" }, -- Specify the file types you want to enable ltex-ls for
-          settings = {
-            ltex = {
-              enabled = true,
-              language = "en-US",
-              diagnosticSeverity = "information",
-              setenceCacheSize = 2000,
-              additionalRules = {
-                enablePickyRules = true,
-                motherTongue = "en-US",
-              },
-            },
-          },
-        },
-      },
+      servers = {},
       diagnostics = {
         signs = {
           active = true,
