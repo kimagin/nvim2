@@ -10,4 +10,22 @@ vim.opt.showtabline = 0 -- Hide tabs
 
 --- Instant appearance of Which key
 vim.o.timeout = true
-vim.o.timeoutlen = 0
+vim.o.timeoutlen = 300
+
+-- Clipboard configuration for wsl
+if vim.fn.has("wsl") == 1 then
+  vim.g.clipboard = {
+    name = "WslClipboard",
+    copy = {
+      ["+"] = "clip.exe",
+      ["*"] = "clip.exe",
+    },
+    paste = {
+      ["+"] = "win32yank.exe -o --lf",
+      ["*"] = "win32yank.exe -o --lf",
+    },
+    cache_enabled = 0,
+  }
+end
+
+vim.opt.fillchars = { eob = "~" } --disable the ~
