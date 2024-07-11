@@ -28,4 +28,13 @@ vim.api.nvim_set_hl(0, "markdownHeadingDelimiter", { fg = "#A88BFA" })
 -- vim.api.nvim_set_hl(0, "Normal", { fg = "#B3B1AD" })
 -- vim.api.nvim_set_hl(0, "NormalNC", { fg = "#ffffff" })
 -- vim.api.nvim_set_hl(0, "TelescopeNormal", { fg = "#ffffff" })
-vim.api.nvim_set_hl(0, "TelescopeBorder", { fg = "#6F7072" })
+vim.api.nvim_set_hl(0, "TelescopeBorder", { fg = "#2f3031" })
+
+vim.api.nvim_set_hl(0, "MiniDepsTitleSame", { fg = "#A88BFA", bg = "#211a33" })
+
+-- Yaml
+
+vim.api.nvim_set_hl(0, "yamlKeyValueDelimiter", { fg = "#A88BFA" })
+vim.api.nvim_set_hl(0, "yamlDocumentStart", { fg = "#A88BFA" })
+
+vim.api.nvim_set_hl(0, "yamlString", { fg = "#C6D0F6" })
