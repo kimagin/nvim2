@@ -37,6 +37,8 @@ return {
         ["p"] = { char = "🎉", hl_group = "ObsidianTag" },
         ["f"] = { char = "🔥", hl_group = "ObsidianTag" },
         ["s"] = { char = "✨", hl_group = "ObsidianTag" },
+        ["u"] = { char = "🦄", hl_group = "ObsidianTag" },
+        ["c"] = { char = "🐈", hl_group = "ObsidianTag" },
         -- Replace the above with this if you don't have a patched font:
         -- [" "] = { char = "☐", hl_group = "ObsidianTodo" },
         -- ["x"] = { char = "✔", hl_group = "ObsidianDone" },
