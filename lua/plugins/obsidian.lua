@@ -14,16 +14,17 @@ return {
   },
   opts = {
     ui = {
+      enable = true,
       hl_groups = {
-        ObsidianTodo = { bold = true, fg = "#F5C2E8" },
-        ObsidianDone = { bold = true, fg = "#89ddff" },
+        ObsidianTodo = { bold = true, fg = "#A88BFA" },
+        ObsidianDone = { bold = true, fg = "#A88BFA" },
         ObsidianImportant = { bold = true, fg = "#EA6C73" },
         ObsidianTag = { fg = "#A88BFA" },
         ObsidianBlockID = { italic = true, bg = "#89ddff" },
         ObsidianHighlightText = { bg = "#FDD899", fg = "#000000", italic = true },
         ObsidianRightArrow = { bold = true, fg = "#f78c6c" },
         ObsidianTilde = { bold = true, fg = "#ff5370" },
-        ObsidianBullet = { bold = true, fg = "#89ddff" },
+        ObsidianBullet = { bold = true, fg = "#A88BFA" },
         ObsidianRefText = { underline = true, fg = "#A0D3E1", bold = true },
         ObsidianExtLinkIcon = { fg = "#c792ea" },
       },
@@ -55,7 +56,7 @@ return {
       },
     },
     completion = {
-      nvim_cmp = true,
+      nvim_cmp = false,
       min_chars = 1,
     },
     new_notes_location = "in",
