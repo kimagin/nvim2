@@ -12,12 +12,17 @@ return {
         disabled_filetypes = { statusline = { "dashboard", "alpha" } },
         component_separators = "",
         section_separators = "",
+        refresh = {
+          statusline = 1000,
+          tabline = 1000,
+          winbar = 1000,
+        },
       },
       sections = {
         lualine_a = {},
         lualine_b = {},
-        lualine_c = {
-          { "filetype", icon_only = true, separator = "", padding = { left = 3, right = -4 } },
+        lualine_x = {
+          { "filetype", icon_only = true, separator = "", padding = { left = 3, right = 1 } },
           {
             "filename",
             shorting_target = 20,
@@ -27,11 +32,17 @@ return {
               unnamed = "Untitled Note", -- Text to show for unnamed buffers.
               newfile = "^", -- Text to show for newly created file before first write
             },
+            padding = { left = 0, right = 1 },
           },
           "branch",
           "diff",
         },
-        lualine_x = {
+        lualine_c = {
+
+          {
+            "mode",
+            padding = { left = 0, right = 1 },
+          },
           {
             "diagnostics",
             symbols = {
@@ -41,7 +52,6 @@ return {
               hint = icons.diagnostics.Hint,
             },
           },
-          "mode",
         },
         lualine_y = {},
 
