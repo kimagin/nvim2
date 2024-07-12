@@ -38,4 +38,6 @@ return {
   -- { "stevearc/conform.nvim", enabled = false },
   -- { "nvimdev/dashboard-nvim", enabled = false },
   -- { "ggandor/leap.nvim", enabled = false },
+  -- { "epwalsh/obsidian.nvim", enabled = false },
+  -- { "MeanderingProgrammer/markdown.nvim", enabled = false },
 }
