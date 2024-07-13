@@ -11,6 +11,9 @@ return {
     "nvim-telescope/telescope.nvim",
     opts = function(_, opts)
       local fzf_lua = require("fzf-lua")
+      local actions = require("telescope.actions")
+      local action_state = require("telescope.actions.state")
+
       opts.defaults = vim.tbl_deep_extend("force", opts.defaults or {}, {
         layout_config = {
           horizontal = {
@@ -28,15 +31,51 @@ return {
         winblend = 0,
         border = true,
         borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
+
         -- FZF-lua specific configurations
         fuzzy = true,
         vimgrep_arguments = fzf_lua.defaults.grep.cmd,
+
+        mappings = {
+          i = {
+            -- Create a new file in the same directory as the highlighted file
+            ["<C-n>"] = function(prompt_bufnr)
+              local selection = action_state.get_selected_entry()
+              if selection == nil then
+                print("No file selected")
+                return
+              end
+
+              local dir = vim.fn.fnamemodify(selection.path, ":h")
+              local new_file = vim.fn.input("New file name: ", dir .. "/", "file")
+
+              if new_file ~= "" then
+                actions.close(prompt_bufnr)
+                vim.cmd("edit " .. new_file)
+              end
+            end,
+
+            -- Yank the path of the highlighted file
+            ["<C-y>"] = function(prompt_bufnr)
+              local selection = action_state.get_selected_entry()
+              if selection == nil then
+                print("No file selected")
+                return
+              end
+
+              vim.fn.setreg("+", selection.path)
+              print("Yanked: " .. selection.path)
+            end,
+          },
+        },
       })
+
       opts.pickers = vim.tbl_deep_extend("force", opts.pickers or {}, {
         find_files = {
           find_command = fzf_lua.defaults.files.cmd,
         },
       })
+
       -- Use fzf-lua for the fuzzy finding
       opts.extensions = vim.tbl_deep_extend("force", opts.extensions or {}, {
         fzf = {
@@ -46,6 +85,7 @@ return {
           case_mode = "smart_case",
         },
       })
+
       return opts
     end,
     dependencies = {
