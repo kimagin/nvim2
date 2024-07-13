@@ -61,3 +61,7 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.cmd([[highlight link markdownTaskListDone markdownTaskListDone]])
   end,
 })
+
+-- Markdown Preview
+
+vim.g.mkdp_highlight_css = vim.fn.expand("$HOME/.config/nvim/markdown/highlight.css")
