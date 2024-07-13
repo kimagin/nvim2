@@ -8,6 +8,8 @@ vim.opt.shortmess:append("I")
 
 vim.opt.showtabline = 0 -- Hide tabs
 
+vim.opt.wrap = true
+
 --- Instant appearance of Which key
 vim.o.timeout = true
 vim.o.timeoutlen = 300
