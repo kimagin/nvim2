@@ -17,10 +17,10 @@ vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#121317", fg = "#A88BFA" })
 -- Modify the floating window (help popup) colors
 -- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#121317", fg = "#A88BFA" })
 
-vim.api.nvim_set_hl(0, "markdownH1", { fg = "#A88BFA" })
+vim.api.nvim_set_hl(0, "markdownH1", { fg = "#A88BFA", bold = true })
 vim.api.nvim_set_hl(0, "markdownH2", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "markdownH3", { fg = "#A88BFA" })
-vim.api.nvim_set_hl(0, "markdownH4", { fg = "#A88BFA" })
+vim.api.nvim_set_hl(0, "markdownH4", { fg = "#A88BFA", underdouble = true })
 vim.api.nvim_set_hl(0, "markdownH5", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "markdownH6", { fg = "#A88BFA" })
 
@@ -66,3 +66,24 @@ vim.api.nvim_create_autocmd("FileType", {
 -- Markdown Preview
 
 vim.g.mkdp_highlight_css = vim.fn.expand("$HOME/.config/nvim/markdown/highlight.css")
+
+-- Headings
+local function setup_markdown_concealing()
+  vim.wo.conceallevel = 2
+  vim.wo.concealcursor = "nc"
+
+  vim.cmd([[
+    syntax match markdownH4 /^####\s\+.*$/ contains=markdownH4Marker
+    syntax match markdownH4Marker /^####/ contained conceal cchar=󰫢
+  ]])
+
+  vim.api.nvim_set_hl(0, "markdownH4", { fg = "#A88BFA", bold = true })
+  vim.api.nvim_set_hl(0, "markdownH4Marker", { fg = "#A88BFA", bold = true })
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function()
+    vim.schedule(setup_markdown_concealing)
+  end,
+})
