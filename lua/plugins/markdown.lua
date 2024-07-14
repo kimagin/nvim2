@@ -35,10 +35,13 @@ return {
     "stevearc/conform.nvim",
     optional = true,
     opts = {
-
+      formatters = {
+        deno_fmt = {
+          cwd = require("conform.util").root_file({ ".git" }),
+        },
+      },
       formatters_by_ft = {
         ["markdown"] = { "deno_fmt" },
-        ["json"] = { "deno_fmt" },
         ["markdown_inline"] = { "deno_fmt" },
       },
     },
