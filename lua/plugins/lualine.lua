@@ -5,17 +5,27 @@ return {
     local icons = require("lazyvim.config").icons
     local Util = require("lazyvim.util")
 
+    -- Define the macro_recording function
+    local function macro_recording()
+      local recording_register = vim.fn.reg_recording()
+      if recording_register == "" then
+        return ""
+      else
+        return "Recording @" .. recording_register
+      end
+    end
+
     return {
       options = {
         theme = "auto",
         globalstatus = true,
         disabled_filetypes = { statusline = { "dashboard", "alpha" } },
-        component_separators = "",
+        component_separators = "",
         section_separators = "",
         refresh = {
-          statusline = 1000,
-          tabline = 1000,
-          winbar = 1000,
+          statusline = 200,
+          tabline = 200,
+          winbar = 200,
         },
       },
       sections = {
@@ -36,9 +46,13 @@ return {
           },
           "branch",
           "diff",
+          -- Add the macro recording function here
+          {
+            macro_recording,
+            color = { fg = "#a88bfa" }, -- You can adjust this color to match your theme
+          },
         },
         lualine_c = {
-
           {
             "mode",
             padding = { left = 0, right = 1 },
@@ -54,7 +68,6 @@ return {
           },
         },
         lualine_y = {},
-
         lualine_z = { "searchcount" },
       },
       extensions = { "neo-tree", "lazy" },
