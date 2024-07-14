@@ -40,4 +40,5 @@ return {
   -- { "ggandor/leap.nvim", enabled = false },
   -- { "epwalsh/obsidian.nvim", enabled = false },
   -- { "MeanderingProgrammer/markdown.nvim", enabled = false },
+  { "akinsho/toggleterm.nvim", enabled = false },
 }
