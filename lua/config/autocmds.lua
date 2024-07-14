@@ -67,7 +67,7 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- Markdown Preview
 
-vim.g.mkdp_highlight_css = vim.fn.expand("$HOME/.config/nvim/markdown/highlight.css")
+-- vim.g.mkdp_highlight_css = vim.fn.expand("$HOME/.config/nvim/markdown/highlight.css")
 
 -- Headings
 local function setup_markdown_concealing()

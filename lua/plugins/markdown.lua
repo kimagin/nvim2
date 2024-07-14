@@ -28,6 +28,9 @@ return {
     },
     config = function()
       vim.cmd([[do FileType]])
+      vim.g.mkdp_highlight_css = vim.fn.expand("$HOME/.config/nvim/markdown/highlight.css")
+      vim.g.mkdp_combine_preview = 1
+      vim.g.mkdp_auto_close = 0
     end,
   },
 
