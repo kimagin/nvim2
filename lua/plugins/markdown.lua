@@ -37,8 +37,9 @@ return {
     opts = {
 
       formatters_by_ft = {
-        ["markdown"] = { "prettierd" },
-        ["markdown_inline"] = { "prettierd" },
+        -- ["markdown"] = { "prettierd" },
+        ["markdown"] = { "deno_fmt" },
+        ["markdown_inline"] = { "deno_fmt" },
       },
     },
   },
