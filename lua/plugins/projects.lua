@@ -52,7 +52,19 @@ return {
                   require("telescope.builtin").find_files({
                     hidden = true,
                     no_ignore = true,
-                    find_command = { "fd", "--type", "f", "--hidden", "--follow", "--exclude", ".git" },
+                    find_command = {
+                      "fd",
+                      "--type",
+                      "f",
+                      "--hidden",
+                      "--follow",
+                      "--exclude",
+                      ".git",
+                      "--exclude",
+                      "node_modules",
+                      "--exclude",
+                      "dist",
+                    },
                   })
                 end)
                 return true
