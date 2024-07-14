@@ -1,1 +1,5 @@
 {"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Qsf asd this\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QProselint can be good?\\E$"}
+{"rule":"WHITESPACE_RULE","sentence":"^\\QCanva Pro 11th 50pln Medium-High\nDomestika 29th 50pln Low\nAdobe Photoshop 9th €9.90 High\nGoogle Workspace 1st €13.80 High\nOneDrive 18th 29,99pln Medium-High\nTotal 232.70pln\\E$"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qzshrc file :\\E$"}
+{"rule":"DOUBLE_PUNCTUATION","sentence":"^\\QExample of the color list(<../assets/Pastel-CLI\\ Color\\ Tool/image.png>)\\E$"}

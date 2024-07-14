@@ -1,1 +1,6 @@
 asd
+Kimagination
+nvim
+Domestika
+Fzf
+Neovim
