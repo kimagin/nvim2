@@ -31,6 +31,8 @@ vim.api.nvim_set_hl(0, "markdownHeadingDelimiter", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "TelescopeBorder", { fg = "#303446" })
 vim.api.nvim_set_hl(0, "TelescopeTitle", { fg = "#737994" })
 
+vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#303446" })
+vim.api.nvim_set_hl(0, "FloatTitle", { fg = "#303446" })
 vim.api.nvim_set_hl(0, "MiniDepsTitleSame", { fg = "#A88BFA", bg = "#211a33" })
 vim.api.nvim_set_hl(0, "@markup.list.checked", { bold = true, fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "@markup.list.unchecked", { bold = true, fg = "#A88BFA" })
