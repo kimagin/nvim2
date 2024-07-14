@@ -4,3 +4,6 @@ nvim
 Domestika
 Fzf
 Neovim
+Deno
+Klack
+Folke
