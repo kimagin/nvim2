@@ -7,8 +7,6 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 vim.cmd("autocmd BufNewFile,BufRead *.astro set filetype=astro")
-vim.cmd("nnoremap q <Nop>")
-vim.cmd("nnoremap qq <Nop>")
 vim.opt.laststatus = 3
 vim.opt.splitkeep = "screen"
 
