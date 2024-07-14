@@ -46,3 +46,33 @@ vim.keymap.set("n", "<C-a>", "ggVG", { desc = "Select All" })
 vim.keymap.set("n", "<leader>qq", "<cmd>w | bdelete<CR>", { desc = "Save and close buffer" })
 
 vim.keymap.set("n", "<leader>ww", "<cmd>w<CR>", { desc = "Save current buffer" })
+
+--Floating terminal
+
+local lazyterm = function()
+  LazyVim.terminal(nil, {
+    cwd = LazyVim.root(),
+    border = "single",
+    highlights = { border = "TelescopeBorder" },
+    title = "-|   Terminal   |-",
+    title_pos = "center",
+    style = "minimal",
+    size = { height = 25 },
+  })
+end
+
+vim.keymap.set("n", "<leader>ft", lazyterm, { desc = "Terminal (Root Dir)" })
+vim.keymap.set("n", "<leader>fT", function()
+  LazyVim.terminal()
+end, { desc = "Terminal (cwd)" })
+vim.keymap.set("n", "<c-\\>", lazyterm, { desc = "Terminal (Root Dir)" })
+vim.keymap.set("n", "<c-_>", lazyterm, { desc = "which_key_ignore" })
+
+-- Terminal Mappings
+vim.keymap.set("t", "<esc><esc>", "<c-\\><c-n>", { desc = "Enter Normal Mode" })
+vim.keymap.set("t", "<C-h>", "<cmd>wincmd h<cr>", { desc = "Go to Left Window" })
+vim.keymap.set("t", "<C-j>", "<cmd>wincmd j<cr>", { desc = "Go to Lower Window" })
+vim.keymap.set("t", "<C-k>", "<cmd>wincmd k<cr>", { desc = "Go to Upper Window" })
+vim.keymap.set("t", "<C-l>", "<cmd>wincmd l<cr>", { desc = "Go to Right Window" })
+vim.keymap.set("t", "<C-\\>", "<cmd>close<cr>", { desc = "Hide Terminal" })
+vim.keymap.set("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
