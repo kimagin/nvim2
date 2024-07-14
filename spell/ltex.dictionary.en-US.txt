@@ -7,3 +7,9 @@ Neovim
 Deno
 Klack
 Folke
+Lazyvim
+LazyVim
+Lualine
+fswatch
+LazyGit
+obsidian-nvim

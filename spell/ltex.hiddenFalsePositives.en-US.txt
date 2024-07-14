@@ -3,3 +3,9 @@
 {"rule":"WHITESPACE_RULE","sentence":"^\\QCanva Pro 11th 50pln Medium-High\nDomestika 29th 50pln Low\nAdobe Photoshop 9th €9.90 High\nGoogle Workspace 1st €13.80 High\nOneDrive 18th 29,99pln Medium-High\nTotal 232.70pln\\E$"}
 {"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qzshrc file :\\E$"}
 {"rule":"DOUBLE_PUNCTUATION","sentence":"^\\QExample of the color list(<../assets/Pastel-CLI\\ Color\\ Tool/image.png>)\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Q7/ Inspired by @thisguy's excellent video on obsidian-nvim, I opted to streamline my Lualine configuration.\\E$"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qgg opens LazyGit in the current repo, while Git signs provide beautiful, minimalistic visual cues.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QA quick fg allows me to jump between projects, streamlining my development process.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QYou have two efficient options: • oq: Search notes by title • os: Grep search for keywords across all notes This dual approach ensures rapid information retrieval.\\E$"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qoq: Search notes by title\nos: Grep search for keywords across all notes This dual approach ensures rapid information retrieval.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Qoq: Search notes by title\nos: Grep search for keywords across all notes This dual approach ensures rapid information retrieval.\\E$"}
