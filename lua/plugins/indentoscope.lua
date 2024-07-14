@@ -7,7 +7,7 @@ return {
     symbol = "│", -- You can change this to any symbol you prefer
 
     draw = {
-      delay = 100,
+      delay = 0,
     },
     options = {
       try_as_border = true,
