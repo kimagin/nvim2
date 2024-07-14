@@ -1,6 +1,7 @@
 -- Keymaps are automatically loaded on the VeryLazy event
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
+---@diagnostic disable: undefined-global
 
 local function cycle_buffers(direction)
   local bufs = vim.tbl_filter(function(buf)
@@ -33,6 +34,7 @@ local function cycle_buffers(direction)
   vim.api.nvim_set_current_buf(bufs[idx])
 end
 
+-- Window action Keymaps
 vim.keymap.set("n", "<leader>bn", function()
   cycle_buffers("next")
 end, { desc = "Next buffer" })
@@ -42,10 +44,11 @@ vim.keymap.set("n", "<leader>bb", function()
 end, { desc = "Previous buffer" })
 
 vim.keymap.set("n", "<C-a>", "ggVG", { desc = "Select All" })
-
 vim.keymap.set("n", "<leader>qq", "<cmd>w | bdelete<CR>", { desc = "Save and close buffer" })
-
 vim.keymap.set("n", "<leader>ww", "<cmd>w<CR>", { desc = "Save current buffer" })
+
+-- Restore q for macro recording
+vim.keymap.set("n", "q", "q", { noremap = true, desc = "Record macro" })
 
 --Floating terminal
 
