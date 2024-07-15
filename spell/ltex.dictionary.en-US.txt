@@ -14,3 +14,15 @@ fswatch
 LazyGit
 obsidian-nvim
 Rynek
+Defunkify
+Kortina
+emeraldwalk
+intellisense
+Wikilinks
+Yu
+Takumi
+CHMOD
+Ishii
+Leistner
+json
+FileUtils
