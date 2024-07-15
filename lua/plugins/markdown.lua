@@ -44,8 +44,8 @@ return {
         },
       },
       formatters_by_ft = {
-        ["markdown"] = { "deno_fmt" },
-        ["markdown_inline"] = { "deno_fmt" },
+        ["markdown"] = { "deno_fmt", "prettierd", "prettier" },
+        ["markdown_inline"] = { "deno_fmt", "prettierd", "prettier" },
       },
     },
   },
