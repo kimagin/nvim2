@@ -20,7 +20,7 @@ return {
         theme = "auto",
         globalstatus = true,
         disabled_filetypes = { statusline = { "dashboard", "alpha" } },
-        component_separators = "",
+        component_separators = " ",
         section_separators = "",
         refresh = {
           statusline = 200,
@@ -42,10 +42,11 @@ return {
               unnamed = "Untitled Note", -- Text to show for unnamed buffers.
               newfile = "^", -- Text to show for newly created file before first write
             },
-            padding = { left = 0, right = 1 },
+            padding = { left = 0, right = 0 },
           },
-          "branch",
-          "diff",
+          { "branch", padding = { left = 1, right = 0 } },
+          "component_separators",
+          { "diff", padding = { left = 1, right = 0 } },
           -- Add the macro recording function here
           {
             macro_recording,
@@ -55,7 +56,7 @@ return {
         lualine_c = {
           {
             "mode",
-            padding = { left = 0, right = 1 },
+            padding = { left = 0, right = 0 },
           },
           {
             "diagnostics",
