@@ -89,3 +89,20 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.schedule(setup_markdown_concealing)
   end,
 })
+
+-- Disabling line numbers in markdown
+-- In your LazyVim config folder, create or edit the file: ~/.config/nvim/lua/config/autocmds.lua
+
+local function augroup(name)
+  return vim.api.nvim_create_augroup("lazyvim_" .. name, { clear = true })
+end
+
+-- Disable line numbers for specific filetypes
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup("disable_line_numbers"),
+  pattern = { "markdown", "text" },
+  callback = function()
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+  end,
+})
