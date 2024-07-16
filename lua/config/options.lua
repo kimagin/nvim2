@@ -3,11 +3,8 @@
 -- Add any additional options here
 
 vim.o.pumblend = 0
-
 vim.opt.shortmess:append("I")
-
 vim.opt.showtabline = 0 -- Hide tabs
-
 vim.opt.wrap = true
 
 --- Instant appearance of Which key
@@ -34,3 +31,6 @@ vim.opt.fillchars = { eob = "~" } --disable the ~
 
 vim.opt.undofile = true
 vim.opt.undodir = vim.fn.expand("~/.vim/undodir")
+
+-- vim.opt.number = false
+-- vim.opt.relativenumber = false
