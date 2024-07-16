@@ -89,9 +89,3 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.schedule(setup_markdown_concealing)
   end,
 })
-
-vim.api.nvim_create_autocmd("FocusLost", {
-  callback = function()
-    vim.cmd("silent! wall")
-  end,
-})
