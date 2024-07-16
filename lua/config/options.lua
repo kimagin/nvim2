@@ -31,3 +31,8 @@ if vim.fn.has("wsl") == 1 then
 end
 
 vim.opt.fillchars = { eob = "~" } --disable the ~
+
+vim.opt.undofile = true
+vim.opt.undodir = vim.fn.expand("~/.vim/undodir")
+
+--test
