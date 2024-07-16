@@ -43,13 +43,10 @@ vim.keymap.set("n", "<leader>bb", function()
   cycle_buffers("prev")
 end, { desc = "Previous buffer" })
 
-vim.keymap.set("n", "<C-a>", "ggVG", { desc = "Select All" })
-vim.keymap.set("n", "<leader>qq", "<cmd>w | bdelete<CR>", { desc = "Save and close buffer" })
+vim.keymap.set("n", "<leader>qq", "<cmd>wa | bdelete<CR>", { desc = "Save and close buffer" })
 vim.keymap.set("n", "<leader>ww", "<cmd>w<CR>", { desc = "Save current buffer" })
 
 vim.keymap.set("n", "Y", "y$", { desc = "Yank to end of line" })
--- Restore q for macro recording
-vim.keymap.set("n", "q", "q", { noremap = true, desc = "Record macro" })
 
 --Floating terminal
 
