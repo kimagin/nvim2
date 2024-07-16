@@ -59,7 +59,7 @@ return {
         mappings = {
           i = {
             -- Create a new file in the same directory as the highlighted file
-            ["<C-n>"] = function(prompt_bufnr)
+            ["<C-a>"] = function(prompt_bufnr)
               local selection = action_state.get_selected_entry()
               if selection == nil then
                 print("No file selected")
