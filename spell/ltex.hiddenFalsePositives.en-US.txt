@@ -11,3 +11,4 @@
 {"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Qoq: Search notes by title\nos: Grep search for keywords across all notes This dual approach ensures rapid information retrieval.\\E$"}
 {"rule":"STARS_AND_STEPS","sentence":"^\\QFiverr Boilerplate\nReviews\n5.0 Star\n4.0 Star\n3.0 Star\\E$"}
 {"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QRun in Terminal This extension will let you assign a shortcut to a terminal command \"Kortina\"\nRun on Save This is for running a terminal command when you save a file emeraldwalk\nMarkdown Notes For intellisense in backlinks and Wikilinks Kortina\nFileUtils To take actions such as rename or delete notes from in side the editor without opening the explorer Steffen Leistner\nMarkdown All in One For enhance Markdown editing Yu Zhang\nMarkdown Table Formatting the tables \"Takumi Ishii\"\\E$"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qyamaha-remi-pss-e30.png\\E$"}
