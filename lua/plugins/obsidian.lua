@@ -228,7 +228,7 @@ return {
       if vim.fn.filereadable(file_path) == 0 then
         local file = io.open(file_path, "w")
         if file then
-          file:write("# " .. date .. "\n\n")
+          file:write("# " .. date .. "\n\n\n#### Today's Tasks\n\n- [ ] Task1\n- [ ] Task2\n\n--- ")
           file:close()
         end
       end
