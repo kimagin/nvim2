@@ -31,3 +31,8 @@ Eevee
 Rossman
 Karcher
 TODO
+Fitzcarraldo
+Kazimierz
+Astro
+npm
+JAMstack

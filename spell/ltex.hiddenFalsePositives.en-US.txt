@@ -23,3 +23,5 @@
 {"rule":"WHITESPACE_RULE","sentence":"^\\QNested   Name\\E$"}
 {"rule":"UNIT_SPACE","sentence":"^\\QCopyright (©) — ©\nRegistered trademark (®) — ®\nTrademark (™) — ™\nEuro (€) — €\nLeft arrow (←) — ←\nUp arrow (↑) — ↑\nRight arrow (→) — →\nDown arrow (↓) — ↓\nDegree (°) — °\nPi (π) — π\\E$"}
 {"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Q!DANGER DANGERRRRR!!!\\E$"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qman-catches-fishes-blowing-in-water.png\\E$"}
+{"rule":"POSSESSIVE_APOSTROPHE","sentence":"^\\QIslands Architecture: Astro uses an islands architecture, where JavaScript is only loaded for interactive components (islands) rather than the entire page.\\E$"}
