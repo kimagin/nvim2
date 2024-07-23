@@ -47,6 +47,28 @@ vim.api.nvim_set_hl(0, "yamlDocumentStart", { fg = "#A88BFA" })
 
 vim.api.nvim_set_hl(0, "yamlString", { fg = "#C6D0F6" })
 
+-- Code colors
+vim.api.nvim_set_hl(0, "@keyword", { fg = "#9CCFD7" })
+vim.api.nvim_set_hl(0, "@number", { fg = "#9CCFD7" })
+vim.api.nvim_set_hl(0, "@string.special.url", { fg = "#9CCFD7" })
+
+vim.api.nvim_set_hl(0, "@keyword.import", { fg = "#F8D2C9" })
+
+vim.api.nvim_set_hl(0, "@punctuation.bracket", { fg = "#94B8FF" })
+
+vim.api.nvim_set_hl(0, "variable", { fg = "#C6D0F6" })
+vim.api.nvim_set_hl(0, "@variable.builtin", { fg = "#C6D0F6" })
+vim.api.nvim_set_hl(0, "@variable", { fg = "#C6D0F6" })
+vim.api.nvim_set_hl(0, "@type", { fg = "#A88BFA" })
+vim.api.nvim_set_hl(0, "string", { fg = "#C6D0F6" })
+vim.api.nvim_set_hl(0, "punctuation.special", { fg = "#C6D0F6" })
+vim.api.nvim_set_hl(0, "@punctuation.special", { fg = "#C6D0F6" })
+vim.api.nvim_set_hl(0, "@tag", { fg = "#A88BFA" })
+vim.api.nvim_set_hl(0, "@operator", { fg = "#A88BFA" })
+vim.api.nvim_set_hl(0, "tag.delimiter", { fg = "#A88BFA" })
+vim.api.nvim_set_hl(0, "@tag.delimiter", { fg = "#A88BFA" })
+vim.api.nvim_set_hl(0, "@tag.attribute", { fg = "#CABEFF" })
+
 -- Adding strikethrough to the completed tasks
 vim.api.nvim_create_augroup("MarkdownTaskListDone", { clear = true })
 
