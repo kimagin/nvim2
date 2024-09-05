@@ -7,6 +7,9 @@ return {
     symbol = "│", -- You can change this to any symbol you prefer
 
     draw = {
+      animation = function()
+        return 0
+      end,
       delay = 0,
     },
     options = {
