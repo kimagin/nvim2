@@ -51,59 +51,59 @@ return {
       },
     },
   },
-  {
-    "barreiroleo/ltex_extra.nvim",
-    lazy = true,
-    event = {
-      "BufReadPre " .. vim.fn.expand("~") .. "*.md",
-      "BufNewFile " .. vim.fn.expand("~") .. "*.md",
-    },
-    ft = { "markdown", "tex" },
-    dependencies = { "neovim/nvim-lspconfig" },
-    config = function()
-      local ltex_extra = require("ltex_extra")
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
-
-      ltex_extra.setup({
-        load_langs = { "en-US" }, -- Add any other languages you need
-        init_check = true,
-        path = vim.fn.expand("~/.config/nvim/spell"), -- Centralized dictionary location
-        log_level = "none",
-        server_opts = {
-          capabilities = capabilities,
-
-          filetypes = { "markdown", "text" }, -- Limit filetypes
-          on_attach = function(client, bufnr)
-            -- Add any additional on_attach functions here
-            -- For example, you might want to set up keybindings:
-            -- vim.api.nvim_buf_set_keymap(
-            --   bufnr,
-            --   "n",
-            --   "<leader>la",
-            --   "<cmd>lua vim.lsp.buf.code_action()<CR>",
-            --   { noremap = true, silent = true }
-            -- )
-            --
-            client.server_capabilities.semanticTokensProvider = nil
-          end,
-          settings = {
-            ltex = {
-              enabled = { "markdown", "markdown_inline", "text" },
-              language = "en-US",
-              diagnosticSeverity = "error",
-              setenceCacheSize = 5000,
-              additionalRules = {
-                enablePickyRules = false,
-                motherTongue = "en-US",
-              },
-              trace = { server = "off" },
-              dictionary = {},
-              disabledRules = {},
-              hiddenFalsePositives = {},
-            },
-          },
-        },
-      })
-    end,
-  },
+  -- {
+  --   "barreiroleo/ltex_extra.nvim",
+  --   lazy = true,
+  --   event = {
+  --     "BufReadPre " .. vim.fn.expand("~") .. "*.md",
+  --     "BufNewFile " .. vim.fn.expand("~") .. "*.md",
+  --   },
+  --   ft = { "markdown", "tex" },
+  --   dependencies = { "neovim/nvim-lspconfig" },
+  --   config = function()
+  --     local ltex_extra = require("ltex_extra")
+  --     local capabilities = require("cmp_nvim_lsp").default_capabilities()
+  --
+  --     ltex_extra.setup({
+  --       load_langs = { "en-US" }, -- Add any other languages you need
+  --       init_check = true,
+  --       path = vim.fn.expand("~/.config/nvim/spell"), -- Centralized dictionary location
+  --       log_level = "none",
+  --       server_opts = {
+  --         capabilities = capabilities,
+  --
+  --         filetypes = { "markdown", "text" }, -- Limit filetypes
+  --         on_attach = function(client, bufnr)
+  --           -- Add any additional on_attach functions here
+  --           -- For example, you might want to set up keybindings:
+  --           -- vim.api.nvim_buf_set_keymap(
+  --           --   bufnr,
+  --           --   "n",
+  --           --   "<leader>la",
+  --           --   "<cmd>lua vim.lsp.buf.code_action()<CR>",
+  --           --   { noremap = true, silent = true }
+  --           -- )
+  --           --
+  --           client.server_capabilities.semanticTokensProvider = nil
+  --         end,
+  --         settings = {
+  --           ltex = {
+  --             enabled = { "markdown", "markdown_inline", "text" },
+  --             language = "en-US",
+  --             diagnosticSeverity = "error",
+  --             setenceCacheSize = 5000,
+  --             additionalRules = {
+  --               enablePickyRules = false,
+  --               motherTongue = "en-US",
+  --             },
+  --             trace = { server = "off" },
+  --             dictionary = {},
+  --             disabledRules = {},
+  --             hiddenFalsePositives = {},
+  --           },
+  --         },
+  --       },
+  --     })
+  --   end,
+  -- },
 }
