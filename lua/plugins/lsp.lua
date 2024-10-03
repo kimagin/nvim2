@@ -6,6 +6,11 @@ return {
         marksman = {},
         -- ltex = {},
       },
+
+      inlay_hints = {
+        enabled = false,
+      },
+
       setup = {
         marksman = function()
           require("lazyvim.util").lsp.on_attach(function(client, bufnr)
