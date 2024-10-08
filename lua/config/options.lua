@@ -39,5 +39,5 @@ vim.opt.undodir = vim.fn.expand("~/.vim/undodir")
 
 vim.opt.breakindent = true
 vim.opt.linebreak = true
-vim.opt.showbreak = "· "
+vim.opt.showbreak = "↪ "
 vim.opt.breakindentopt = "shift:2,min:40,sbr"

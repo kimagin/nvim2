@@ -3,8 +3,33 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
-        marksman = {},
+        marksman = {
+          filetypes = { "markdown, markdown_inline" },
+          root_dir = require("lspconfig").util.root_pattern(".git", "package.json"),
+        },
         -- ltex = {},
+        astro = {
+          root_dir = require("lspconfig").util.root_pattern("astro.config.mjs"),
+          on_attach = function(client, bufnr) end,
+          capabilities = require("cmp_nvim_lsp").default_capabilities(),
+          flags = {
+            debounce_text_changes = 150,
+          },
+        },
+        tsserver = {},
+        tailwindcss = {
+          "css",
+          "scss",
+          "less",
+          "postcss",
+          "html",
+          "javascript",
+          "typescript",
+          "javascriptreact",
+          "typescriptreact",
+          "vue",
+          "svelte",
+        },
       },
 
       inlay_hints = {

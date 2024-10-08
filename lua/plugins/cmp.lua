@@ -22,6 +22,23 @@ return {
         },
       }
 
+      -- opts.sources = cmp.config.sources({
+      --   { name = "nvim_lsp" },
+      --   -- { name = "vsnip" }, -- For vsnip users.
+      --   { name = "luasnip" }, -- For luasnip users.
+      --   -- { name = "ultisnips" }, -- For ultisnips users.
+      --   -- { name = "snippy" }, -- For snippy users.
+      -- }, {
+      --   { name = "buffer" },
+      -- })
+      --
+      -- -- Markdown specific setup (attach LSP to Markdown)
+      -- cmp.setup.filetype("markdown", {
+      --   sources = cmp.config.sources({
+      --     { name = "nvim_lsp" },
+      --     { name = "buffer" }, -- You can add other sources specific to markdown here
+      --   }),
+      -- })
       opts.mapping = vim.tbl_extend("force", opts.mapping, {
         ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
         ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
