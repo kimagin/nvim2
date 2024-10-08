@@ -128,3 +128,9 @@ vim.api.nvim_create_autocmd("FileType", {
 --     vim.opt_local.relativenumber = false
 --   end,
 -- })
+
+-- Make visual mode selection (V) more visible
+vim.api.nvim_set_hl(0, "Visual", { bg = "#a6aef8", fg = "#000000", reverse = false })
+
+-- Optional: Make selection in line highlight more subtle
+vim.api.nvim_set_hl(0, "CursorLine", { bg = "#1f1e21" })
