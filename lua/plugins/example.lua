@@ -13,12 +13,12 @@ return {
   -- { "ellisonleao/gruvbox.nvim" },
 
   -- Configure LazyVim to load gruvbox
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "catppuccin",
-    },
-  },
+  -- {
+  --   "LazyVim/LazyVim",
+  --   opts = {
+  --     colorscheme = "catppuccin",
+  --   },
+  -- },
 
 
 --  {
@@ -39,7 +39,7 @@ return {
   -- },
 
   -- disable trouble
-  { "folke/trouble.nvim", enabled = true },
+  -- { "folke/trouble.nvim", enabled = true },
 
   -- override nvim-cmp and add cmp-emoji
   -- {
@@ -123,7 +123,7 @@ return {
   -- },
   -- for typescript, LazyVim also includes extra specs to properly setup lspconfig,
   -- treesitter, mason and typescript.nvim. So instead of the above, you can use:
-  { import = "lazyvim.plugins.extras.lang.typescript" },
+  -- { import = "lazyvim.plugins.extras.lang.typescript" },
 
   -- add more treesitter parsers
   -- {
@@ -186,18 +186,18 @@ return {
   -- { import = "lazyvim.plugins.extras.ui.mini-starter" },
 
   -- add jsonls and schemastore packages, and setup treesitter for json, json5 and jsonc
-  { import = "lazyvim.plugins.extras.lang.json" },
+  -- { import = "lazyvim.plugins.extras.lang.json" },
 
   -- add any tools you want to have installed below
-  {
-    "williamboman/mason.nvim",
-    opts = {
-      ensure_installed = {
-        -- "stylua",
-        -- "shellcheck",
-        -- "shfmt",
-        -- "flake8",
-      },
-    },
-  },
+  -- {
+  --   "williamboman/mason.nvim",
+  --   opts = {
+  --     ensure_installed = {
+  --       -- "stylua",
+  --       -- "shellcheck",
+  --       -- "shfmt",
+  --       -- "flake8",
+  --     },
+  --   },
+  -- },
 }
