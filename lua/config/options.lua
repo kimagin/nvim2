@@ -29,15 +29,24 @@ if vim.fn.has("wsl") == 1 then
   }
 end
 
-vim.opt.fillchars = { eob = "·", fold = " " } --disable the ~
+-- Adding fold and eob char
+vim.opt.fillchars = { eob = "~" }
 
 vim.opt.undofile = true
 vim.opt.undodir = vim.fn.expand("~/.vim/undodir")
 
--- vim.opt.number = false
--- vim.opt.relativenumber = false
-
 vim.opt.breakindent = true
-vim.opt.linebreak = true
-vim.opt.showbreak = "↪ "
-vim.opt.breakindentopt = "shift:2,min:40,sbr"
+vim.opt.linebreak = false
+-- vim.opt.showbreak = "↳ "
+vim.opt.breakindentopt = "shift:0,min:40,sbr"
+
+-- Folds
+
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldlevel = 99
+vim.opt.foldtext =
+  [[substitute(getline(v:foldstart),'\\t',repeat('\ ',&tabstop),'g').'...'.trim(getline(v:foldend)) . ' / ' . (v:foldend - v:foldstart + 1) . ' lines ']]
+
+-- foldindicator
+vim.opt.fillchars = { foldopen = "", foldclose = "", fold = " ", foldsep = " " }

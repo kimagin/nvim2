@@ -134,6 +134,7 @@ vim.api.nvim_set_hl(0, "Visual", { bg = "#a6aef8", fg = "#000000", reverse = fal
 
 -- Optional: Make selection in line highlight more subtle
 vim.api.nvim_set_hl(0, "CursorLine", { bg = "#1f1e21" })
+vim.api.nvim_set_hl(0, "Folded", { fg = "#69579d" })
 
 -- Remove eob ~ from the neotree panel
 vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "none", fg = "#141317" })

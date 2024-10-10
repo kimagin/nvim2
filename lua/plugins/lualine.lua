@@ -71,7 +71,7 @@ return {
         lualine_y = {},
         lualine_z = { "searchcount" },
       },
-      extensions = { "neo-tree", "lazy" },
+      extensions = { "lazy" },
     }
   end,
 }

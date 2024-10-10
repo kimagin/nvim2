@@ -11,6 +11,7 @@ return {
         return 0
       end,
       delay = 0,
+      priority = 99,
     },
     options = {
       try_as_border = true,
