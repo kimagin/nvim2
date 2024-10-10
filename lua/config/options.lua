@@ -2,6 +2,8 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 
+vim.opt.winbar = " "
+
 vim.o.pumblend = 0
 vim.opt.shortmess:append("I")
 vim.opt.showtabline = 0 -- Hide tabs
@@ -50,3 +52,7 @@ vim.opt.foldtext =
 
 -- foldindicator
 vim.opt.fillchars = { foldopen = "", foldclose = "", fold = " ", foldsep = " " }
+
+-- Number column
+vim.opt.numberwidth = 4
+vim.opt.signcolumn = "yes:1"
