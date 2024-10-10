@@ -1,16 +1,5 @@
 return {
 
-  {
-    "williamboman/mason.nvim",
-    opts = { ensure_installed = {} },
-  },
-  -- lspconfig
-  {
-    "neovim/nvim-lspconfig",
-    opts = {
-      servers = {},
-    },
-  },
   -- MarkdownPreview
   {
     "iamcco/markdown-preview.nvim",
