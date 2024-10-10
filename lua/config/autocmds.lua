@@ -134,3 +134,24 @@ vim.api.nvim_set_hl(0, "Visual", { bg = "#a6aef8", fg = "#000000", reverse = fal
 
 -- Optional: Make selection in line highlight more subtle
 vim.api.nvim_set_hl(0, "CursorLine", { bg = "#1f1e21" })
+
+-- Remove eob ~ from the neotree panel
+vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "none", fg = "#141317" })
+
+-- Disable line numbers in Markdown files
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function()
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+  end,
+})
+
+-- Configure gitsigns to use a sign column in Markdown files
+-- even when line numbers are disabled
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function()
+    vim.opt_local.signcolumn = "yes:1"
+  end,
+})
