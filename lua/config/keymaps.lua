@@ -95,10 +95,10 @@ local function close_other_buffers()
 end
 
 --NOTE: Select all
-vim.keymap.set("n", "<leader>", "gg<S-v>G", { desc = "Select all" })
+vim.keymap.set("n", "<leader>a", "gg<S-v>G", { desc = "Select all" })
 
 -- Keymapping to close other buffers
-vim.keymap.set("n", "<leader>bo", close_other_buffers, { noremap = true, desc = "Close other buffers" })
+vim.keymap.set("n", "<leader>bo", close_other_buffers, { desc = "Close other buffers" })
 
 -- Optional: Add a command for closing other buffers
 vim.api.nvim_create_user_command("BufOnly", close_other_buffers, { desc = "Close all buffers except current" })
