@@ -3,10 +3,15 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
+        -- Disabeling eslint
+        eslint = false,
+
         marksman = {
           filetypes = { "markdown", "markdown_inline" },
           root_dir = require("lspconfig").util.root_pattern(".git", "package.json"),
         },
+
+        -- Guiding Astro to attach on bufnr
         astro = {
           root_dir = require("lspconfig").util.root_pattern("astro.config.mjs"),
           on_attach = function(client, bufnr) end,
@@ -14,9 +19,24 @@ return {
           flags = {
             debounce_text_changes = 150,
           },
+          filetypes = {
+            "astro",
+          },
         },
-        tsserver = {},
+
         tailwindcss = {
+          on_attach = function(client, bufnr) end,
+          capabilities = require("cmp_nvim_lsp").default_capabilities(),
+          root_dir = require("lspconfig").util.root_pattern(
+            "tailwind.config.js",
+            "tailwind.config.cjs",
+            "postcss.config.js",
+            "postcss.config.cjs",
+            "package.json"
+          ),
+          flags = {
+            debounce_text_changes = 150,
+          },
           filetypes = {
             "css",
             "scss",
@@ -56,6 +76,15 @@ return {
           },
         },
         virtual_text = false,
+        float = {
+          focusable = true,
+          style = "minimal",
+          border = "rounded",
+          source = "always",
+          header = "",
+          prefix = "",
+        },
+        virtual_lines = { only_active_buffers = true },
         update_in_insert = false,
         underline = true,
         severity_sort = true,
