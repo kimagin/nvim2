@@ -48,6 +48,8 @@ return {
           "Movies",
         },
         sorting_strategy = "descending",
+        color_devicons = true,
+        debounce = 50,
         winblend = 0,
         border = true,
         borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
