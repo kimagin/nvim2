@@ -25,24 +25,34 @@ return {
           winhighlight = "Normal:Normal,FloatBorder:TelescopeBorder,CursorLine:@comment.todo,Search:Pmenu",
         },
       }
+      -- Intelligent Tab function
+      local has_words_before = function()
+        if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then
+          return false
+        end
+        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+        return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match("^%s*$") == nil
+      end
 
       opts.mapping = vim.tbl_extend("force", opts.mapping, {
         ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
         ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+
         ["<Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_next_item()
-          elseif luasnip.expand_or_jumpable() then
-            luasnip.expand_or_jump()
+          elseif vim.fn["codeium#Accept"] ~= nil and vim.fn["codeium#Accept"]() ~= "" then
+            vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<C-g>", true, true, true), "")
+          elseif has_words_before() then
+            cmp.complete()
           else
             fallback()
           end
         end, { "i", "s" }),
+
         ["<S-Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_prev_item()
-          elseif luasnip.jumpable(-1) then
-            luasnip.jump(-1)
           else
             fallback()
           end
@@ -51,10 +61,11 @@ return {
       })
 
       opts.sources = cmp.config.sources({
-        { name = "nvim_lsp" },
-        { name = "luasnip" },
-        { name = "buffer" },
-        { name = "path" },
+        { name = "codeium", priority = 1200 },
+        { name = "nvim_lsp", priority = 1400 },
+        { name = "luasnip", priority = 800 },
+        { name = "buffer", priority = 0 },
+        { name = "path", priority = 1200 },
       })
 
       -- Markdown specific setup
@@ -62,6 +73,7 @@ return {
         sources = cmp.config.sources({
           { name = "nvim_lsp" },
           { name = "luasnip" },
+          { name = "codeium" },
           { name = "buffer" },
           { name = "path" },
         }),
