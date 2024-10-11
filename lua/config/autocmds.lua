@@ -11,6 +11,34 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+-- Asynchronous Git sync when opening any file in the Obsidian directory
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = vim.fn.expand("$HOME") .. "/Developments/obsidian/*",
+  callback = function()
+    local bufnr = vim.api.nvim_get_current_buf()
+    vim.fn.jobstart(
+      { "zsh", "-c", "cd $HOME/Developments/obsidian && git fetch origin notes && git pull origin notes" },
+      {
+        on_exit = function(_, exit_code)
+          if exit_code == 0 then
+            vim.notify("Obsidian sync completed successfully", vim.log.levels.INFO)
+            -- Reload the buffer
+            vim.schedule(function()
+              if vim.api.nvim_buf_is_valid(bufnr) then
+                vim.api.nvim_buf_call(bufnr, function()
+                  vim.cmd("checktime")
+                end)
+              end
+            end)
+          else
+            vim.notify("Obsidian sync failed", vim.log.levels.ERROR)
+          end
+        end,
+      }
+    )
+  end,
+})
+
 -- Modify the autocomplete menu colors
 vim.api.nvim_set_hl(0, "Pmenu", { bg = "#121317", fg = "#7B7D85" })
 vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#121317", fg = "#A88BFA" })
