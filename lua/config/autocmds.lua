@@ -145,14 +145,7 @@ vim.api.nvim_create_autocmd("FileType", {
   callback = function()
     vim.opt_local.number = false
     vim.opt_local.relativenumber = false
-  end,
-})
-
--- Configure gitsigns to use a sign column in Markdown files
--- even when line numbers are disabled
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "markdown",
-  callback = function()
+    vim.api.nvim_set_hl(0, "LineNr", { fg = "#1f1e21" })
     vim.opt_local.signcolumn = "yes:1"
   end,
 })
