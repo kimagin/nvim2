@@ -39,6 +39,34 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
   end,
 })
 
+-- Periodically check for changes and reload buffer
+vim.api.nvim_create_autocmd("CursorHold", {
+  pattern = vim.fn.expand("$HOME") .. "/Developments/obsidian/*",
+  callback = function()
+    local bufnr = vim.api.nvim_get_current_buf()
+    vim.fn.jobstart({
+      "zsh",
+      "-c",
+      "cd $HOME/Developments/obsidian && git fetch origin notes && git pull --rebase origin notes && git push origin notes",
+    }, {
+      on_exit = function(_, exit_code)
+        if exit_code == 0 then
+          -- Reload the buffer silently
+          vim.schedule(function()
+            if vim.api.nvim_buf_is_valid(bufnr) then
+              vim.api.nvim_buf_call(bufnr, function()
+                vim.cmd("checktime")
+              end)
+            end
+          end)
+        end
+      end,
+    })
+  end,
+})
+
+vim.o.updatetime = 300
+
 -- Modify the autocomplete menu colors
 vim.api.nvim_set_hl(0, "Pmenu", { bg = "#121317", fg = "#7B7D85" })
 vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#121317", fg = "#A88BFA" })
