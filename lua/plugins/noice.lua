@@ -10,6 +10,13 @@ return {
       command_palette = true, -- position the cmdline and popupmenu together
       lsp_doc_border = true, -- add a border to hover docs and signature help
     },
+
+    -- Change the default CMDline Icon
+    cmdline = {
+      format = {
+        cmdline = { icon = " " },
+      },
+    },
     lsp = {
       override = {
         -- override the default lsp markdown formatter with Noice
