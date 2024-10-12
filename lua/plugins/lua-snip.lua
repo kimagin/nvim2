@@ -7,7 +7,19 @@ return {
     config = function()
       require("luasnip.loaders.from_vscode").lazy_load()
       -- load custom snippets in markdown.lua file
-      require("luasnip.loaders.from_lua").lazy_load({ paths = { "~/.config/nvim/snippets" } })
+      require("luasnip.loaders.from_lua").load({ paths = { "~/.config/nvim/snippets" } })
+      -- Extend filetypes for LuaSnip
+      local ls = require("luasnip")
+      local filetype_ext = {
+        markdown = "lua",
+        html = "webdev",
+        astro = "webdev",
+        javascript = "webdev",
+        typescript = "webdev",
+      }
+      for ft, ext in pairs(filetype_ext) do
+        ls.filetype_extend(ft, { ext })
+      end
     end,
     opts = {
       history = true,

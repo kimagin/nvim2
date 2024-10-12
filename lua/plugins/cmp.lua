@@ -2,23 +2,23 @@ return {
   {
     "hrsh7th/nvim-cmp",
     dependencies = {
+      -- Ensure LuaSnip and related sources are properly loaded
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
-      "saadparwaiz1/cmp_luasnip",
-      "L3MON4D3/LuaSnip",
+      "saadparwaiz1/cmp_luasnip", -- For LuaSnip completion
     },
     opts = function(_, opts)
       local cmp = require("cmp")
+      local ls = require("luasnip")
 
-      local luasnip = require("luasnip")
-      require("luasnip.loaders.from_lua").lazy_load({ paths = "~/.config/nvim/lua/snippets" })
-      luasnip.config.setup({
-        load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft({
-          markdown = { "lua" },
-        }),
-      })
+      -- Intelligent Tab function
+      local has_words_before = function()
+        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+        return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match("^%s*$") == nil
+      end
 
+      -- Setup custom window options
       opts.window = {
         completion = {
           border = "single",
@@ -30,15 +30,8 @@ return {
           winhighlight = "Normal:Normal,FloatBorder:TelescopeBorder,CursorLine:@comment.todo,Search:Pmenu",
         },
       }
-      -- Intelligent Tab function
-      local has_words_before = function()
-        if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then
-          return false
-        end
-        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-        return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match("^%s*$") == nil
-      end
 
+      -- Mapping setup
       opts.mapping = vim.tbl_extend("force", opts.mapping, {
         ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
         ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
@@ -62,32 +55,36 @@ return {
             fallback()
           end
         end, { "i", "s" }),
+
         ["<CR>"] = cmp.mapping.confirm({ select = true }),
       })
+
+      -- Snippet expansion
       cmp.setup.snippet = {
         expand = function(args)
-          luasnip.lsp_expand(args.body)
+          ls.lsp_expand(args.body)
         end,
       }
 
-      opts.sources = cmp.config.sources({
+      -- Define default sources
+      local sources = {
+        { name = "luasnip", priority = 1500 },
         { name = "codeium", priority = 1200 },
         { name = "nvim_lsp", priority = 1400 },
-        { name = "luasnip", priority = 800 },
-        { name = "buffer", priority = 0 },
-        { name = "path", priority = 1200 },
-      })
+        { name = "buffer", priority = 1000 },
+        { name = "path", priority = 800 },
+      }
 
-      -- Markdown specific setup
-      cmp.setup.filetype("markdown", {
-        sources = cmp.config.sources({
-          { name = "luasnip", priority = 1500 }, -- Prioritize LuaSnip for markdown
-          { name = "nvim_lsp", priority = 1400 },
-          { name = "codeium", priority = 1200 },
-          { name = "buffer", priority = 1000 },
-          { name = "path", priority = 800 },
-        }),
-      })
+      opts.sources = cmp.config.sources(sources)
+
+      -- Filetype-specific setups
+      local special_filetypes =
+        { "astro", "javascript", "typescript", "javascriptreact", "typescriptreact", "markdown" }
+      for _, ft in ipairs(special_filetypes) do
+        cmp.setup.filetype(ft, {
+          sources = cmp.config.sources(sources),
+        })
+      end
 
       return opts
     end,

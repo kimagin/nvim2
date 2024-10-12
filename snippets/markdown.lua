@@ -7,6 +7,7 @@ return {
   s("block: note", {
     t("> [!NOTE]"),
     t({ "", "> " }),
+    t({ "", "> " }),
     i(1),
   }, {
     description = "Insert a note block",
@@ -14,6 +15,7 @@ return {
 
   s("block: tip", {
     t("> [!TIP]"),
+    t({ "", "> " }),
     t({ "", "> " }),
     i(1),
   }, {
@@ -23,6 +25,7 @@ return {
   s("block: important", {
     t("> [!IMPORTANT]"),
     t({ "", "> " }),
+    t({ "", "> " }),
     i(1),
   }, {
     description = "Insert an important block",
@@ -30,6 +33,7 @@ return {
 
   s("block: warning", {
     t("> [!WARNING]"),
+    t({ "", "> " }),
     t({ "", "> " }),
     i(1),
   }, {
@@ -39,6 +43,7 @@ return {
   s("block: caution", {
     t("> [!CAUTION]"),
     t({ "", "> " }),
+    t({ "", "> " }),
     i(1),
   }, {
     description = "Insert a caution block",
@@ -46,6 +51,7 @@ return {
 
   s("block: abstract", {
     t("> [!ABSTRACT]"),
+    t({ "", "> " }),
     t({ "", "> " }),
     i(1),
   }, {
@@ -55,6 +61,7 @@ return {
   s("block: todo", {
     t("> [!TODO]"),
     t({ "", "> " }),
+    t({ "", "> " }),
     i(1),
   }, {
     description = "Insert a todo block",
@@ -62,6 +69,7 @@ return {
 
   s("block: success", {
     t("> [!SUCCESS]"),
+    t({ "", "> " }),
     t({ "", "> " }),
     i(1),
   }, {
@@ -71,6 +79,7 @@ return {
   s("block: question", {
     t("> [!QUESTION]"),
     t({ "", "> " }),
+    t({ "", "> " }),
     i(1),
   }, {
     description = "Insert a question block",
@@ -78,6 +87,7 @@ return {
 
   s("block: failure", {
     t("> [!FAILURE]"),
+    t({ "", "> " }),
     t({ "", "> " }),
     i(1),
   }, {
@@ -87,6 +97,7 @@ return {
   s("block: danger", {
     t("> [!DANGER]"),
     t({ "", "> " }),
+    t({ "", "> " }),
     i(1),
   }, {
     description = "Insert a danger block",
@@ -94,6 +105,7 @@ return {
 
   s("block: bug", {
     t("> [!BUG]"),
+    t({ "", "> " }),
     t({ "", "> " }),
     i(1),
   }, {
@@ -103,6 +115,7 @@ return {
   s("block: example", {
     t("> [!EXAMPLE]"),
     t({ "", "> " }),
+    t({ "", "> " }),
     i(1),
   }, {
     description = "Insert an example block",
@@ -111,9 +124,33 @@ return {
   s("block: quote", {
     t("> [!QUOTE]"),
     t({ "", "> " }),
+    t({ "", "> " }),
     i(1),
   }, {
     description = "Insert a quote block",
   }),
+  s("block: info", {
+    t("> [!INFO]"),
+    t({ "", "> " }),
+    t({ "", "> " }),
+    i(1),
+  }, {
+    description = "Insert an information block",
+  }),
+
+  s("fire", {
+    t("🔥 "),
+    i(1),
+  }, {
+    description = "fire",
+  }),
+
+  s("confetti", {
+    t("🎉 "),
+    i(1),
+  }, {
+    description = "confetti",
+  }),
+
   -- Add more snippets here in the same format
 }
