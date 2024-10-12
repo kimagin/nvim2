@@ -1,97 +1,27 @@
 {
-  "important": {
-    "prefix": "quote: important",
-    "body": ["> 🔥 Important", "> $1"],
-    "description": "Markdown Blockquote Important"
-  },
-  "warning": {
-    "prefix": "quote: warning",
-    "body": ["> 🔶 Warning", "> $1"],
-    "description": "Markdown Blockquote Warning"
-  },
-  "note": {
-    "prefix": "quote: note",
-    "body": ["> ✨ Note", "> $1"],
-    "description": "Markdown Blockquote Note"
-  },
-  "success": {
-    "prefix": "quote: success",
-    "body": ["> 🎉 Success", "> $1"],
-    "description": "Markdown Blockquote Success"
-  },
-  "prohibited": {
-    "prefix": "quote: prohibited",
-    "body": ["> ⛔ Never do this", "> $1"],
-    "description": "Markdown Blockquote Prohibited"
-  },
-  "bl-note": {
-    "prefix": "block: note",
-    "body": ["> [!NOTE]", "> $1"],
-    "description": "Insert a note block"
-  },
-  "tip": {
-    "prefix": "block: tip",
-    "body": ["> [!TIP]", "> $1"],
-    "description": "Insert a tip block"
-  },
-  "bl-important": {
-    "prefix": "block: important",
-    "body": ["> [!IMPORTANT]", "> $1"],
-    "description": "Insert an important block"
-  },
-  "bl-warning": {
-    "prefix": "block: warning",
-    "body": ["> [!WARNING]", "> $1"],
-    "description": "Insert a warning block"
-  },
-  "caution": {
-    "prefix": "block: caution",
-    "body": ["> [!CAUTION]", "> $1"],
-    "description": "Insert a caution block"
-  },
-  "abstract": {
-    "prefix": "block: abstract",
-    "body": ["> [!ABSTRACT]", "> $1"],
-    "description": "Insert an abstract block"
-  },
-  "todo": {
-    "prefix": "block: todo",
-    "body": ["> [!TODO]", "> $1"],
-    "description": "Insert a todo block"
-  },
-  "bl-success": {
-    "prefix": "block: success",
-    "body": ["> [!SUCCESS]", "> $1"],
-    "description": "Insert a success block"
-  },
-  "question": {
-    "prefix": "block: question",
-    "body": ["> [!QUESTION]", "> $1"],
-    "description": "Insert a question block"
-  },
-  "failure": {
-    "prefix": "block: failure",
-    "body": ["> [!FAILURE]", "> $1"],
-    "description": "Insert a failure block"
-  },
-  "danger": {
-    "prefix": "block: danger",
-    "body": ["> [!DANGER]", "> $1"],
-    "description": "Insert a danger block"
-  },
-  "bug": {
-    "prefix": "block: bug",
-    "body": ["> [!BUG]", "> $1"],
-    "description": "Insert a bug block"
-  },
-  "example": {
-    "prefix": "block: example",
-    "body": ["> [!EXAMPLE]", "> $1"],
-    "description": "Insert an example block"
-  },
-  "quote": {
-    "prefix": "block: quote",
-    "body": ["> [!QUOTE]", "> $1"],
-    "description": "Insert a quote block"
-  }
+    "important": {
+        "prefix": "quote: important",
+        "body": ["> 🔥 Important", "> $1"],
+        "description": "Markdown Blockquote Important"
+    },
+    "warning": {
+        "prefix": "quote: warning",
+        "body": ["> 🔶 Warning", "> $1"],
+        "description": "Markdown Blockquote Warning"
+    },
+    "note": {
+        "prefix": "quote: note",
+        "body": ["> ✨ Note", "> $1"],
+        "description": "Markdown Blockquote Note"
+    },
+    "success": {
+        "prefix": "quote: success",
+        "body": ["> 🎉 Success", "> $1"],
+        "description": "Markdown Blockquote Success"
+    },
+    "prohibited": {
+        "prefix": "quote: prohibited",
+        "body": ["> ⛔ Never do this", "> $1"],
+        "description": "Markdown Blockquote Prohibited"
+    }
 }

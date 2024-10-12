@@ -2,18 +2,23 @@ return {
   {
     "hrsh7th/nvim-cmp",
     dependencies = {
-      "L3MON4D3/LuaSnip",
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
       "saadparwaiz1/cmp_luasnip",
+      "L3MON4D3/LuaSnip",
     },
     opts = function(_, opts)
       local cmp = require("cmp")
-      local luasnip = require("luasnip")
 
-      opts.snippet = {
-        expand = function(args)
-          luasnip.lsp_expand(args.body)
-        end,
-      }
+      local luasnip = require("luasnip")
+      require("luasnip.loaders.from_lua").lazy_load({ paths = "~/.config/nvim/lua/snippets" })
+      luasnip.config.setup({
+        load_ft_func = require("luasnip.extras.filetype_functions").extend_load_ft({
+          markdown = { "lua" },
+        }),
+      })
+
       opts.window = {
         completion = {
           border = "single",
@@ -59,6 +64,11 @@ return {
         end, { "i", "s" }),
         ["<CR>"] = cmp.mapping.confirm({ select = true }),
       })
+      cmp.setup.snippet = {
+        expand = function(args)
+          luasnip.lsp_expand(args.body)
+        end,
+      }
 
       opts.sources = cmp.config.sources({
         { name = "codeium", priority = 1200 },
@@ -71,11 +81,11 @@ return {
       -- Markdown specific setup
       cmp.setup.filetype("markdown", {
         sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "luasnip" },
-          { name = "codeium" },
-          { name = "buffer" },
-          { name = "path" },
+          { name = "luasnip", priority = 1500 }, -- Prioritize LuaSnip for markdown
+          { name = "nvim_lsp", priority = 1400 },
+          { name = "codeium", priority = 1200 },
+          { name = "buffer", priority = 1000 },
+          { name = "path", priority = 800 },
         }),
       })
 
