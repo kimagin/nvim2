@@ -65,7 +65,7 @@ vim.api.nvim_create_autocmd("CursorHold", {
   end,
 })
 
-vim.o.updatetime = 300
+vim.o.updatetime = 5000
 
 -- Modify the autocomplete menu colors
 vim.api.nvim_set_hl(0, "Pmenu", { bg = "#121317", fg = "#7B7D85" })
@@ -186,7 +186,7 @@ vim.api.nvim_create_autocmd("FileType", {
 -- })
 
 -- Make visual mode selection (V) more visible
-vim.api.nvim_set_hl(0, "Visual", { bg = "#a6aef8", fg = "#000000", reverse = false })
+vim.api.nvim_set_hl(0, "Visual", { bg = "#31294c", reverse = false })
 
 -- Optional: Make selection in line highlight more subtle
 vim.api.nvim_set_hl(0, "CursorLine", { bg = "#1f1e21" })

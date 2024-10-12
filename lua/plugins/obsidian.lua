@@ -62,6 +62,10 @@ return {
 
         -- You can also add more custom ones...
       },
+
+      external_link_icon = { char = "", hl_group = "ObsidianBullet" },
+
+      bullets = { char = "•", hl_group = "ObsidianBullet" },
     },
 
     block_ids = { hl_group = "ObsidianBlockID" },
@@ -72,7 +76,7 @@ return {
       },
     },
     completion = {
-      nvim_cmp = false,
+      nvim_cmp = true,
       min_chars = 1,
     },
     new_notes_location = "in",

@@ -30,7 +30,6 @@ return {
           winhighlight = "Normal:Normal,FloatBorder:TelescopeBorder,CursorLine:@comment.todo,Search:Pmenu",
         },
       }
-
       -- Mapping setup
       opts.mapping = vim.tbl_extend("force", opts.mapping, {
         ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
@@ -59,22 +58,14 @@ return {
         ["<CR>"] = cmp.mapping.confirm({ select = true }),
       })
 
-      -- Snippet expansion
-      cmp.setup.snippet = {
-        expand = function(args)
-          ls.lsp_expand(args.body)
-        end,
-      }
-
       -- Define default sources
       local sources = {
-        { name = "luasnip", priority = 1500 },
-        { name = "codeium", priority = 1200 },
-        { name = "nvim_lsp", priority = 1400 },
+        { name = "luasnip", priority = 1400 },
+        -- { name = "codeium", priority = 1200 },
+        { name = "nvim_lsp", priority = 1500 },
         { name = "buffer", priority = 1000 },
         { name = "path", priority = 800 },
       }
-
       opts.sources = cmp.config.sources(sources)
 
       -- Filetype-specific setups

@@ -5,52 +5,99 @@ local i = ls.insert_node
 
 return {
   -- Astro Page Template
-  s("page~", {
+  s("sec~", {
     t({
       "---",
-      "import SectionLayout from '../../layouts/SectionLayout.astro'",
+      "import SectionLayout from '../layouts/SectionLayout.astro'",
+      "",
+      "// Interface",
       "interface Props {",
-      "   ",
+      "  title?: string",
+      "  description?: string",
+      "  ",
+    }),
+    i(1, "propName"),
+    t(": "),
+    i(2, "propType"),
+    t({
+      "",
       "}",
       "",
-      "const { } = Astro.props",
-      'const title = "',
+      "// Props",
+      "const { title, description, ",
     }),
-    i(1, "Page Title"), -- Cursor lands here for title
+    i(3, "propName"),
+    t({
+      " } = Astro.props",
+      "",
+      "// Page Properties",
+      'const sectionTitle = title || "',
+    }),
+    i(4, "Page Title"),
     t({
       '"',
-      'const description = "Generic Page"',
+      'const sectionDescription = description || "',
+    }),
+    i(5, "Generic Page"),
+    t({
+      '"',
       "---",
       "",
-      "<SectionLayout>",
-      "    <h1>{",
+      "<SectionLayout ",
+      "  id={sectionTitle} ",
+      "  title={sectionTitle} ",
+      "  description={sectionDescription}",
+      ">",
+      "  <h1>{sectionTitle}</h1>",
     }),
-    i(2, "title"), -- Cursor lands inside <h1>{title}</h1> after title is set
-    t({ "}</h1>", "</SectionLayout>" }),
+    i(6, ""),
+    t({
+      "",
+      "</SectionLayout>",
+    }),
   }),
-
   -- Astro Component Template
-  s("component~", {
+  s("com~", {
     t({
       "---",
+      "// Component ",
+    }),
+    i(1, "Name"),
+    t({
+      "",
       "interface Props {",
-      "   ",
+      "  title: string",
+      "  ",
+    }),
+    i(2, "propName"),
+    t(": "),
+    i(3, "propType"),
+    t({
+      "",
       "}",
       "",
-      "const { } = Astro.props",
-      'const title = "',
+      "const { title, ",
     }),
-    i(1, "Component"), -- Cursor lands here for title
+    i(4, "propName"),
     t({
-      '"',
-      'const description = "Generic Component"',
+      " } = Astro.props",
+      "const description = ",
+    }),
+    t('"'),
+    i(5, "Generic Component Description"),
+    t('"'),
+    t({
+      "",
       "---",
       "",
-      "<div>",
-      "    <h1>{",
+      "<div id={title}>",
+      "  ",
     }),
-    i(2, "title"), -- Cursor lands inside <h1>{title}</h1> after title is set
-    t({ "}</h1>", "    <!-- component -->", "</div>" }),
+    i(6, ""),
+    t({
+      "",
+      "</div>",
+    }),
   }),
 
   -- Arrow Function

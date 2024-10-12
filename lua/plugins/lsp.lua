@@ -6,10 +6,10 @@ return {
         -- Disabeling eslint
         eslint = false,
 
-        marksman = {
-          filetypes = { "markdown", "markdown_inline" },
-          root_dir = require("lspconfig").util.root_pattern(".git", "package.json"),
-        },
+        -- marksman = {
+        --   filetypes = { "markdown", "markdown_inline" },
+        --   root_dir = require("lspconfig").util.root_pattern(".git", "package.json"),
+        -- },
 
         -- Guiding Astro to attach on bufnr
         astro = {
@@ -50,13 +50,13 @@ return {
         enabled = false,
       },
       setup = {
-        marksman = function()
-          require("lazyvim.util").lsp.on_attach(function(client, bufnr)
-            if client.name == "marksman" then
-              client.server_capabilities.documentFormattingProvider = false
-            end
-          end)
-        end,
+        -- marksman = function()
+        --   require("lazyvim.util").lsp.on_attach(function(client, bufnr)
+        --     if client.name == "marksman" then
+        --       client.server_capabilities.documentFormattingProvider = false
+        --     end
+        --   end)
+        -- end,
       },
       diagnostics = {
         signs = {

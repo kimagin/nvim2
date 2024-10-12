@@ -12,107 +12,24 @@ return {
       -- Any file larger than this will effectively be ignored
       max_file_size = 1.5,
       -- Capture groups that get pulled from markdown
-      markdown_query = [[
-        (atx_heading [
-            (atx_h1_marker)
-            (atx_h2_marker)
-            (atx_h3_marker)
-            (atx_h4_marker)
-            (atx_h5_marker)
-            (atx_h6_marker)
-        ] @heading)
 
-        (thematic_break) @dash
-
-        (fenced_code_block) @code
-        (fenced_code_block (info_string (language) @language))
-
-        [
-            (list_marker_plus)
-            (list_marker_minus)
-            (list_marker_star)
-        ] @list_marker
-
-        (task_list_marker_unchecked) @checkbox_unchecked
-        (task_list_marker_checked) @checkbox_checked
-
-        (block_quote) @quote
-
-        (pipe_table) @table
-    ]],
-      -- Capture groups that get pulled from quote nodes
-      markdown_quote_query = [[
-        [
-            (block_quote_marker)
-            (block_continuation)
-        ] @quote_marker
-    ]],
-      -- Capture groups that get pulled from inline markdown
-      inline_query = [[
-        (code_span) @code
-
-        (shortcut_link) @callout
-
-        [(inline_link) (image)] @link
-    ]],
-      -- Query to be able to identify links in nodes
-      inline_link_query = "[(inline_link) (image)] @link",
-      -- The level of logs to write to file: vim.fn.stdpath('state') .. '/render-markdown.log'
-      -- Only intended to be used for plugin development / debugging
       log_level = "error",
       -- Filetypes this plugin will run on
       file_types = { "markdown" },
       -- Vim modes that will show a rendered view of the markdown file
       -- All other modes will be uneffected by this plugin
       render_modes = { "n", "c" },
-      exclude = {
-        -- Buftypes ignored by this plugin, see :h 'buftype'
-        buftypes = {},
-      },
       latex = {
-        -- Whether LaTeX should be rendered, mainly used for health check
+        -- Turn on / off latex rendering
         enabled = false,
-        -- Executable used to convert latex formula to rendered unicode
-        converter = "latex2text",
-        -- Highlight for LaTeX blocks
-        highlight = "@markup.math",
       },
       heading = {
         -- Turn on / off heading icon & background rendering
         enabled = false,
-        -- Replaces '#+' of 'atx_h._marker'
-        -- The number of '#' in the heading determines the 'level'
-        -- The 'level' is used to index into the array using a cycle
-        -- The result is left padded with spaces to hide any additional '#'
-        icons = { "󰲡 ", "󰲣 ", "󰲥 ", "󰲧 ", "󰲩 ", "󰲫 " },
-        -- Added to the sign column
-        -- The 'level' is used to index into the array using a cycle
-        signs = { "󰫎 " },
-        -- The 'level' is used to index into the array using a clamp
-        -- Highlight for the heading icon and extends through the entire line
-        backgrounds = { "DiffAdd", "DiffChange", "DiffDelete" },
-        -- The 'level' is used to index into the array using a clamp
-        -- Highlight for the heading and sign icons
-        foregrounds = {
-          "@markup.heading.1.markdown",
-          "@markup.heading.2.markdown",
-          "@markup.heading.3.markdown",
-          "@markup.heading.4.markdown",
-          "@markup.heading.5.markdown",
-          "@markup.heading.6.markdown",
-        },
       },
       code = {
         -- Turn on / off code block & inline code rendering
         enabled = false,
-        -- Determines how code blocks & inline code are rendered:
-        --  none: disables all rendering
-        --  normal: adds highlight group to code blocks & inline code
-        --  language: adds language icon to sign column and icon + name above code blocks
-        --  full: normal + language
-        style = "language",
-        -- Highlight for code blocks & inline code
-        highlight = "Normal",
       },
       dash = {
         -- Turn on / off thematic break rendering
@@ -121,7 +38,7 @@ return {
         -- The icon gets repeated across the window's width
         icon = "─",
         -- Highlight for the whole line generated from the icon
-        highlight = "LineNr",
+        -- highlight = "RenderMarkdownDash",
       },
       bullet = {
         -- Turn on / off list bullet rendering
@@ -130,9 +47,9 @@ return {
         -- How deeply nested the list is determines the 'level'
         -- The 'level' is used to index into the array using a cycle
         -- If the item is a 'checkbox' a conceal is used to hide the bullet instead
-        icons = { "", "", "◆", "◇" },
+        icons = { "", "", "◇" },
         -- Highlight for the bullet icon
-        highlight = "Normal",
+        highlight = "@diff.delta",
       },
       -- Checkboxes are a special instance of a 'list_item' that start with a 'shortcut_link'
       -- There are two special states for unchecked & checked defined in the markdown grammar
@@ -230,6 +147,9 @@ return {
         -- Inlined with 'inline_link' elements
         hyperlink = " ",
         -- Applies to the inlined icon
+        custom = {
+          web = { pattern = "^http[s]?://", icon = " ", highlight = "Normal" },
+        },
         highlight = "@markup.heading",
       },
       -- Window options to use that change between rendered and raw view

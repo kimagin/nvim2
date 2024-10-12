@@ -4,7 +4,7 @@ return {
     opts = function(_, opts)
       -- Ensure markdown is in the list of ensured_installed parsers
       if type(opts.ensure_installed) == "table" then
-        vim.list_extend(opts.ensure_installed, { "markdown" })
+        vim.list_extend(opts.ensure_installed, { "markdown", "markdown_inline" })
       end
 
       -- Disable spell checking for markdown if it's causing issues
