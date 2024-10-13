@@ -1,10 +1,12 @@
 return {
   "MeanderingProgrammer/markdown.nvim",
   name = "render-markdown", -- Only needed if you have another plugin named markdown.nvim
-  dependencies = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.nvim" }, -- if you use the mini.nvim suite
+  -- dependencies = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.nvim" }, -- if you use the mini.nvim suite
   -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
-  -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+  dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons", "echasnovski/mini.nvim" }, -- if you prefer nvim-web-devicons
   config = function()
+    local render_markdown = require("render-markdown")
+
     require("render-markdown").setup({
       -- Whether Markdown should be rendered by default or not
       enabled = true,
@@ -15,7 +17,7 @@ return {
 
       log_level = "error",
       -- Filetypes this plugin will run on
-      file_types = { "markdown" },
+      file_types = { "markdown", "Avante" },
       -- Vim modes that will show a rendered view of the markdown file
       -- All other modes will be uneffected by this plugin
       render_modes = { "n", "c" },
@@ -28,8 +30,16 @@ return {
         enabled = false,
       },
       code = {
-        -- Turn on / off code block & inline code rendering
-        enabled = false,
+        enabled = true,
+        sign = true, -- Enable signs for code blocks
+        language_name = true, -- Show language name
+        width = "block",
+        left_margin = 0,
+        left_pad = 2,
+        right_pad = 2,
+        border = "thick", -- Use rounded borders
+        highlight = "RenderMarkdownCode", -- Use our custom highlight
+        highlight_inline = "RenderMarkdownCodeInline",
       },
       dash = {
         -- Turn on / off thematic break rendering
@@ -172,6 +182,14 @@ return {
       -- Mapping from treesitter language to user defined handlers
       -- See 'Custom Handlers' document for more info
       custom_handlers = {},
+    })
+
+    -- Enable TreeSitter syntax highlighting for fenced code blocks
+    require("nvim-treesitter.configs").setup({
+      highlight = {
+        enable = true,
+        additional_vim_regex_highlighting = { "markdown" },
+      },
     })
   end,
 }
