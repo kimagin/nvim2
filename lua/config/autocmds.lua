@@ -40,32 +40,32 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 })
 
 -- Periodically check for changes and reload buffer
-vim.api.nvim_create_autocmd("CursorHold", {
-  pattern = vim.fn.expand("$HOME") .. "/Developments/obsidian/*",
-  callback = function()
-    local bufnr = vim.api.nvim_get_current_buf()
-    vim.fn.jobstart({
-      "zsh",
-      "-c",
-      "cd $HOME/Developments/obsidian && git fetch origin notes && git pull --rebase origin notes && git push origin notes",
-    }, {
-      on_exit = function(_, exit_code)
-        if exit_code == 0 then
-          -- Reload the buffer silently
-          vim.schedule(function()
-            if vim.api.nvim_buf_is_valid(bufnr) then
-              vim.api.nvim_buf_call(bufnr, function()
-                vim.cmd("checktime")
-              end)
-            end
-          end)
-        end
-      end,
-    })
-  end,
-})
-
-vim.o.updatetime = 5000
+-- vim.api.nvim_create_autocmd("CursorHold", {
+--   pattern = vim.fn.expand("$HOME") .. "/Developments/obsidian/*",
+--   callback = function()
+--     local bufnr = vim.api.nvim_get_current_buf()
+--     vim.fn.jobstart({
+--       "zsh",
+--       "-c",
+--       "cd $HOME/Developments/obsidian && git fetch origin notes && git pull --rebase origin notes && git push origin notes",
+--     }, {
+--       on_exit = function(_, exit_code)
+--         if exit_code == 0 then
+--           -- Reload the buffer silently
+--           vim.schedule(function()
+--             if vim.api.nvim_buf_is_valid(bufnr) then
+--               vim.api.nvim_buf_call(bufnr, function()
+--                 vim.cmd("checktime")
+--               end)
+--             end
+--           end)
+--         end
+--       end,
+--     })
+--   end,
+-- })
+--
+-- vim.o.updatetime = 5000
 
 -- Modify the autocomplete menu colors
 vim.api.nvim_set_hl(0, "Pmenu", { bg = "#121317", fg = "#7B7D85" })
@@ -79,6 +79,13 @@ vim.api.nvim_set_hl(0, "markdownH3", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "markdownH4", { fg = "#A88BFA", underdouble = true })
 vim.api.nvim_set_hl(0, "markdownH5", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "markdownH6", { fg = "#A88BFA" })
+
+vim.api.nvim_set_hl(0, "@markup.heading.1.markdown", { fg = "#A88BFA", bold = true })
+vim.api.nvim_set_hl(0, "@markup.heading.2.markdown", { fg = "#A88BFA" })
+vim.api.nvim_set_hl(0, "@markup.heading.3.markdown", { fg = "#A88BFA" })
+vim.api.nvim_set_hl(0, "@markup.heading.4.markdown", { fg = "#A88BFA" })
+vim.api.nvim_set_hl(0, "@markup.heading.5.markdown", { fg = "#A88BFA" })
+vim.api.nvim_set_hl(0, "@markup.heading.6.markdown", { fg = "#A88BFA" })
 
 vim.api.nvim_set_hl(0, "markdownHeadingDelimiter", { fg = "#A88BFA" })
 -- vim.api.nvim_set_hl(0, "Normal", { fg = "#B3B1AD" })
@@ -155,10 +162,12 @@ local function setup_markdown_concealing()
   vim.cmd([[
     syntax match markdownH4 /^####\s\+.*$/ contains=markdownH4Marker
     syntax match markdownH4Marker /^####/ contained conceal cchar=󰫢
+    syntax match @markup.heading.4.markdown /^####/ contained conceal cchar=
   ]])
 
   vim.api.nvim_set_hl(0, "markdownH4", { fg = "#A88BFA", bold = true })
   vim.api.nvim_set_hl(0, "markdownH4Marker", { fg = "#A88BFA", bold = true })
+  vim.api.nvim_set_hl(0, "@markup.heading.4.markdown", { fg = "#A88BFA", bold = true })
 end
 
 vim.api.nvim_create_autocmd("FileType", {
@@ -191,6 +200,10 @@ vim.api.nvim_set_hl(0, "Visual", { bg = "#31294c", reverse = false })
 -- Optional: Make selection in line highlight more subtle
 vim.api.nvim_set_hl(0, "CursorLine", { bg = "#1f1e21" })
 vim.api.nvim_set_hl(0, "Folded", { fg = "#69579d" })
+
+vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#111112" })
+
+vim.api.nvim_set_hl(0, "RenderMarkdownCodeInline", { bg = "#26241f" })
 
 -- Remove eob ~ from the neotree panel
 vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "none", fg = "#141317" })
