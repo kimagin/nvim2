@@ -5,8 +5,6 @@ return {
   -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
   dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons", "echasnovski/mini.nvim" }, -- if you prefer nvim-web-devicons
   config = function()
-    local render_markdown = require("render-markdown")
-
     require("render-markdown").setup({
       -- Whether Markdown should be rendered by default or not
       enabled = true,
@@ -40,6 +38,7 @@ return {
         border = "thick", -- Use rounded borders
         highlight = "RenderMarkdownCode", -- Use our custom highlight
         highlight_inline = "RenderMarkdownCodeInline",
+        style = "normal",
       },
       dash = {
         -- Turn on / off thematic break rendering
@@ -182,14 +181,6 @@ return {
       -- Mapping from treesitter language to user defined handlers
       -- See 'Custom Handlers' document for more info
       custom_handlers = {},
-    })
-
-    -- Enable TreeSitter syntax highlighting for fenced code blocks
-    require("nvim-treesitter.configs").setup({
-      highlight = {
-        enable = true,
-        additional_vim_regex_highlighting = { "markdown" },
-      },
     })
   end,
 }

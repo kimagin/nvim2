@@ -5,9 +5,22 @@ return {
   version = false, -- set this if you want to always pull the latest change
   opts = {
     -- add any opts here
+    behaviour = {
+      auto_suggestions = false,
+    },
     mappings = {
       suggestion = {
         accept = "<C-g>",
+        next = "<C-]>",
+        prev = "}",
+        dismiss = "<C-x>",
+      },
+    },
+    windows = {
+      width = 35,
+      sidebar_header = {
+        align = "right",
+        rounded = false,
       },
     },
   },
