@@ -95,7 +95,7 @@ local function close_other_buffers()
 end
 
 --NOTE: Select all
-vim.keymap.set("n", "<leader>a", "gg<S-v>G", { desc = "Select all" })
+vim.keymap.set("n", "<C-a>", "gg<S-v>G", { desc = "Select all" })
 
 -- Keymapping to close other buffers
 vim.keymap.set("n", "<leader>bo", close_other_buffers, { desc = "Close other buffers" })
