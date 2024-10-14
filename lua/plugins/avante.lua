@@ -17,12 +17,13 @@ return {
       },
     },
     windows = {
-      width = 35,
+      width = 38,
       sidebar_header = {
         align = "right",
         rounded = false,
       },
     },
+    hints = { enabled = false },
   },
   -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
   build = "make",
