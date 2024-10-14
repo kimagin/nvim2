@@ -219,3 +219,148 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.signcolumn = "yes:1"
   end,
 })
+
+local function find_project_root()
+  -- Attempt to find the root directory using common version control directories or project files
+  local root_patterns = { ".git", ".svn", ".hg", "package.json", "Cargo.toml" }
+  for _, pattern in ipairs(root_patterns) do
+    local root = vim.fn.finddir(pattern, vim.fn.expand("%:p:h") .. ";")
+    if root ~= "" then
+      return vim.fn.fnamemodify(root, ":h")
+    end
+  end
+  -- If no root found, return the directory of the current file
+  return vim.fn.expand("%:p:h")
+end
+
+local function set_cwd_to_project_root()
+  -- Check if the current buffer is a normal file buffer
+  if vim.bo.buftype ~= "" then
+    return
+  end
+  local root = find_project_root()
+  if root ~= vim.fn.getcwd() then
+    -- Use pcall to catch any potential errors
+    local ok, err = pcall(vim.cmd, "lcd " .. root)
+    if ok then
+      -- Only print if the directory has actually changed and is not just "."
+      if root ~= "." and root ~= vim.fn.getcwd() then
+        print("CWD changed to: " .. root)
+      end
+    else
+      print("Failed to change CWD: " .. err)
+    end
+  end
+end
+
+vim.api.nvim_create_autocmd("BufEnter", {
+  pattern = "*",
+  callback = function()
+    -- Delay the execution slightly to ensure buffer properties are set
+    vim.defer_fn(set_cwd_to_project_root, 0)
+  end,
+})
+
+-- Optional: Add a command to manually trigger CWD change
+vim.api.nvim_create_user_command("ChangeCWD", set_cwd_to_project_root, {})
+-- local Terminal = require("toggleterm.terminal").Terminal
+--
+-- -- Table to store terminals for each directory
+-- local dir_terminals = {}
+
+-- Default terminal direction
+-- local default_direction = "horizontal" -- or "vertical" for vertical split
+--
+-- local function get_or_create_terminal(cwd)
+--   if not dir_terminals[cwd] then
+--     dir_terminals[cwd] = Terminal:new({
+--       cmd = vim.o.shell,
+--       dir = cwd,
+--       direction = default_direction,
+--       close_on_exit = false,
+--       on_exit = function(term)
+--         vim.schedule(function()
+--           term:shutdown()
+--           dir_terminals[cwd] = nil
+--         end)
+--       end,
+--     })
+--   end
+--   return dir_terminals[cwd]
+-- end
+--
+-- local function smart_toggle_terminal()
+--   local cwd = vim.fn.getcwd()
+--   local term = get_or_create_terminal(cwd)
+--
+--   if term:is_open() then
+--     term:close()
+--   else
+--     term:open()
+--   end
+-- end
+--
+-- local function close_all_terminals()
+--   for _, term in pairs(dir_terminals) do
+--     if term:is_open() then
+--       term:close()
+--     end
+--   end
+--   print("Closed all terminals")
+-- end
+--
+-- local function switch_terminal_mode()
+--   if default_direction == "float" then
+--     default_direction = "horizontal"
+--     print("Switched to horizontal split mode")
+--   else
+--     default_direction = "float"
+--     print("Switched to floating mode")
+--   end
+--
+--   -- Update existing terminals
+--   for cwd, term in pairs(dir_terminals) do
+--     term:close()
+--     dir_terminals[cwd] = Terminal:new({
+--       cmd = vim.o.shell,
+--       dir = cwd,
+--       direction = default_direction,
+--       close_on_exit = false,
+--       on_exit = function(t)
+--         vim.schedule(function()
+--           t:shutdown()
+--           dir_terminals[cwd] = nil
+--         end)
+--       end,
+--     })
+--   end
+-- end
+--
+-- -- Create user commands
+-- vim.api.nvim_create_user_command("SmartToggleTerminal", smart_toggle_terminal, { desc = "Smart Toggle ToggleTerm" })
+-- vim.api.nvim_create_user_command("CloseAllTerminals", close_all_terminals, { desc = "Close all ToggleTerm terminals" })
+-- vim.api.nvim_create_user_command(
+--   "SwitchTerminalMode",
+--   switch_terminal_mode,
+--   { desc = "Switch between split and float mode" }
+-- )
+--
+-- -- Optional: Add keymappings
+-- vim.keymap.set(
+--   "n",
+--   "<leader>tt",
+--   ":SmartToggleTerminal<CR>",
+--   { noremap = true, silent = true, desc = "Smart Toggle ToggleTerm" }
+-- )
+-- vim.keymap.set(
+--   "n",
+--   "<leader>tca",
+--   ":CloseAllTerminals<CR>",
+--   { noremap = true, silent = true, desc = "Close all ToggleTerm terminals" }
+-- )
+-- vim.keymap.set(
+--   "n",
+--   "<leader>tsm",
+--   ":SwitchTerminalMode<CR>",
+--   { noremap = true, silent = true, desc = "Switch Terminal Mode" }
+-- )
