@@ -132,6 +132,15 @@ vim.api.nvim_set_hl(0, "tag.delimiter", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "@tag.delimiter", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "@tag.attribute", { fg = "#CABEFF" })
 
+-- Avante
+vim.api.nvim_set_hl(0, "AvanteConflictCurrent", { bg = "#2c1718" })
+vim.api.nvim_set_hl(0, "AvanteConflictCurrentLabel", { fg = "#ff3838", bg = "#713645" })
+
+vim.api.nvim_set_hl(0, "AvanteConflictIncoming", { bg = "#182919" })
+vim.api.nvim_set_hl(0, "AvanteConflictIncomingLabel", { bg = "#405a35", fg = "#6fdf6f" })
+
+vim.api.nvim_set_hl(0, "AvanteInlineHint", { fg = "#433861" })
+
 -- Adding strikethrough to the completed tasks
 vim.api.nvim_create_augroup("MarkdownTaskListDone", { clear = true })
 
