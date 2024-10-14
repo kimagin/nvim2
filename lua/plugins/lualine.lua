@@ -15,6 +15,14 @@ return {
       end
     end
 
+    local function get_toggleterm_name()
+      local term = vim.b.toggle_number
+      if term then
+        return string.format(" Terminal %d", term)
+      end
+      return ""
+    end
+
     return {
       options = {
         theme = "auto",
@@ -71,7 +79,34 @@ return {
         lualine_y = {},
         lualine_z = { "searchcount" },
       },
-      extensions = { "lazy" },
+      extensions = {
+        "lazy",
+
+        {
+          sections = {
+            lualine_a = {
+              {
+                get_toggleterm_name,
+                color = { fg = "#a88bfa", bg = "none" },
+                padding = { left = 0, right = 0 },
+              },
+            },
+            lualine_b = {},
+            lualine_c = {},
+            lualine_x = {},
+            lualine_y = {},
+            lualine_z = {
+              {
+                function()
+                  return vim.fn.fnamemodify(vim.fn.getcwd(), ":~")
+                end,
+                color = { fg = "#b5bedf", bg = "none" },
+              },
+            },
+          },
+          filetypes = { "toggleterm" },
+        },
+      },
     }
   end,
 }
