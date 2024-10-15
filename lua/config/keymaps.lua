@@ -44,6 +44,9 @@ vim.keymap.set("n", "<leader>ww", "<cmd>w<CR>", { desc = "Save current buffer" }
 
 vim.keymap.set("n", "Y", "y$", { desc = "Yank to end of line" })
 
+-- Ensure 'A' works as expected
+vim.keymap.set("n", "A", "A", { noremap = true, desc = "Insert at end of line" })
+
 --NOTE: Floating Terminal
 
 --Floating terminal
@@ -102,3 +105,88 @@ vim.keymap.set("n", "<leader>bo", close_other_buffers, { desc = "Close other buf
 
 -- Optional: Add a command for closing other buffers
 vim.api.nvim_create_user_command("BufOnly", close_other_buffers, { desc = "Close all buffers except current" })
+
+-- Fullscreen toggle functionality
+local fullscreen_win = nil
+local original_size = {}
+local fullscreen_autocmd_id = nil
+
+local function toggle_fullscreen()
+  if fullscreen_win == nil then
+    -- Store the original window size
+    original_size = {
+      width = vim.api.nvim_win_get_width(0),
+      height = vim.api.nvim_win_get_height(0),
+    }
+    -- Calculate 85% of the screen width
+    local screen_width = vim.o.columns
+    local new_width = math.floor(screen_width * 0.85)
+
+    -- Make the current window 90% of screen width and full height
+    vim.cmd("resize")
+    vim.api.nvim_win_set_width(0, new_width)
+    fullscreen_win = vim.api.nvim_get_current_win()
+
+    -- Set up an autocommand to restore the window size when it loses focus
+    fullscreen_autocmd_id = vim.api.nvim_create_autocmd("WinLeave", {
+      callback = function()
+        if vim.api.nvim_get_current_win() == fullscreen_win then
+          vim.api.nvim_win_set_width(fullscreen_win, original_size.width)
+          vim.api.nvim_win_set_height(fullscreen_win, original_size.height)
+          fullscreen_win = nil
+          if fullscreen_autocmd_id then
+            vim.api.nvim_del_autocmd(fullscreen_autocmd_id)
+            fullscreen_autocmd_id = nil
+          end
+        end
+      end,
+    })
+  else
+    -- Restore the original window size
+    vim.api.nvim_win_set_width(fullscreen_win, original_size.width)
+    vim.api.nvim_win_set_height(fullscreen_win, original_size.height)
+    fullscreen_win = nil
+    if fullscreen_autocmd_id then
+      vim.api.nvim_del_autocmd(fullscreen_autocmd_id)
+      fullscreen_autocmd_id = nil
+    end
+  end
+end
+
+-- Add keymap for toggling fullscreen
+vim.keymap.set("n", "<leader>m", toggle_fullscreen, { desc = "Toggle fullscreen for current window" })
+
+-- Permanent fullscreen toggle functionality
+local permanent_fullscreen_win = nil
+local permanent_original_size = {}
+
+local function toggle_permanent_fullscreen()
+  if permanent_fullscreen_win == nil then
+    -- Store the original window size
+    permanent_original_size = {
+      width = vim.api.nvim_win_get_width(0),
+      height = vim.api.nvim_win_get_height(0),
+    }
+    -- Calculate 85% of the screen width
+    local screen_width = vim.o.columns
+    local new_width = math.floor(screen_width * 0.85)
+
+    -- Make the current window 85% of screen width and full height
+    vim.cmd("resize")
+    vim.api.nvim_win_set_width(0, new_width)
+    permanent_fullscreen_win = vim.api.nvim_get_current_win()
+  else
+    -- Restore the original window size
+    vim.api.nvim_win_set_width(permanent_fullscreen_win, permanent_original_size.width)
+    vim.api.nvim_win_set_height(permanent_fullscreen_win, permanent_original_size.height)
+    permanent_fullscreen_win = nil
+  end
+end
+
+-- Add keymap for toggling permanent fullscreen
+vim.keymap.set(
+  "n",
+  "<leader>M",
+  toggle_permanent_fullscreen,
+  { desc = "Toggle permanent fullscreen for current window" }
+)

@@ -17,7 +17,7 @@ return {
       },
     },
     windows = {
-      width = 38,
+      width = 35,
       sidebar_header = {
         align = "right",
         rounded = false,
