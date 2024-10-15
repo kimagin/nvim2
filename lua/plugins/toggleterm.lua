@@ -38,7 +38,6 @@ return {
         end
         return dir_terminals[key]
       end
-
       local function smart_toggle_terminal(count, force_direction)
         count = count or 1
         local cwd = vim.fn.getcwd()
@@ -87,12 +86,15 @@ return {
       end
 
       local function close_all_terminals()
-        for _, term in pairs(dir_terminals) do
+        for key, term in pairs(dir_terminals) do
           if term:is_open() then
             term:close()
           end
+          term:shutdown()
+          dir_terminals[key] = nil
         end
-        print("Closed all terminals")
+        terminal_count = 0
+        print("Deleted all terminals and reset counter")
       end
 
       local function switch_terminal_mode()
@@ -154,14 +156,8 @@ return {
       -- Additional keymaps
       vim.keymap.set(
         "n",
-        "<leader>tca",
+        "<leader>td",
         ":CloseAllTerminals<CR>",
-        { desc = "Toggle Vertical Terminal", nowait = true, noremap = true, silent = true }
-      )
-      vim.keymap.set(
-        "n",
-        "<leader>tsm",
-        ":SwitchTerminalMode<CR>",
         { desc = "Toggle Vertical Terminal", nowait = true, noremap = true, silent = true }
       )
 
