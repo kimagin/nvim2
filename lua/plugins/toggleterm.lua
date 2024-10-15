@@ -14,6 +14,8 @@ return {
       local default_direction = "horizontal"
       -- Counter for terminal instances
       local terminal_count = 0
+      -- Current terminal mode
+      local current_mode = "horizontal"
 
       local function get_or_create_terminal(cwd, count, direction)
         direction = direction or default_direction
@@ -40,7 +42,7 @@ return {
       local function smart_toggle_terminal(count, force_direction)
         count = count or 1
         local cwd = vim.fn.getcwd()
-        local direction = force_direction or default_direction
+        local direction = force_direction or current_mode
         local term = get_or_create_terminal(cwd, count, direction)
 
         if force_direction then
@@ -50,44 +52,38 @@ return {
           end
         end
 
-        -- Hide vertical terminals when opening horizontal ones
-        if direction == "horizontal" then
-          for _, t in pairs(dir_terminals) do
-            if t:is_open() and t.direction == "vertical" then
-              t:close()
-            end
+        -- Close terminals of the opposite direction
+        for _, t in pairs(dir_terminals) do
+          if t:is_open() and t.direction ~= direction then
+            t:close()
           end
         end
 
         term:toggle()
       end
 
-      local function get_project_root()
-        local current_buf = vim.api.nvim_get_current_buf()
-        local current_file = vim.api.nvim_buf_get_name(current_buf)
-        local current_dir = vim.fn.fnamemodify(current_file, ":h")
-
-        -- Try to find a common project root
-        local root = vim.fn.finddir(".git/..", current_dir .. ";")
-
-        -- If .git is not found, try to find other common project files
-        if root == "" then
-          local markers = { ".root", "Makefile", "package.json", "Cargo.toml" }
-          for _, marker in ipairs(markers) do
-            root = vim.fn.findfile(marker, current_dir .. ";")
-            if root ~= "" then
-              root = vim.fn.fnamemodify(root, ":h")
-              break
+      local function toggle_vertical_terminal()
+        if current_mode == "horizontal" then
+          -- Switch to vertical mode
+          current_mode = "vertical"
+          -- Close all horizontal terminals
+          for _, t in pairs(dir_terminals) do
+            if t:is_open() and t.direction == "horizontal" then
+              t:close()
             end
           end
+          smart_toggle_terminal(1, "vertical")
+        else
+          -- Switch back to horizontal mode
+          current_mode = "horizontal"
+          -- Close all vertical terminals
+          for _, t in pairs(dir_terminals) do
+            if t:is_open() and t.direction == "vertical" then
+              t:close()
+            end
+          end
+          smart_toggle_terminal(1, "horizontal")
         end
-
-        -- If no project root is found, use the current file's directory
-        return root ~= "" and root or current_dir
-      end
-
-      local function toggle_vertical_terminal()
-        smart_toggle_terminal(1, "vertical")
       end
 
       local function close_all_terminals()
@@ -171,8 +167,8 @@ return {
 
       -- Override the default toggle behavior with our smart toggle
       vim.keymap.set({ "n", "t" }, [[<C-\>]], function()
-        smart_toggle_terminal(1, "horizontal")
-      end, { noremap = true, silent = true, desc = "Smart Toggle ToggleTerm 1 (Horizontal)" })
+        smart_toggle_terminal(1)
+      end, { noremap = true, silent = true, desc = "Smart Toggle ToggleTerm 1 (Horizontal or Vertical)" })
 
       -- Add keymaps for additional terminal instances
       for i = 2, 3 do
