@@ -30,6 +30,8 @@ return {
               "--hidden",
               "--follow",
               "--exclude",
+              ".cargo",
+              "--exclude",
               ".git",
               "--exclude",
               "node_modules",
@@ -59,6 +61,10 @@ return {
               ".ollama",
               "--exclude",
               "OneDrive",
+              "--exclude",
+              "undodir",
+              "--exclude",
+              ".rustup",
             },
           })
         end,
@@ -76,7 +82,7 @@ return {
           local function get_git_repos()
             local search_dir = os.getenv("HOME")
             local cmd = string.format(
-              [[fd --hidden --type d --exclude '.local' --exclude ".Trash" --exclude ".vscode" --exclude ".tldrc" --exclude "Library/*" --exclude ".cache" --exclude ".vscode-server" --exclude "node_modules" --exclude ".npm" --exclude ".pnpm" ".git" "%s" | xargs -n1 dirname | sort -u]],
+              [[fd --hidden --type d --exclude '.local' --exclude '.cargo' --exclude ".Trash" --exclude ".vscode" --exclude ".tldrc" --exclude "Library/*" --exclude ".cache" --exclude ".vscode-server" --exclude "node_modules" --exclude ".npm" --exclude ".pnpm" ".git" "%s" | xargs -n1 dirname | sort -u]],
               search_dir
             )
             local handle = io.popen(cmd)
