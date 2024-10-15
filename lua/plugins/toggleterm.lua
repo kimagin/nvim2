@@ -160,13 +160,13 @@ return {
         "n",
         "<leader>tca",
         ":CloseAllTerminals<CR>",
-        { noremap = true, silent = true, desc = "Close all ToggleTerm terminals" }
+        { desc = "Toggle Vertical Terminal", nowait = true, noremap = true, silent = true }
       )
       vim.keymap.set(
         "n",
         "<leader>tsm",
         ":SwitchTerminalMode<CR>",
-        { noremap = true, silent = true, desc = "Switch Terminal Mode" }
+        { desc = "Toggle Vertical Terminal", nowait = true, noremap = true, silent = true }
       )
 
       -- Override the default toggle behavior with our smart toggle
@@ -187,10 +187,10 @@ return {
 
       -- Add keymap for vertical terminal toggle
       vim.keymap.set(
-        { "n", "t" },
+        { "n" },
         "<leader>tv",
         toggle_vertical_terminal,
-        { noremap = true, silent = true, desc = "Toggle Vertical Terminal" }
+        { desc = "Toggle Vertical Terminal", nowait = true, noremap = true, silent = true }
       )
     end,
   },
