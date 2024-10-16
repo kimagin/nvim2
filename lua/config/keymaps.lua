@@ -190,3 +190,6 @@ vim.keymap.set(
   toggle_permanent_fullscreen,
   { desc = "Toggle permanent fullscreen for current window" }
 )
+
+-- Avante Clear Chat
+vim.api.nvim_set_keymap("n", "<leader>aA", "<cmd>AvanteClear<cr>", { noremap = true, silent = true })

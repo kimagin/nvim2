@@ -5,6 +5,16 @@ return {
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
       -- configure fzf-lua here if needed
+      local startup_file = vim.fn.expand("~/untitled.md")
+
+      vim.api.nvim_create_autocmd("VimEnter", {
+        callback = function()
+          -- Only open the file if Neovim was started without arguments
+          if vim.fn.argc() == 0 then
+            vim.cmd("edit " .. startup_file)
+          end
+        end,
+      })
     end,
   },
   {

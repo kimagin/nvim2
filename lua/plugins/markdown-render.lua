@@ -15,7 +15,7 @@ return {
 
       log_level = "error",
       -- Filetypes this plugin will run on
-      file_types = { "markdown", "Avante" },
+      file_types = { "markdown", "Avante", "markdown_inline" },
       -- Vim modes that will show a rendered view of the markdown file
       -- All other modes will be uneffected by this plugin
       render_modes = { "n", "c" },
