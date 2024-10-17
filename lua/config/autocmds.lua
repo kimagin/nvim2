@@ -214,6 +214,7 @@ vim.api.nvim_set_hl(0, "CursorLine", { bg = "#1f1e21" })
 vim.api.nvim_set_hl(0, "Folded", { fg = "#69579d" })
 
 vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#111112" })
+vim.api.nvim_set_hl(0, "CodeiumSuggestion", { fg = "#58468c" })
 
 vim.api.nvim_set_hl(0, "RenderMarkdownCodeInline", { bg = "#26241f" })
 vim.api.nvim_set_hl(0, "Comment", { fg = "#6a6e83" })

@@ -53,6 +53,9 @@ return {
 
         ["<CR>"] = cmp.mapping.confirm({ select = true }),
       })
+      opts.experimental = {
+        ghost_text = false,
+      }
 
       -- Define default sources
       local sources = {
