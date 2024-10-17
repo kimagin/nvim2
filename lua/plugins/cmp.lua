@@ -18,18 +18,52 @@ return {
         return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match("^%s*$") == nil
       end
 
+      -- Border styles
+      local border_styles = {
+        default = { "┌", "─", "┐", "│", "┘", "─", "└", "│" },
+        minimal = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
+        rounded = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
+        solid = { "▄", "▄", "▄", "█", "▀", "▀", "▀", "█" },
+        dots = { ".", ".", ".", ":", ".", ".", ".", ":" },
+        none = { "", "", "", "", "", "", "", "" },
+      }
+
+      -- Function to select border style (you can change 'default' to any other style)
+      local function select_border_style()
+        return border_styles.default
+      end
       -- Setup custom window options
       opts.window = {
         completion = {
-          border = "single",
-          winhighlight = "Normal:Normal,FloatBorder:TelescopeBorder,CursorLine:MiniDepsTitleSame,Search:Pmenu",
+          border = select_border_style(),
+          col_offset = -3,
+          side_padding = 1,
+          winhighlight = "Normal:CmpPmenu,CursorLine:PmenuSel,Search:None",
           scrollbar = false,
         },
         documentation = {
           border = "single",
-          winhighlight = "Normal:Normal,FloatBorder:TelescopeBorder,CursorLine:@comment.todo,Search:Pmenu",
+          winhighlight = "Normal:CmpDocumentation,CursorLine:CmpDocumentationCursorLine",
+          scrollbar = true,
         },
       }
+
+      -- Set colors for nvim-cmp
+      -- Note: These highlight groups are specific to nvim-cmp
+      -- vim.api.nvim_set_hl(0, "CmpItemAbbrDefault", { fg = "#00ff00" })
+      vim.api.nvim_set_hl(0, "CmpItemAbbrMatch", { fg = "#a88bfa", bold = true })
+      vim.api.nvim_set_hl(0, "CmpItemAbbrMatchFuzzy", { fg = "#c298dd", bold = true })
+      -- vim.api.nvim_set_hl(0, "CmpItemKindDefault", { fg = "#00ff00" })
+      -- vim.api.nvim_set_hl(0, "CmpItemMenuDefault", { fg = "#00cc00" })
+
+      vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#291c39", bold = true })
+      vim.api.nvim_set_hl(0, "Pmenu", { bg = "none", fg = "#a88bfa", bold = true })
+      -- vim.api.nvim_set_hl(0, "CmpPmenu", { fg = "#291c39", bg = "#00ff00" })
+      vim.api.nvim_set_hl(0, "CmpItemKindFunction", { fg = "#aeffd6" })
+      vim.api.nvim_set_hl(0, "CmpItemKindMethod", { fg = "#fff09a" })
+      vim.api.nvim_set_hl(0, "CmpItemKindVariable", { fg = "#c298dd" })
+      vim.api.nvim_set_hl(0, "CmpItemKindKeyword", { fg = "#a88bfa" })
+
       -- Mapping setup
       opts.mapping = vim.tbl_extend("force", opts.mapping, {
         ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
@@ -52,6 +86,8 @@ return {
         -- end, { "i", "s" }),
 
         ["<CR>"] = cmp.mapping.confirm({ select = true }),
+        ["<C-u>"] = cmp.mapping.scroll_docs(-4),
+        ["<C-d>"] = cmp.mapping.scroll_docs(4),
       })
       opts.experimental = {
         ghost_text = false,
