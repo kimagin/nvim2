@@ -200,3 +200,16 @@ vim.api.nvim_set_keymap("n", "<leader>aA", "<cmd>AvanteClear<cr>", { noremap = t
 -- Moving up and down with K and J in visual mode
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+
+-- Toggle cmp visibility
+local cmp_visible = true
+vim.keymap.set({ "i", "s" }, "<C-x>", function()
+  local cmp = require("cmp")
+  if cmp_visible then
+    cmp.close()
+    cmp_visible = false
+  else
+    cmp.complete()
+    cmp_visible = true
+  end
+end, { desc = "Toggle cmp visibility" })

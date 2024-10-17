@@ -36,24 +36,20 @@ return {
         ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
 
         ["<Tab>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.select_next_item()
-          elseif vim.fn["codeium#Accept"] ~= nil and vim.fn["codeium#Accept"]() ~= "" then
+          if vim.fn["codeium#Accept"] ~= nil and vim.fn["codeium#Accept"]() ~= "" then
             vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<C-g>", true, true, true), "")
-          elseif has_words_before() then
-            cmp.complete()
           else
             fallback()
           end
         end, { "i", "s" }),
 
-        ["<S-Tab>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.select_prev_item()
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
+        -- ["<S-Tab>"] = cmp.mapping(function(fallback)
+        --   if cmp.visible() then
+        --     cmp.select_prev_item()
+        --   else
+        --     fallback()
+        --   end
+        -- end, { "i", "s" }),
 
         ["<CR>"] = cmp.mapping.confirm({ select = true }),
       })
