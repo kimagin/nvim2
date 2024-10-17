@@ -39,7 +39,10 @@ end, { desc = "Previous buffer" })
 -- Use Telescope for buffer picking
 vim.keymap.set("n", "<leader>bl", "<cmd>Telescope buffers<cr>", { desc = "Switch Buffer" })
 
-vim.keymap.set("n", "<leader>qq", "<cmd>wa | bdelete<CR>", { desc = "Save and close buffer" })
+vim.keymap.set("n", "<leader>qq", function()
+  vim.cmd("wa") -- Save all modified buffers
+  vim.cmd("quit") -- Close the current window
+end, { desc = "Save all and close current window" })
 vim.keymap.set("n", "<leader>ww", "<cmd>w<CR>", { desc = "Save current buffer" })
 
 vim.keymap.set("n", "Y", "y$", { desc = "Yank to end of line" })
@@ -193,3 +196,7 @@ vim.keymap.set(
 
 -- Avante Clear Chat
 vim.api.nvim_set_keymap("n", "<leader>aA", "<cmd>AvanteClear<cr>", { noremap = true, silent = true })
+
+-- Moving up and down with K and J in visual mode
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
