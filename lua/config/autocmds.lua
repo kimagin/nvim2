@@ -3,6 +3,9 @@
 -- Add any additional autocmds hereby
 --
 -- wrap and check for spell in text filetypes
+
+vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none", fg = "#141317" })
+
 vim.api.nvim_create_autocmd("FileType", {
   group = vim.api.nvim_create_augroup("lazyvim_wrap_spell", { clear = true }),
   pattern = { "gitcommit", "markdown", "tex", "text", "typ" },
