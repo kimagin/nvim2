@@ -32,7 +32,7 @@ if vim.fn.has("wsl") == 1 then
 end
 
 -- Adding fold and eob char
-vim.opt.fillchars = { eob = "~" }
+vim.opt.fillchars = { eob = " " }
 
 vim.opt.undofile = true
 vim.opt.undodir = vim.fn.expand("~/.vim/undodir")
@@ -51,7 +51,7 @@ vim.opt.foldtext =
   [[substitute(getline(v:foldstart),'\\t',repeat('\ ',&tabstop),'g').'...'.trim(getline(v:foldend)) . ' / ' . (v:foldend - v:foldstart + 1) . ' lines ']]
 
 -- foldindicator
-vim.opt.fillchars = { foldopen = "", foldclose = "", fold = " ", foldsep = " " }
+vim.opt.fillchars = { foldopen = "", foldclose = "", fold = " ", foldsep = " ", eob = " " }
 
 -- Number column
 vim.opt.numberwidth = 4
