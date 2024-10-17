@@ -59,30 +59,18 @@ return {
         end
 
         term:toggle()
+        current_mode = direction
       end
 
       local function toggle_vertical_terminal()
-        if current_mode == "horizontal" then
-          -- Switch to vertical mode
-          current_mode = "vertical"
-          -- Close all horizontal terminals
-          for _, t in pairs(dir_terminals) do
-            if t:is_open() and t.direction == "horizontal" then
-              t:close()
-            end
+        local new_mode = current_mode == "horizontal" and "vertical" or "horizontal"
+        -- Close all terminals of the current mode
+        for _, t in pairs(dir_terminals) do
+          if t:is_open() and t.direction == current_mode then
+            t:close()
           end
-          smart_toggle_terminal(1, "vertical")
-        else
-          -- Switch back to horizontal mode
-          current_mode = "horizontal"
-          -- Close all vertical terminals
-          for _, t in pairs(dir_terminals) do
-            if t:is_open() and t.direction == "vertical" then
-              t:close()
-            end
-          end
-          smart_toggle_terminal(1, "horizontal")
         end
+        smart_toggle_terminal(1, new_mode)
       end
 
       local function close_all_terminals()
@@ -164,16 +152,16 @@ return {
       -- Override the default toggle behavior with our smart toggle
       vim.keymap.set({ "n", "t" }, [[<C-\>]], function()
         smart_toggle_terminal(1)
-      end, { noremap = true, silent = true, desc = "Smart Toggle ToggleTerm 1 (Horizontal or Vertical)" })
+      end, { noremap = true, silent = true, desc = "Smart Toggle ToggleTerm 1 (Current Mode)" })
 
       -- Add keymaps for additional terminal instances
       for i = 2, 3 do
         vim.keymap.set({ "n", "t" }, string.format([[%d<C-\>]], i), function()
-          smart_toggle_terminal(i, "horizontal")
+          smart_toggle_terminal(i)
         end, {
           noremap = true,
           silent = true,
-          desc = string.format("Smart Toggle ToggleTerm %d (Horizontal)", i),
+          desc = string.format("Smart Toggle ToggleTerm %d (Current Mode)", i),
         })
       end
 
@@ -182,7 +170,33 @@ return {
         { "n" },
         "<leader>tv",
         toggle_vertical_terminal,
-        { desc = "Toggle Vertical Terminal", nowait = true, noremap = true, silent = true }
+        { desc = "Toggle Between Vertical and Horizontal Terminal", nowait = true, noremap = true, silent = true }
+      )
+
+      -- Add keymaps for moving between buffers in terminal mode
+      vim.keymap.set(
+        "t",
+        "<C-h>",
+        [[<C-\><C-n><C-W>h]],
+        { noremap = true, silent = true, desc = "Move to left buffer" }
+      )
+      vim.keymap.set(
+        "t",
+        "<C-j>",
+        [[<C-\><C-n><C-W>j]],
+        { noremap = true, silent = true, desc = "Move to buffer below" }
+      )
+      vim.keymap.set(
+        "t",
+        "<C-k>",
+        [[<C-\><C-n><C-W>k]],
+        { noremap = true, silent = true, desc = "Move to buffer above" }
+      )
+      vim.keymap.set(
+        "t",
+        "<C-l>",
+        [[<C-\><C-n><C-W>l]],
+        { noremap = true, silent = true, desc = "Move to right buffer" }
       )
     end,
   },
