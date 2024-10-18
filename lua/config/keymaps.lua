@@ -213,3 +213,16 @@ vim.keymap.set({ "i", "s" }, "<C-x>", function()
     cmp_visible = true
   end
 end, { desc = "Toggle cmp visibility" })
+
+-- Wrap line in console.log
+
+vim.keymap.set("n", "<leader>cp", function()
+  -- Get the current line
+  local line = vim.fn.getline(".")
+  -- Escape single quotes in the line
+  line = line:gsub("'", "\\'")
+  -- Create the console.log statement
+  local log_statement = string.format("console.log('%s');", line)
+  -- Replace the current line with the console.log statement
+  vim.api.nvim_set_current_line(log_statement)
+end, { desc = "Wrap line in console.log" })
