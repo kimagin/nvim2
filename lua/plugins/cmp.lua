@@ -56,8 +56,9 @@ return {
       -- vim.api.nvim_set_hl(0, "CmpItemKindDefault", { fg = "#00ff00" })
       -- vim.api.nvim_set_hl(0, "CmpItemMenuDefault", { fg = "#00cc00" })
 
-      vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#291c39", bold = true })
+      vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#303446", bold = true })
       vim.api.nvim_set_hl(0, "Pmenu", { bg = "none", fg = "#a88bfa", bold = true })
+
       -- vim.api.nvim_set_hl(0, "CmpPmenu", { fg = "#291c39", bg = "#00ff00" })
       vim.api.nvim_set_hl(0, "CmpItemKindFunction", { fg = "#aeffd6" })
       vim.api.nvim_set_hl(0, "CmpItemKindMethod", { fg = "#fff09a" })

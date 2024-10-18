@@ -72,7 +72,7 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 
 -- Modify the autocomplete menu colors
 vim.api.nvim_set_hl(0, "Pmenu", { bg = "#121317", fg = "#7B7D85" })
-vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#121317", fg = "#A88BFA" })
+vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#404456", fg = "#A88BFA" })
 -- Modify the floating window (help popup) colors
 -- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#121317", fg = "#A88BFA" })
 
@@ -130,10 +130,10 @@ vim.api.nvim_set_hl(0, "string", { fg = "#C6D0F6" })
 vim.api.nvim_set_hl(0, "punctuation.special", { fg = "#C6D0F6" })
 vim.api.nvim_set_hl(0, "@punctuation.special", { fg = "#C6D0F6" })
 vim.api.nvim_set_hl(0, "@tag", { fg = "#A88BFA" })
-vim.api.nvim_set_hl(0, "@operator", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "tag.delimiter", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "@tag.delimiter", { fg = "#A88BFA" })
-vim.api.nvim_set_hl(0, "@tag.attribute", { fg = "#CABEFF" })
+vim.api.nvim_set_hl(0, "@tag.attribute", { fg = "#c3e4dc" })
+vim.api.nvim_set_hl(0, "@operator", { fg = "#c3e4dc" })
 
 -- Avante
 vim.api.nvim_set_hl(0, "AvanteConflictCurrent", { bg = "#2c1718" })
@@ -276,3 +276,8 @@ vim.api.nvim_create_autocmd("BufEnter", {
 
 -- Optional: Add a command to manually trigger CWD change
 vim.api.nvim_create_user_command("ChangeCWD", set_cwd_to_project_root, {})
+
+-- Function to show highlight group under cursor
+vim.keymap.set("n", "<leader>h", function()
+  print(vim.treesitter.get_captures_at_cursor()[1])
+end, { desc = "Show Tree-sitter highlight group" })
