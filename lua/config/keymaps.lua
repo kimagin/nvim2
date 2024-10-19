@@ -226,3 +226,6 @@ vim.keymap.set("n", "<leader>cp", function()
   -- Replace the current line with the console.log statement
   vim.api.nvim_set_current_line(log_statement)
 end, { desc = "Wrap line in console.log" })
+
+-- Split buffer vertically
+vim.keymap.set("n", "<leader>_", "<cmd>:split<cr>", { desc = "Split buffer vertically" })

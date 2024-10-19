@@ -213,7 +213,7 @@ return {
       --  double: use double line border characters
       --  round:  use round border corners
       --  none:   does nothing
-      preset = "none",
+      preset = "round",
       -- Determines how the table as a whole is rendered:
       --  none:   disables all rendering
       --  normal: applies the 'cell' style rendering to each row of the table

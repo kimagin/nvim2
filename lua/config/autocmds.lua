@@ -104,7 +104,7 @@ vim.api.nvim_set_hl(0, "FloatTitle", { fg = "#404456" })
 vim.api.nvim_set_hl(0, "MiniDepsTitleSame", { fg = "#A88BFA", bg = "#211a33" })
 vim.api.nvim_set_hl(0, "@markup.list.checked", { bold = true, fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "@markup.list.unchecked", { bold = true, fg = "#A88BFA" })
-vim.api.nvim_set_hl(0, "@markup.quote", { bold = true, fg = "#A88BFA", bg = "none" })
+-- vim.api.nvim_set_hl(0, "@markup.quote", { bold = true, fg = "#A88BFA", bg = "none" })
 
 -- vim.api.nvim_set_hl(0, "markdownCodeBlock", { fg = "#a6aef8" })
 -- vim.api.nvim_set_hl(0, "markdownCode", { fg = "#a6aef2", blend = 10 })
