@@ -30,7 +30,7 @@ return {
       end,
     },
     ui = {
-      enable = true,
+      enable = false,
       hl_groups = {
         ObsidianTodo = { bold = true, fg = "#A88BFA" },
         ObsidianDone = { bold = true, fg = "#A88BFA" },

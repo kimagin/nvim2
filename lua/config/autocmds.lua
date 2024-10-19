@@ -77,18 +77,20 @@ vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#404456", fg = "#A88BFA" })
 -- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#121317", fg = "#A88BFA" })
 
 vim.api.nvim_set_hl(0, "markdownH1", { fg = "#A88BFA", bold = true })
-vim.api.nvim_set_hl(0, "markdownH2", { fg = "#A88BFA" })
-vim.api.nvim_set_hl(0, "markdownH3", { fg = "#A88BFA" })
-vim.api.nvim_set_hl(0, "markdownH4", { fg = "#A88BFA", underdouble = true })
-vim.api.nvim_set_hl(0, "markdownH5", { fg = "#A88BFA" })
-vim.api.nvim_set_hl(0, "markdownH6", { fg = "#A88BFA" })
+vim.api.nvim_set_hl(0, "markdownH2", { fg = "#806abf" })
+vim.api.nvim_set_hl(0, "markdownH3", { fg = "#806abf" })
+vim.api.nvim_set_hl(0, "markdownH4", { fg = "#A88BFA", bold = true })
+vim.api.nvim_set_hl(0, "markdownH5", { fg = "#806abf" })
+vim.api.nvim_set_hl(0, "markdownH6", { fg = "#fae0d0" })
 
-vim.api.nvim_set_hl(0, "@markup.heading.1.markdown", { fg = "#A88BFA", bold = true })
-vim.api.nvim_set_hl(0, "@markup.heading.2.markdown", { fg = "#A88BFA" })
-vim.api.nvim_set_hl(0, "@markup.heading.3.markdown", { fg = "#A88BFA" })
+vim.api.nvim_set_hl(0, "@markup.heading.1.markdown", { fg = "#A88BFA", bold = true, underline = true })
+vim.api.nvim_set_hl(0, "@markup.heading.2.markdown", { fg = "#A88BFA", bold = true })
+vim.api.nvim_set_hl(0, "@markup.heading.3.markdown", { fg = "#A88BFA", underline = true })
 vim.api.nvim_set_hl(0, "@markup.heading.4.markdown", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "@markup.heading.5.markdown", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "@markup.heading.6.markdown", { fg = "#A88BFA" })
+
+vim.api.nvim_set_hl(0, "@markup.list", { fg = "#A88BFA" })
 
 vim.api.nvim_set_hl(0, "markdownHeadingDelimiter", { fg = "#A88BFA" })
 -- vim.api.nvim_set_hl(0, "Normal", { fg = "#B3B1AD" })
@@ -102,9 +104,10 @@ vim.api.nvim_set_hl(0, "FloatTitle", { fg = "#404456" })
 vim.api.nvim_set_hl(0, "MiniDepsTitleSame", { fg = "#A88BFA", bg = "#211a33" })
 vim.api.nvim_set_hl(0, "@markup.list.checked", { bold = true, fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "@markup.list.unchecked", { bold = true, fg = "#A88BFA" })
-vim.api.nvim_set_hl(0, "@markup.quote", { bold = false, fg = "#C6D0F6", bg = "#0F1014" })
-vim.api.nvim_set_hl(0, "markdownCodeBlock", { fg = "#a6aef8" })
-vim.api.nvim_set_hl(0, "markdownCode", { fg = "#a6aef2", blend = 10 })
+vim.api.nvim_set_hl(0, "@markup.quote", { bold = true, fg = "#A88BFA", bg = "none" })
+
+-- vim.api.nvim_set_hl(0, "markdownCodeBlock", { fg = "#a6aef8" })
+-- vim.api.nvim_set_hl(0, "markdownCode", { fg = "#a6aef2", blend = 10 })
 
 -- Yaml
 
@@ -167,27 +170,27 @@ vim.api.nvim_create_autocmd("FileType", {
 -- vim.g.mkdp_highlight_css = vim.fn.expand("$HOME/.config/nvim/markdown/highlight.css")
 
 -- Headings
-local function setup_markdown_concealing()
-  vim.wo.conceallevel = 2
-  vim.wo.concealcursor = "nc"
-
-  vim.cmd([[
-    syntax match markdownH4 /^####\s\+.*$/ contains=markdownH4Marker
-    syntax match markdownH4Marker /^####/ contained conceal cchar=󰫢
-    syntax match @markup.heading.4.markdown /^####/ contained conceal cchar=
-  ]])
-
-  vim.api.nvim_set_hl(0, "markdownH4", { fg = "#A88BFA", bold = true })
-  vim.api.nvim_set_hl(0, "markdownH4Marker", { fg = "#A88BFA", bold = true })
-  vim.api.nvim_set_hl(0, "@markup.heading.4.markdown", { fg = "#A88BFA", bold = true })
-end
-
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "markdown",
-  callback = function()
-    vim.schedule(setup_markdown_concealing)
-  end,
-})
+-- local function setup_markdown_concealing()
+--   vim.wo.conceallevel = 2
+--   vim.wo.concealcursor = "nc"
+--
+--   vim.cmd([[
+--     syntax match markdownH4 /^####\s\+.*$/ contains=markdownH4Marker
+--     syntax match markdownH4Marker /^####/ contained conceal cchar=󰫢
+--     syntax match @markup.heading.4.markdown /^####/ contained conceal cchar=
+--   ]])
+--
+--   vim.api.nvim_set_hl(0, "markdownH4", { fg = "#A88BFA", bold = true })
+--   vim.api.nvim_set_hl(0, "markdownH4Marker", { fg = "#A88BFA", bold = true })
+--   vim.api.nvim_set_hl(0, "@markup.heading.4.markdown", { fg = "#A88BFA", bold = true })
+-- end
+--
+-- vim.api.nvim_create_autocmd("FileType", {
+--   pattern = "markdown",
+--   callback = function()
+--     vim.schedule(setup_markdown_concealing)
+--   end,
+-- })
 
 -- Disabling line numbers in markdown
 -- In your LazyVim config folder, create or edit the file: ~/.config/nvim/lua/config/autocmds.lua
@@ -214,9 +217,12 @@ vim.api.nvim_set_hl(0, "CursorLine", { bg = "#1f1e21" })
 vim.api.nvim_set_hl(0, "Folded", { fg = "#69579d" })
 
 vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#111112" })
+vim.api.nvim_set_hl(0, "RenderMarkdownBullet", { fg = "#A88BFA", bold = true })
+vim.api.nvim_set_hl(0, "RenderMarkdownWarn", { fg = "#f8da90", bold = true })
+vim.api.nvim_set_hl(0, "RenderMarkdownLink", { fg = "#85c1dc", bold = true })
 vim.api.nvim_set_hl(0, "CodeiumSuggestion", { fg = "#58468c" })
 
-vim.api.nvim_set_hl(0, "RenderMarkdownCodeInline", { bg = "#26241f" })
+-- vim.api.nvim_set_hl(0, "RenderMarkdownCodeInline", { bg = "#26241f" })
 vim.api.nvim_set_hl(0, "Comment", { fg = "#6a6e83" })
 
 -- Remove eob ~ from the neotree panel
