@@ -4,6 +4,67 @@
 --
 -- wrap and check for spell in text filetypes
 
+-- Adding strikethrough to the completed tasks
+local function setup_markdown_task_highlighting(bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+
+  -- Match completed tasks: '- [x]', '* [x]', or any number of spaces before these
+  vim.api.nvim_buf_call(bufnr, function()
+    vim.cmd([[syntax match markdownTaskListDone /^\s*[-*]\s\[x\].*$/]])
+  end)
+
+  -- Set highlight with strikethrough
+  vim.api.nvim_set_hl(0, "markdownTaskListDone", { fg = "#A88BFA", strikethrough = true, italic = true })
+
+  -- Link the syntax match to the highlight group
+  vim.cmd([[highlight link markdownTaskListDone markdownTaskListDone]])
+end
+
+local markdown_highlight_group = vim.api.nvim_create_augroup("MarkdownTaskListDone", { clear = true })
+
+vim.api.nvim_create_autocmd({ "FileType", "BufEnter", "BufWritePost" }, {
+  group = markdown_highlight_group,
+  pattern = "*.md",
+  callback = function(args)
+    if vim.bo[args.buf].filetype == "markdown" then
+      setup_markdown_task_highlighting(args.buf)
+      -- Schedule a delayed re-application of highlighting
+      vim.defer_fn(function()
+        if vim.api.nvim_buf_is_valid(args.buf) then
+          setup_markdown_task_highlighting(args.buf)
+        end
+      end, 100)
+    end
+  end,
+})
+
+-- Trigger syntax sync when entering insert mode or when the buffer is written
+-- vim.api.nvim_create_autocmd({ "InsertEnter", "BufWritePost", "BufEnter" }, {
+--   group = markdown_highlight_group,
+--   pattern = "*.md",
+--   callback = function(args)
+--     if vim.bo[args.buf].filetype == "markdown" then
+--       vim.api.nvim_buf_call(args.buf, function()
+--         vim.cmd([[syntax sync fromstart]])
+--       end)
+--       -- Re-apply highlighting after sync
+--       setup_markdown_task_highlighting(args.buf)
+--     end
+--   end,
+-- })
+
+-- Ensure highlighting is applied after your startup file is loaded
+-- vim.api.nvim_create_autocmd("VimEnter", {
+--   group = markdown_highlight_group,
+--   callback = function()
+--     vim.defer_fn(function()
+--       local current_buf = vim.api.nvim_get_current_buf()
+--       if vim.bo[current_buf].filetype == "markdown" then
+--         setup_markdown_task_highlighting(current_buf)
+--       end
+--     end, 100)
+--   end,
+-- })
 vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none", fg = "#141317" })
 
 vim.api.nvim_create_autocmd("FileType", {
@@ -146,24 +207,6 @@ vim.api.nvim_set_hl(0, "AvanteConflictIncoming", { bg = "#182919" })
 vim.api.nvim_set_hl(0, "AvanteConflictIncomingLabel", { bg = "#405a35", fg = "#6fdf6f" })
 
 vim.api.nvim_set_hl(0, "AvanteInlineHint", { fg = "#433861" })
-
--- Adding strikethrough to the completed tasks
-vim.api.nvim_create_augroup("MarkdownTaskListDone", { clear = true })
-
-vim.api.nvim_create_autocmd("FileType", {
-  group = "MarkdownTaskListDone",
-  pattern = "markdown",
-  callback = function()
-    -- Match completed tasks: '- [x]', '* [x]', or any number of spaces before these
-    vim.cmd([[syntax match markdownTaskListDone /^\s*[-*]\s\[x\].*$/]])
-
-    -- Set highlight with strikethrough
-    vim.api.nvim_set_hl(0, "markdownTaskListDone", { fg = "#A88BFA", strikethrough = true, italic = true })
-
-    -- Link the syntax match to the highlight group
-    vim.cmd([[highlight link markdownTaskListDone markdownTaskListDone]])
-  end,
-})
 
 -- Markdown Preview
 

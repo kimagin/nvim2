@@ -6,6 +6,27 @@ return {
   ---@module 'render-markdown'
   ---@type render.md.UserConfig
   opts = {
+
+    debounce = 100,
+    preset = "lazy",
+    render_modes = { "c", "n" },
+    anti_conceal = {
+      -- This enables hiding any added text on the line the cursor is on
+      enabled = true,
+      -- Which elements to always show, ignoring anti conceal behavior. Values can either be booleans
+      -- to fix the behavior or string lists representing modes where anti conceal behavior will be
+      -- ignored. Possible keys are:
+      --  head_icon, head_background, head_border, code_language, code_background, code_border
+      --  dash, bullet, check_icon, check_scope, quote, table_border, callout, link, sign
+      ignore = {
+        code_background = true,
+        sign = true,
+      },
+      -- Number of lines above cursor to show
+      above = 0,
+      -- Number of lines below cursor to show
+      below = 0,
+    },
     heading = {
       -- Turn on / off heading icon & background rendering
       enabled = true,
@@ -126,11 +147,11 @@ return {
       -- Determins how the top / bottom of code block are rendered:
       --  thick: use the same highlight as the code body
       --  thin:  when lines are empty overlay the above & below icons
-      border = "thick",
+      border = "thin",
       -- Used above code blocks for thin border
-      above = "▄",
+      -- above = "▄",
       -- Used below code blocks for thin border
-      below = "▀",
+      -- below = "▀",
       -- Highlight for code blocks
       highlight = "RenderMarkdownCode",
       -- Highlight for inline code

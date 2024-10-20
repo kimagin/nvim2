@@ -112,7 +112,6 @@ return {
           sources = cmp.config.sources(sources),
         })
       end
-
       return opts
     end,
   },

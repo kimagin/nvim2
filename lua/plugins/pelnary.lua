@@ -1,0 +1,68 @@
+return {
+  -- "nvim-lua/plenary.nvim",
+  -- config = function()
+  --   local function get_random_journal_file()
+  --     local files = vim.fn.glob("~/Developments/obsidian/journal/*.md", false, true)
+  --     if #files > 0 then
+  --       math.randomseed(os.time())
+  --       return files[math.random(#files)]
+  --     end
+  --     return ""
+  --   end
+  --
+  --   local function open_file_in_float(file_path)
+  --     -- Create a new float window
+  --     local buf = vim.api.nvim_create_buf(false, true)
+  --     local width = math.floor(vim.o.columns * 0.9)
+  --     local height = math.floor(vim.o.lines * 0.9)
+  --     local win = vim.api.nvim_open_win(buf, true, {
+  --       relative = "editor",
+  --       width = width - 4, -- Subtract 4 for left and right padding
+  --       height = height - 4, -- Subtract 4 for top and bottom padding
+  --       col = math.floor((vim.o.columns - width) / 2) + 2, -- Add 2 for left padding
+  --       row = math.floor((vim.o.lines - height) / 2) + 2, -- Add 2 for top padding
+  --       style = "minimal",
+  --       border = "single",
+  --     })
+  --
+  --     -- Read and set the file content
+  --     local content = vim.fn.readfile(file_path)
+  --     vim.api.nvim_buf_set_lines(buf, 0, -1, false, content)
+  --
+  --     -- Set buffer options
+  --     vim.bo[buf].modifiable = false
+  --     vim.bo[buf].buftype = "nofile"
+  --     vim.bo[buf].bufhidden = "hide"
+  --     vim.bo[buf].buflisted = false
+  --
+  --     vim.bo[buf].filetype = "markdown"
+  --
+  --     -- Set window options
+  --     vim.wo[win].wrap = true
+  --     vim.wo[win].cursorline = true
+  --
+  --     -- Set buffer name to the file path
+  --     vim.api.nvim_buf_set_name(buf, file_path)
+  --
+  --     -- Apply markdown syntax highlighting
+  --     vim.cmd([[syntax enable]])
+  --     vim.cmd([[set syntax=markdown]])
+  --
+  --     -- Add keymapping to close the float window
+  --     vim.keymap.set("n", "q", ":close<CR>", { buffer = buf, noremap = true, silent = true })
+  --     vim.keymap.set("n", "<leader>", ":close<CR>", { buffer = buf, nowait = true })
+  --   end
+  --
+  --   vim.api.nvim_create_autocmd("VimEnter", {
+  --     callback = function()
+  --       -- Only open the file if Neovim was started without arguments
+  --       if vim.fn.argc() == 0 then
+  --         local startup_file = get_random_journal_file()
+  --         if startup_file ~= "" then
+  --           open_file_in_float(startup_file)
+  --         end
+  --       end
+  --     end,
+  --   })
+  -- end,
+}

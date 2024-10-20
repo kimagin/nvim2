@@ -5,16 +5,28 @@ return {
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
       -- configure fzf-lua here if needed
-      local startup_file = vim.fn.expand("~/untitled.md")
-
-      vim.api.nvim_create_autocmd("VimEnter", {
-        callback = function()
-          -- Only open the file if Neovim was started without arguments
-          if vim.fn.argc() == 0 then
-            vim.cmd("edit " .. startup_file)
-          end
-        end,
-      })
+      -- local function get_random_journal_file()
+      --   local files = vim.fn.glob("~/Developments/obsidian/journal/*.md", false, true)
+      --   if #files > 0 then
+      --     math.randomseed(os.time())
+      --     return files[math.random(#files)]
+      --   end
+      --   return ""
+      -- end
+      --
+      -- vim.api.nvim_create_autocmd("VimEnter", {
+      --   callback = function()
+      --     -- Only open the file if Neovim was started without arguments
+      --     if vim.fn.argc() == 0 then
+      --       local startup_file = get_random_journal_file()
+      --
+      --       if startup_file ~= "" then
+      --         vim.cmd("edit " .. startup_file)
+      --         vim.bo.filetype = "markdown"
+      --       end
+      --     end
+      --   end,
+      -- })
     end,
   },
   {
