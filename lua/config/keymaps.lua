@@ -201,20 +201,13 @@ vim.api.nvim_set_keymap("n", "<leader>aA", "<cmd>AvanteClear<cr>", { noremap = t
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 
--- Toggle cmp visibility
-local cmp_visible = true
-vim.keymap.set({ "i", "s" }, "<C-x>", function()
-  local cmp = require("cmp")
-  if cmp_visible then
-    cmp.close()
-    cmp_visible = false
-  else
-    cmp.complete()
-    cmp_visible = true
-  end
-end, { desc = "Toggle cmp visibility" })
-
--- Wrap line in console.log
+-- vim.keymap.set({ "i", "s" }, "<C-x>", function()
+--   if cmp.visible() then
+--     cmp.close()
+--   else
+--     cmp.complete()
+--   end
+-- end, { desc = "Toggle cmp visibility" })
 
 vim.keymap.set("n", "<leader>cp", function()
   -- Get the current line

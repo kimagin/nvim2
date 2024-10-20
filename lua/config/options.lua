@@ -9,11 +9,17 @@ vim.opt.shortmess:append("I")
 vim.opt.showtabline = 0 -- Hide tabs
 vim.opt.wrap = true
 
+vim.opt.encoding = "utf-8"
+vim.opt.fileencoding = "utf-8"
+
 vim.opt.termguicolors = true
 
 --- Instant appearance of Which key
 vim.o.timeout = true
 vim.o.timeoutlen = 300
+
+-- Clipboard configuration
+vim.opt.clipboard = "unnamedplus"
 
 -- Clipboard configuration for wsl
 if vim.fn.has("wsl") == 1 then
@@ -24,8 +30,8 @@ if vim.fn.has("wsl") == 1 then
       ["*"] = "clip.exe",
     },
     paste = {
-      ["+"] = "win32yank.exe -o --lf",
-      ["*"] = "win32yank.exe -o --lf",
+      ["+"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+      ["*"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
     },
     cache_enabled = 0,
   }
