@@ -196,8 +196,9 @@ vim.api.nvim_set_hl(0, "@punctuation.special", { fg = "#C6D0F6" })
 vim.api.nvim_set_hl(0, "@tag", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "tag.delimiter", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "@tag.delimiter", { fg = "#A88BFA" })
-vim.api.nvim_set_hl(0, "@tag.attribute", { fg = "#c3e4dc" })
-vim.api.nvim_set_hl(0, "@operator", { fg = "#c3e4dc" })
+vim.api.nvim_set_hl(0, "@tag.attribute", { fg = "#a0b9ff" })
+vim.api.nvim_set_hl(0, "@operator", { fg = "#a0b9ff" })
+vim.api.nvim_set_hl(0, "@punctuation.special", { fg = "#a0b9ff" })
 
 -- Avante
 vim.api.nvim_set_hl(0, "AvanteConflictCurrent", { bg = "#2c1718" })
