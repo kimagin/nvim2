@@ -97,9 +97,9 @@ return {
     opts = {
       formatters_by_ft = {
         markdown = { "deno_fmt" },
-        javascript = { "prettier" },
-        typescript = { "prettier" },
-        astro = { "prettier" },
+        javascript = { "prettierd" },
+        typescript = { "prettierd" },
+        astro = { "prettierd" },
       },
     },
   },
