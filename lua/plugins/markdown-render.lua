@@ -7,9 +7,9 @@ return {
   ---@type render.md.UserConfig
   opts = {
 
-    debounce = 100,
+    debounce = 300,
     preset = "lazy",
-    render_modes = { "c", "n" },
+    render_modes = { "i", "c", "v", "n", "o-pending" },
     anti_conceal = {
       -- This enables hiding any added text on the line the cursor is on
       enabled = true,
@@ -21,6 +21,11 @@ return {
       ignore = {
         code_background = true,
         sign = true,
+        table_border = true,
+        code_language = true,
+        code_border = true,
+        pipe_table = true,
+        head_border = true,
       },
       -- Number of lines above cursor to show
       above = 0,
@@ -234,7 +239,7 @@ return {
       --  double: use double line border characters
       --  round:  use round border corners
       --  none:   does nothing
-      preset = "round",
+      preset = "none",
       -- Determines how the table as a whole is rendered:
       --  none:   disables all rendering
       --  normal: applies the 'cell' style rendering to each row of the table
@@ -245,7 +250,7 @@ return {
       --  raw:     replaces only the '|' characters in each row, leaving the cells unmodified
       --  padded:  raw + cells are padded to maximum visual width for each column
       --  trimmed: padded except empty space is subtracted from visual width calculation
-      cell = "padded",
+      cell = "raw",
       -- Amount of space to put between cell contents and border
       padding = 1,
       -- Minimum column width to use for padded or trimmed cell
@@ -260,7 +265,7 @@ return {
             '│', '─',
         },
       -- Gets placed in delimiter row for each column, position is based on alignmnet
-      alignment_indicator = "",
+      alignment_indicator = "⬥",
       -- Highlight for table heading, delimiter, and the line above
       head = "RenderMarkdownTableHead",
       -- Highlight for everything else, main table rows and the line below
