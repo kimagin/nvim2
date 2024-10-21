@@ -245,7 +245,7 @@ return {
       --  raw:     replaces only the '|' characters in each row, leaving the cells unmodified
       --  padded:  raw + cells are padded to maximum visual width for each column
       --  trimmed: padded except empty space is subtracted from visual width calculation
-      cell = "trimmed",
+      cell = "padded",
       -- Amount of space to put between cell contents and border
       padding = 1,
       -- Minimum column width to use for padded or trimmed cell
