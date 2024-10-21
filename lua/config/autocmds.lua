@@ -199,6 +199,7 @@ vim.api.nvim_set_hl(0, "@tag.delimiter", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "@tag.attribute", { fg = "#a0b9ff" })
 vim.api.nvim_set_hl(0, "@operator", { fg = "#a0b9ff" })
 vim.api.nvim_set_hl(0, "@punctuation.special", { fg = "#a0b9ff" })
+vim.api.nvim_set_hl(0, "RenderMarkdownDash", { fg = "#2e313e" })
 
 -- Avante
 vim.api.nvim_set_hl(0, "AvanteConflictCurrent", { bg = "#2c1718" })
