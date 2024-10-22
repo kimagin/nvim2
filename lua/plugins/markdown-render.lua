@@ -24,7 +24,6 @@ return {
         table_border = true,
         code_language = true,
         code_border = true,
-        pipe_table = true,
         head_border = true,
       },
       -- Number of lines above cursor to show
@@ -250,7 +249,7 @@ return {
       --  raw:     replaces only the '|' characters in each row, leaving the cells unmodified
       --  padded:  raw + cells are padded to maximum visual width for each column
       --  trimmed: padded except empty space is subtracted from visual width calculation
-      cell = "raw",
+      cell = "trimmed",
       -- Amount of space to put between cell contents and border
       padding = 1,
       -- Minimum column width to use for padded or trimmed cell
