@@ -13,7 +13,7 @@ return {
       --   end
       --   return ""
       -- end
-      --
+
       -- vim.api.nvim_create_autocmd("VimEnter", {
       --   callback = function()
       --     -- Only open the file if Neovim was started without arguments
@@ -27,6 +27,26 @@ return {
       --     end
       --   end,
       -- })
+
+      -- Create and open note.md on startup if vim was started without arguments
+      vim.api.nvim_create_autocmd("VimEnter", {
+        callback = function()
+          if vim.fn.argc() == 0 then
+            -- Get home directory
+            local home = os.getenv("HOME")
+            local note_file = home .. "/note.md"
+
+            -- Create a new buffer
+            vim.cmd("enew")
+            vim.bo.filetype = "markdown"
+            vim.api.nvim_buf_set_lines(0, 0, -1, false, { "# Neovim", "", "" })
+            -- Set the buffer name
+            vim.cmd("file " .. note_file)
+            -- Set nomodified initially
+            vim.bo.modified = false
+          end
+        end,
+      })
     end,
   },
   {
