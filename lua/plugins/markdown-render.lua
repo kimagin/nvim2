@@ -105,7 +105,7 @@ return {
       enabled = true,
       -- Amount of margin to add to the left of paragraphs
       -- If a floating point value < 1 is provided it is treated as a percentage of the available window space
-      left_margin = 2,
+      left_margin = 0,
       -- Minimum width to use for paragraphs
       min_width = 0,
     },
