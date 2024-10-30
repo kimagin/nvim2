@@ -59,6 +59,26 @@ vim.opt.foldtext =
 -- foldindicator
 vim.opt.fillchars = { foldopen = "", foldclose = "", fold = " ", foldsep = " ", eob = " " }
 
+-- Save folds and cursor position
+vim.opt.viewoptions = "folds,cursor"
+vim.opt.viewdir = vim.fn.stdpath("data") .. "/views"
+
+-- Create the view directory if it doesn't exist
+local view_dir = vim.fn.stdpath("data") .. "/views"
+if vim.fn.isdirectory(view_dir) == 0 then
+  vim.fn.mkdir(view_dir, "p")
+end
+
 -- Number column
 vim.opt.numberwidth = 4
 vim.opt.signcolumn = "yes:1"
+
+-- Make buffers persistant (folds, cursor position, etc.)
+vim.api.nvim_create_autocmd({ "BufWinLeave" }, {
+  pattern = { "*.*" },
+  command = "silent! mkview",
+})
+vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
+  pattern = { "*.*" },
+  command = "silent! loadview",
+})
