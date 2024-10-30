@@ -258,8 +258,8 @@ vim.api.nvim_set_hl(0, "AvanteInlineHint", { fg = "#433861" })
 vim.api.nvim_set_hl(0, "Visual", { bg = "#31294c", reverse = false })
 
 -- Optional: Make selection in line highlight more subtle
-vim.api.nvim_set_hl(0, "CursorLine", { bg = "#1f1e21" })
-vim.api.nvim_set_hl(0, "Folded", { fg = "#69579d" })
+vim.api.nvim_set_hl(0, "CursorLine", { bg = "#1e192b", blend = 50 })
+vim.api.nvim_set_hl(0, "Folded", { fg = "#58468c", blend = 10, italic = true })
 
 vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#111112" })
 vim.api.nvim_set_hl(0, "RenderMarkdownBullet", { fg = "#A88BFA", bold = true })
