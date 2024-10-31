@@ -117,6 +117,10 @@ return {
         open_mapping = [[<C-\>]],
         direction = "horizontal",
         shade_terminals = true,
+        start_in_insert = true,
+        on_open = function(term)
+          vim.cmd("startinsert!")
+        end,
         size = function(term)
           if term.direction == "horizontal" then
             return 15
