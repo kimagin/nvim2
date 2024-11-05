@@ -39,6 +39,20 @@ return {
     filesystem = {
       follow_current_file = { enabled = true },
       use_libuv_file_watcher = true,
+      filtered_items = {
+        never_show = { -- remains hidden even if visible is toggled to true
+          ".DS_Store",
+          "thumbs.db",
+          "node_modules",
+          "dist",
+          "build",
+          "venv",
+          "target",
+          ".git",
+        },
+      },
+      -- Limit search depth to avoid going too deep
+      search_limit = 10, -- limits the search depth to 10 levels
     },
     window = {
       width = 30, -- Smaller window size (customize as needed)

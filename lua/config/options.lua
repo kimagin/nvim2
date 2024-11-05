@@ -1,5 +1,3 @@
--- Options are automatically loaded before lazy.nvim startup
--- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Performance related options
 vim.opt.updatetime = 120 -- Faster completion (default: 4000)
 vim.opt.timeoutlen = 200 -- Faster key sequence completion
@@ -65,79 +63,10 @@ vim.opt.fillchars = {
   eob = " ",
 }
 
--- View options with directory management
+-- View options
 vim.opt.viewoptions = "folds,cursor,curdir"
 vim.opt.viewdir = vim.fn.stdpath("data") .. "/views/bufs"
-
--- Create view directory if it doesn't exist
-local view_dir = vim.fn.stdpath("data") .. "/views/bufs"
-if vim.fn.isdirectory(view_dir) == 0 then
-  vim.fn.mkdir(view_dir, "p")
-end
 
 -- UI elements
 vim.opt.numberwidth = 4
 vim.opt.signcolumn = "yes:1"
-
--- Large file detection and optimization
-local function is_large_file(bufnr)
-  local max_size = 1024 * 1024 -- 1MB
-  local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(bufnr))
-  return ok and stats and stats.size > max_size
-end
-
--- Buffer persistence with Treesitter-aware view loading
-vim.api.nvim_create_autocmd({ "BufWinLeave" }, {
-  pattern = { "*.*" },
-  callback = function(args)
-    if not is_large_file(args.buf) then
-      vim.cmd("silent! mkview")
-    end
-  end,
-})
-
-vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
-  pattern = { "*.*" },
-  callback = function(args)
-    if not is_large_file(args.buf) then
-      -- Wait for Treesitter to attach before loading view
-      vim.defer_fn(function()
-        if vim.api.nvim_buf_is_valid(args.buf) then
-          vim.cmd("silent! loadview")
-        end
-      end, 20) -- Small delay to ensure Treesitter is ready
-    end
-  end,
-})
-
--- Large file optimizations
-vim.api.nvim_create_autocmd("BufReadPre", {
-  pattern = "*",
-  callback = function(args)
-    if is_large_file(args.buf) then
-      -- Disable heavy features only for large files
-      vim.opt_local.foldmethod = "manual"
-      vim.opt_local.foldenable = false
-      vim.opt_local.swapfile = false
-      vim.b[args.buf].large_file = true
-      -- Don't disable syntax completely, but use a more performant method
-      vim.opt_local.syntax = "on"
-      vim.opt_local.spell = false
-      vim.opt_local.undofile = false
-    end
-  end,
-})
-
--- Clean up old view files periodically
-vim.api.nvim_create_autocmd("VimLeavePre", {
-  callback = function()
-    local view_files = vim.fn.glob(view_dir .. "/*", true, true)
-    for _, file in ipairs(view_files) do
-      -- Remove view files older than 7 days
-      local last_modified = vim.uv.fs_stat(file).mtime.sec
-      if os.time() - last_modified > 7 * 24 * 60 * 60 then
-        os.remove(file)
-      end
-    end
-  end,
-})
