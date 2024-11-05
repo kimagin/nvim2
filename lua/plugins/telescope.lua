@@ -1,55 +1,5 @@
 return {
   {
-    "ibhagwan/fzf-lua",
-    -- optional for icon support
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    config = function()
-      -- configure fzf-lua here if needed
-      -- local function get_random_journal_file()
-      --   local files = vim.fn.glob("~/Developments/obsidian/journal/*.md", false, true)
-      --   if #files > 0 then
-      --     math.randomseed(os.time())
-      --     return files[math.random(#files)]
-      --   end
-      --   return ""
-      -- end
-
-      -- vim.api.nvim_create_autocmd("VimEnter", {
-      --   callback = function()
-      --     -- Only open the file if Neovim was started without arguments
-      --     if vim.fn.argc() == 0 then
-      --       local startup_file = get_random_journal_file()
-      --
-      --       if startup_file ~= "" then
-      --         vim.cmd("edit " .. startup_file)
-      --         vim.bo.filetype = "markdown"
-      --       end
-      --     end
-      --   end,
-      -- })
-
-      -- Create and open note.md on startup if vim was started without arguments
-      vim.api.nvim_create_autocmd("VimEnter", {
-        callback = function()
-          if vim.fn.argc() == 0 then
-            -- Get home directory
-            local home = os.getenv("HOME")
-            local note_file = home .. "/note.md"
-
-            -- Create a new buffer
-            vim.cmd("enew")
-            vim.bo.filetype = "markdown"
-            vim.api.nvim_buf_set_lines(0, 0, -1, false, { "# Neovim", "", "" })
-            -- Set the buffer name
-            vim.cmd("file " .. note_file)
-            -- Set nomodified initially
-            vim.bo.modified = false
-          end
-        end,
-      })
-    end,
-  },
-  {
     "nvim-telescope/telescope.nvim",
     opts = function(_, opts)
       local fzf_lua = require("fzf-lua")
@@ -90,8 +40,10 @@ return {
           "Movies",
         },
         sorting_strategy = "descending",
+        sort_mtime = true,
+        sort_lastused = true,
         color_devicons = true,
-        debounce = 50,
+        debounce = 80,
         winblend = 0,
         border = true,
         borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },

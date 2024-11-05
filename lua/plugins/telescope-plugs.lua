@@ -24,13 +24,16 @@ return {
             hidden = true,
             no_ignore = false,
             find_command = {
-              "fd",
-              "--type",
-              "f",
-              "--hidden",
-              "--follow",
-              "--exclude",
-              ".cargo",
+              "sh",
+              "-c",
+              [[fd --type f --hidden --follow \
+                --exclude .cargo --exclude .git --exclude node_modules \
+                --exclude dist --exclude .local --exclude .Trash \
+                --exclude .vscode --exclude .tldrc --exclude Library \
+                --exclude .cache --exclude .vscode-server --exclude .npm \
+                --exclude .pnpm --exclude .continue --exclude .ollama \
+                --exclude OneDrive --exclude undodir --exclude .rustup \
+                -0 | xargs -0 ls -t]],
               "--exclude",
               ".git",
               "--exclude",

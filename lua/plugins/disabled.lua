@@ -36,7 +36,7 @@ return {
   -- { "neovim/nvim-lspconfig", enabled = false },
   { "jose-elias-alvarez/null-ls.nvim", enabled = false },
   -- { "stevearc/conform.nvim", enabled = false },
-  -- { "nvimdev/dashboard-nvim", enabled = false },
+  { "nvimdev/dashboard-nvim", enabled = false },
   -- { "ggandor/leap.nvim", enabled = false },
   -- { "epwalsh/obsidian.nvim", enabled = false },
   -- { "MeanderingProgrammer/markdown.nvim", enabled = false },
