@@ -79,20 +79,60 @@ return {
           local conf = require("telescope.config").values
           local actions = require("telescope.actions")
           local action_state = require("telescope.actions.state")
+          local function load_frequency_data()
+            local freq_file = vim.fn.stdpath("data") .. "/repo_frequency.json"
+            local f = io.open(freq_file, "r")
+            if f then
+              local content = f:read("*all")
+              f:close()
+              return vim.json.decode(content) or {}
+            end
+            return {}
+          end
+
+          local function save_frequency_data(freq_data)
+            local freq_file = vim.fn.stdpath("data") .. "/repo_frequency.json"
+            local f = io.open(freq_file, "w")
+            if f then
+              f:write(vim.json.encode(freq_data))
+              f:close()
+            end
+          end
+
           local function get_git_repos()
             local search_dir = os.getenv("HOME")
             local cmd = string.format(
-              [[fd --hidden --type d --exclude '.local' --exclude '.cargo' --exclude ".Trash" --exclude ".vscode" --exclude ".tldrc" --exclude "Library/*" --exclude ".cache" --exclude ".vscode-server" --exclude "node_modules" --exclude ".npm" --exclude ".pnpm" ".git" "%s" | xargs -n1 dirname | sort -u]],
+              [[fd --hidden --type d --max-depth 5 --exclude '.local' --exclude '.cargo' --exclude ".Trash" --exclude ".vscode" --exclude ".tldrc" --exclude "Library/*" --exclude ".cache" --exclude ".vscode-server" --exclude "node_modules" --exclude ".npm" --exclude ".pnpm" ".git$" "%s" | xargs -n1 dirname | sort -u]],
               search_dir
             )
             local handle = io.popen(cmd)
             local result = handle:read("*a")
             handle:close()
+
+            local freq_data = load_frequency_data()
             local repos = {}
             for repo in result:gmatch("[^\r\n]+") do
-              table.insert(repos, repo)
+              table.insert(repos, {
+                path = repo,
+                freq = freq_data[repo] or 0,
+              })
             end
-            return repos
+
+            -- Sort by frequency (descending) and then by path
+            table.sort(repos, function(a, b)
+              if a.freq == b.freq then
+                return a.path < b.path
+              end
+              return a.freq > b.freq
+            end)
+
+            -- Convert back to simple path array
+            local sorted_repos = {}
+            for _, repo in ipairs(repos) do
+              table.insert(sorted_repos, repo.path)
+            end
+
+            return sorted_repos
           end
           pickers
             .new({
@@ -122,6 +162,10 @@ return {
                 actions.select_default:replace(function()
                   actions.close(prompt_bufnr)
                   local selection = action_state.get_selected_entry()
+                  -- Update frequency
+                  local freq_data = load_frequency_data()
+                  freq_data[selection.value] = (freq_data[selection.value] or 0) + 1
+                  save_frequency_data(freq_data)
                   vim.cmd("cd " .. selection.value)
                   require("telescope.builtin").find_files({
                     hidden = true,
