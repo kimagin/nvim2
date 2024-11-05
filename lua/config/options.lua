@@ -69,4 +69,4 @@ vim.opt.viewdir = vim.fn.stdpath("data") .. "/views/bufs"
 
 -- UI elements
 vim.opt.numberwidth = 4
-vim.opt.signcolumn = "yes:1"
+vim.opt.signcolumn = "number"
