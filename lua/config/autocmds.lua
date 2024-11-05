@@ -135,6 +135,8 @@ vim.api.nvim_set_hl(0, "@markup.heading.4.markdown", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "@markup.heading.5.markdown", { fg = "#A88BFA" })
 vim.api.nvim_set_hl(0, "@markup.heading.6.markdown", { fg = "#A88BFA" })
 
+vim.api.nvim_set_hl(0, "@markup.quote", { fg = "#ea928a" })
+
 vim.api.nvim_set_hl(0, "@markup.list", { fg = "#A88BFA" })
 
 vim.api.nvim_set_hl(0, "markdownHeadingDelimiter", { fg = "#A88BFA" })

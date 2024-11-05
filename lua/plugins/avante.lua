@@ -1,12 +1,16 @@
 return {
   "yetone/avante.nvim",
   event = "VeryLazy",
-  lazy = false,
+  lazy = true,
   version = false, -- set this if you want to always pull the latest change
   opts = {
     -- add any opts here
     behaviour = {
       auto_suggestions = false,
+      debounce_ms = 150,
+      max_lines = 1000,
+      trim_text = true,
+      show_debug_info = false,
     },
     mappings = {
       suggestion = {
@@ -17,13 +21,46 @@ return {
       },
     },
     windows = {
-      width = 35,
+      width = 40,
+      max_height = 20,
       sidebar_header = {
         align = "right",
         rounded = false,
       },
+      border = "rounded", -- Rounded borders for better aesthetics
+      padding = { 1, 1, 1, 1 },
+      win_options = {
+        wrap = true,
+        linebreak = true,
+        foldcolumn = "0",
+        winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+      },
     },
     hints = { enabled = false },
+    ui = {
+      icons = {
+        enabled = true,
+        suggestion = "💡",
+        sidebar = "📝",
+        error = "❌",
+        warning = "⚠️",
+      },
+      highlights = {
+        suggestion = "Comment",
+        selected = "Visual",
+      },
+    },
+    filters = {
+      -- Ignore specific file types or patterns
+      ignored_file_types = {
+        "help",
+        "qf",
+        "lazy",
+        "mason",
+        "notify",
+      },
+      max_file_size = 1000000, -- 1MB max file size
+    },
   },
   -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
   build = "make",
@@ -40,7 +77,6 @@ return {
       -- support for image pasting
       "HakonHarnes/img-clip.nvim",
       event = "VeryLazy",
-
       opts = {
 
         -- recommended settings
@@ -56,10 +92,10 @@ return {
       },
     },
     {
-      -- Make sure to set this up properly if you have lazy=true
       "MeanderingProgrammer/render-markdown.nvim",
       opts = {
         file_types = { "markdown", "Avante" },
+        highlight_code_blocks = true,
       },
       ft = { "markdown", "Avante" },
     },

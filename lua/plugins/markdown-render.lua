@@ -7,9 +7,9 @@ return {
   ---@type render.md.UserConfig
   opts = {
 
-    debounce = 300,
-    preset = "lazy",
-    render_modes = { "i", "c", "v", "n", "o-pending" },
+    debounce = 150,
+    preset = "none",
+    render_modes = { "i", "n", "c", "o-pending" },
     anti_conceal = {
       -- This enables hiding any added text on the line the cursor is on
       enabled = true,
@@ -20,6 +20,8 @@ return {
       --  dash, bullet, check_icon, check_scope, quote, table_border, callout, link, sign
       ignore = {
         code_background = true,
+        code = true,
+        checkbox = true,
         sign = true,
         table_border = true,
         code_language = true,
@@ -113,13 +115,13 @@ return {
       -- Turn on / off code block & inline code rendering
       enabled = true,
       -- Turn on / off any sign column related rendering
-      sign = false,
+      sign = true,
       -- Determines how code blocks & inline code are rendered:
       --  none:     disables all rendering
       --  normal:   adds highlight group to code blocks & inline code, adds padding to code blocks
       --  language: adds language icon to sign column if enabled and icon + name above code blocks
       --  full:     normal + language
-      style = "full",
+      style = "language",
       -- Determines where language icon is rendered:
       --  right: right side of code block
       --  left:  left side of code block
