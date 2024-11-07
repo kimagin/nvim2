@@ -1,6 +1,6 @@
 -- Performance related options
 vim.opt.updatetime = 120 -- Faster completion (default: 4000)
-vim.opt.timeoutlen = 200 -- Faster key sequence completion
+vim.opt.timeoutlen = 300 -- Faster key sequence completion
 vim.opt.redrawtime = 500 -- Allow more time for loading syntax on large files
 
 -- File handling and encoding

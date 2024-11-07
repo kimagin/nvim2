@@ -223,16 +223,16 @@ return {
   config = function(_, opts)
     require("obsidian").setup(opts)
 
-    -- Add this function to create daily notes with only the title
-    local function create_daily_note_with_title()
-      local date = os.date(opts.daily_notes.date_format)
-      local file_path = vim.fn.expand("~/Developments/obsidian/journal/" .. date .. ".md")
+    -- Helper function to create a note with template
+    local function create_note_with_template(date_str, is_tomorrow)
+      local file_path = vim.fn.expand("~/Developments/obsidian/journal/" .. date_str .. ".md")
 
       -- Create the file if it doesn't exist
       if vim.fn.filereadable(file_path) == 0 then
         local file = io.open(file_path, "w")
         if file then
-          file:write("# " .. date .. "\n\n\n#### Today's Tasks\n\n- [ ] Task1\n- [ ] Task2\n\n--- ")
+          local header = "Today's Tasks"
+          file:write("# " .. date_str .. "\n\n\n#### " .. header .. "\n\n- [ ] Task1\n- [ ] Task2\n\n--- ")
           file:close()
         end
       end
@@ -241,8 +241,23 @@ return {
       vim.cmd("edit " .. file_path)
     end
 
+    -- Function to create today's note
+    local function create_daily_note_with_title()
+      local date = os.date(opts.daily_notes.date_format)
+      create_note_with_template(date, false)
+    end
+
+    -- Function to create tomorrow's note
+    local function create_tomorrow_note_with_title()
+      local tomorrow = os.time() + 86400 -- 86400 seconds = 1 day
+      local date = os.date(opts.daily_notes.date_format, tomorrow)
+      create_note_with_template(date, true)
+    end
+
     -- Override the ObsidianToday command
     vim.api.nvim_create_user_command("ObsidianToday", create_daily_note_with_title, {})
+    -- Add ObsidianTomorrow command
+    vim.api.nvim_create_user_command("ObsidianTomorrow", create_tomorrow_note_with_title, {})
 
     vim.api.nvim_create_user_command("ObsidianOpenFolder", function()
       local folder = vim.fn.expand("~/Developments/obsidian")
@@ -256,8 +271,10 @@ return {
     { "<leader>os", "<cmd>ObsidianSearch<cr>", desc = "Search Obsidian notes" },
     { "<leader>oq", "<cmd>ObsidianQuickSwitch<cr>", desc = "Quick Switch" },
     { "<leader>ob", "<cmd>ObsidianBacklinks<cr>", desc = "Show backlinks" },
-    { "<leader>ot", "<cmd>ObsidianTemplate<cr>", desc = "Templates" },
+    { "<leader>oT", "<cmd>ObsidianTemplate<cr>", desc = "Templates" },
     { "<leader>od", "<cmd>ObsidianToday<cr>", desc = "Open today's daily note" },
+    { "<leader>ot", "<cmd>ObsidianTomorrow<cr>", desc = "Paste image into the file" },
+    { "<leader>oy", "<cmd>ObsidianYesterday<cr>", desc = "Paste image into the file" },
     { "<leader>pi", "<cmd>ObsidianPasteImg<cr>", desc = "Paste image into the file" },
   },
 }
