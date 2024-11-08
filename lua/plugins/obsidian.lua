@@ -254,10 +254,19 @@ return {
       create_note_with_template(date, true)
     end
 
+    -- Function to create yesterday's note
+    local function create_yesterday_note_with_title()
+      local yesterday = os.time() - 86400 -- 86400 seconds = 1 day
+      local date = os.date(opts.daily_notes.date_format, yesterday)
+      create_note_with_template(date, false)
+    end
+
     -- Override the ObsidianToday command
     vim.api.nvim_create_user_command("ObsidianToday", create_daily_note_with_title, {})
     -- Add ObsidianTomorrow command
     vim.api.nvim_create_user_command("ObsidianTomorrow", create_tomorrow_note_with_title, {})
+    -- Add ObsidianYesterday command
+    vim.api.nvim_create_user_command("ObsidianYesterday", create_yesterday_note_with_title, {})
 
     vim.api.nvim_create_user_command("ObsidianOpenFolder", function()
       local folder = vim.fn.expand("~/Developments/obsidian")
