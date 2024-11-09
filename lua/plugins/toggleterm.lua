@@ -1,5 +1,9 @@
 return {
   {
+    "nvim-lua/plenary.nvim",
+    lazy = true,
+  },
+  {
     "akinsho/toggleterm.nvim",
     version = "*",
     config = function()
@@ -118,8 +122,23 @@ return {
         direction = "horizontal",
         shade_terminals = true,
         start_in_insert = true,
+        insert_mappings = true,
+        terminal_mappings = true,
         on_open = function(term)
           vim.cmd("startinsert!")
+          -- Add terminal keymaps for normal mode
+          vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], { buffer = term.bufnr })
+          vim.keymap.set("t", "jk", [[<C-\><C-n>]], { buffer = term.bufnr })
+
+          -- Auto-enter insert mode when buffer is entered
+          vim.api.nvim_create_autocmd({ "BufEnter" }, {
+            buffer = term.bufnr,
+            callback = function()
+              if vim.bo.buftype == "terminal" then
+                vim.cmd("startinsert!")
+              end
+            end,
+          })
         end,
         size = function(term)
           if term.direction == "horizontal" then
@@ -176,6 +195,30 @@ return {
         toggle_vertical_terminal,
         { desc = "Toggle Between Vertical and Horizontal Terminal", nowait = true, noremap = true, silent = true }
       )
+
+      -- Add Calcure calendar toggle
+      vim.keymap.set("n", "<leader>oc", function()
+        local calcure = Terminal:new({
+          cmd = "calcure --config=$HOME/Developments/obsidian/calcure/config.ini",
+          direction = "float",
+          hidden = true,
+          count = 99,
+          display_name = "  Calendar ",
+          float_opts = {
+            width = math.floor(vim.o.columns * 0.9),
+            height = math.floor(vim.o.lines * 0.9),
+          },
+          on_open = function(term)
+            -- Disable Esc mapping for this specific terminal
+            vim.keymap.set("t", "<Esc>", "<Nop>", { buffer = term.bufnr, noremap = true })
+            -- Add q mapping to close the terminal
+            vim.keymap.set("n", "q", function()
+              term:close()
+            end, { buffer = term.bufnr, noremap = true })
+          end,
+        })
+        calcure:toggle()
+      end, { desc = "Open Calcure Calendar", nowait = true, noremap = true, silent = true })
 
       -- Add keymaps for moving between buffers in terminal mode
       vim.keymap.set(
