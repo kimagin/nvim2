@@ -223,6 +223,46 @@ return {
   config = function(_, opts)
     require("obsidian").setup(opts)
 
+    -- Helper function to perform git operations asynchronously
+    local function perform_git_operations(callback)
+      local Job = require("plenary.job")
+      local vault_path = vim.fn.expand("~/Developments/obsidian")
+
+      -- Check if we're in a git repository
+      Job:new({
+        command = "git",
+        args = { "rev-parse", "--is-inside-work-tree" },
+        cwd = vault_path,
+        on_exit = function(j, return_val)
+          if return_val ~= 0 then
+            vim.schedule(function()
+              vim.notify("Obsidian Vault is Not a git repository", vim.log.levels.WARN)
+              callback(false)
+            end)
+            return
+          end
+
+          -- If it is a git repo, perform git pull
+          Job:new({
+            command = "git",
+            args = { "pull" },
+            cwd = vault_path,
+            on_exit = function(j2, pull_return_val)
+              vim.schedule(function()
+                if pull_return_val ~= 0 then
+                  vim.notify("Obsidian Vault sync failed", vim.log.levels.ERROR)
+                  callback(false)
+                else
+                  vim.notify("Obsidian Vault sync successful", vim.log.levels.INFO)
+                  callback(true)
+                end
+              end)
+            end,
+          }):start()
+        end,
+      }):start()
+    end
+
     -- Helper function to create a note with template
     local function create_note_with_template(date_str, is_tomorrow)
       local file_path = vim.fn.expand("~/Developments/obsidian/journal/" .. date_str .. ".md")
@@ -245,6 +285,8 @@ return {
     local function create_daily_note_with_title()
       local date = os.date(opts.daily_notes.date_format)
       create_note_with_template(date, false)
+      -- Perform git operations after opening the file
+      perform_git_operations(function(_) end)
     end
 
     -- Function to create tomorrow's note
@@ -252,6 +294,8 @@ return {
       local tomorrow = os.time() + 86400 -- 86400 seconds = 1 day
       local date = os.date(opts.daily_notes.date_format, tomorrow)
       create_note_with_template(date, true)
+      -- Perform git operations after opening the file
+      perform_git_operations(function(_) end)
     end
 
     -- Function to create yesterday's note
@@ -259,6 +303,8 @@ return {
       local yesterday = os.time() - 86400 -- 86400 seconds = 1 day
       local date = os.date(opts.daily_notes.date_format, yesterday)
       create_note_with_template(date, false)
+      -- Perform git operations after opening the file
+      perform_git_operations(function(_) end)
     end
 
     -- Override the ObsidianToday command
