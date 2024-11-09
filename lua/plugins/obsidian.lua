@@ -276,6 +276,52 @@ return {
     local vault_path = vim.fn.expand("~/Developments/obsidian")
     local group = vim.api.nvim_create_augroup("ObsidianGitOps", { clear = true })
 
+    -- Timer for auto-save functionality
+    local auto_save_timer = nil
+    local function setup_auto_save()
+      -- Clear existing timer if any
+      if auto_save_timer then
+        auto_save_timer:stop()
+        auto_save_timer:close()
+      end
+
+      -- Create new timer
+      auto_save_timer = vim.loop.new_timer()
+      auto_save_timer:start(
+        10000,
+        0,
+        vim.schedule_wrap(function()
+          -- Only save if buffer is modified
+          if vim.bo.modified then
+            vim.cmd("silent! write")
+            -- vim.notify("󰆓", vim.log.levels.INFO)
+          end
+        end)
+      )
+    end
+
+    -- Set up auto-save for markdown files in vault
+    vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
+      group = group,
+      pattern = vault_path .. "/*.md",
+      callback = function()
+        setup_auto_save()
+      end,
+    })
+
+    -- Clean up timer when leaving buffer
+    vim.api.nvim_create_autocmd({ "BufLeave", "BufUnload" }, {
+      group = group,
+      pattern = vault_path .. "/*.md",
+      callback = function()
+        if auto_save_timer then
+          auto_save_timer:stop()
+          auto_save_timer:close()
+          auto_save_timer = nil
+        end
+      end,
+    })
+
     -- Auto-pull when opening any .md file in the vault
     vim.api.nvim_create_autocmd({ "BufReadPost" }, {
       group = group,
