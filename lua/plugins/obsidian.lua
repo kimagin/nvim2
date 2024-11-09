@@ -14,16 +14,7 @@ return {
   },
   opts = {
     attachments = {
-      -- The default folder to place images in via `:ObsidianPasteImg`.
-      -- If this is a relative path it will be interpreted as relative to the vault root.
-      -- You can always override this per image by passing a full path to the command instead of just a filename.
-      img_folder = "./assets/", -- This is the default
-      -- A function that determines the text to insert in the note when pasting an image.
-      -- It takes two arguments, the `obsidian.Client` and an `obsidian.Path` to the image file.
-      -- This is the default implementation.
-      ---@param client obsidian.Client
-      ---@param path obsidian.Path the absolute path to the image file
-      ---@return string
+      img_folder = "./assets/",
       img_text_func = function(client, path)
         path = client:vault_relative_path(path) or path
         return string.format("![%s](../%s)", path.name, path)
@@ -45,29 +36,20 @@ return {
         ObsidianExtLinkIcon = { fg = "#c792ea" },
       },
       checkboxes = {
-        -- NOTE: the 'char' value has to be a single character, and the highlight groups are defined below.
         [" "] = { char = "󰄱", hl_group = "ObsidianTodo" },
-        ["x"] = { char = "", hl_group = "ObsidianDone" },
+        ["x"] = { char = "", hl_group = "ObsidianDone" },
         [">"] = { char = "▶︎", hl_group = "ObsidianBullet" },
         ["~"] = { char = "󰰱", hl_group = "ObsidianTilde" },
-        ["!"] = { char = "", hl_group = "ObsidianImportant" },
+        ["!"] = { char = "", hl_group = "ObsidianImportant" },
         ["p"] = { char = "🎉", hl_group = "ObsidianTag" },
         ["f"] = { char = "🔥", hl_group = "ObsidianTag" },
         ["s"] = { char = "✨", hl_group = "ObsidianTag" },
         ["u"] = { char = "🦄", hl_group = "ObsidianTag" },
         ["c"] = { char = "🐈", hl_group = "ObsidianTag" },
-        -- Replace the above with this if you don't have a patched font:
-        -- [" "] = { char = "☐", hl_group = "ObsidianTodo" },
-        -- ["x"] = { char = "✔", hl_group = "ObsidianDone" },
-
-        -- You can also add more custom ones...
       },
-
-      external_link_icon = { char = "", hl_group = "ObsidianBullet" },
-
+      external_link_icon = { char = "", hl_group = "ObsidianBullet" },
       bullets = { char = "•", hl_group = "ObsidianBullet" },
     },
-
     block_ids = { hl_group = "ObsidianBlockID" },
     workspaces = {
       {
@@ -83,9 +65,9 @@ return {
     notes_subdir = "in",
     daily_notes = {
       folder = "journal",
-      date_format = "%A-%d-%m-%Y", -- Format: Friday-05-07-2024
+      date_format = "%A-%d-%m-%Y",
       time_format = "%I:%M %p",
-      template = nil, -- No template for daily notes
+      template = nil,
     },
     templates = {
       subdir = "templates",
@@ -104,15 +86,10 @@ return {
       },
     },
     note_id_func = function(title)
-      -- Create note IDs in a Zettelkasten format with a timestamp and a suffix.
-      -- In this case a note with the title 'My new note' will be given an ID that looks
-      -- like '1657296016-my-new-note', and therefore the file name '1657296016-my-new-note.md'
       local suffix = ""
       if title ~= nil then
-        -- If title is given, transform it into valid file name.
         suffix = title:gsub(" ", "-"):gsub("[^A-Za-z0-9-]", ""):lower()
       else
-        -- If title is nil, just add 4 random uppercase letters to the suffix.
         for _ = 1, 4 do
           suffix = suffix .. string.char(math.random(65, 90))
         end
@@ -124,15 +101,11 @@ return {
     end,
     preferred_link_style = "wiki",
     note_frontmatter_func = function(note)
-      -- Check if note.path is a table and use the first element if it is
       local note_path = type(note.path) == "table" and note.path[1] or note.path
 
-      -- Check if it's a daily note
       if string.match(tostring(note_path), "^" .. vim.fn.expand("~/Developments/obsidian/journal/")) then
-        -- For daily notes, return an empty table to prevent any frontmatter
         return {}
       else
-        -- For non-daily notes, keep the existing frontmatter logic
         local current_time = os.time()
         local date_str = os.date("%B %d, %Y", current_time)
         local time_str = os.date("%Ih %Mm %p", current_time)
@@ -155,59 +128,6 @@ return {
         return out
       end
     end,
-
-    config = function(_, opts)
-      require("obsidian").setup(opts)
-
-      -- ... (keep the rest of the config function unchanged)
-
-      -- Custom on_write function to remove frontmatter and duplicate titles from daily notes
-      local function on_write(args)
-        local file_path = args.file
-        if string.match(file_path, "^" .. vim.fn.expand("~/Developments/obsidian/journal/")) then
-          -- Read the file content
-          local lines = vim.fn.readfile(file_path)
-          local content_start = 1
-          local title_line = nil
-
-          -- Check if there's frontmatter and find where the actual content starts
-          if #lines > 0 and lines[1] == "---" then
-            for i = 2, #lines do
-              if lines[i] == "---" then
-                content_start = i + 1
-                break
-              end
-            end
-          end
-
-          -- Find the title line and remove any duplicates
-          local new_lines = {}
-          for i = content_start, #lines do
-            if lines[i]:match("^# ") then
-              if not title_line then
-                title_line = lines[i]
-                table.insert(new_lines, lines[i])
-              end
-            else
-              table.insert(new_lines, lines[i])
-            end
-          end
-
-          -- Write back only the content (without frontmatter and duplicate titles)
-          local content = table.concat(new_lines, "\n")
-          local file = io.open(file_path, "w")
-          if file then
-            file:write(content)
-            file:close()
-          end
-        end
-      end
-
-      -- Register the on_write function
-      local obsidian = require("obsidian")
-      obsidian.util.on_write = on_write
-    end,
-
     mappings = {
       ["gf"] = {
         action = function()
@@ -217,14 +137,14 @@ return {
       },
     },
     open_notes_in = "current",
-    new_note_template = "default.md", -- Use default.md as the template for new notes in the "in" folder
+    new_note_template = "default.md",
     sort_by = "modified",
   },
   config = function(_, opts)
     require("obsidian").setup(opts)
 
     -- Helper function to perform git operations asynchronously
-    local function perform_git_operations(callback)
+    local function perform_git_operations(operation, callback)
       local Job = require("plenary.job")
       local vault_path = vim.fn.expand("~/Developments/obsidian")
 
@@ -242,32 +162,84 @@ return {
             return
           end
 
-          -- If it is a git repo, perform git pull
-          Job:new({
-            command = "git",
-            args = { "pull" },
-            cwd = vault_path,
-            on_exit = function(j2, pull_return_val)
-              vim.schedule(function()
-                if pull_return_val ~= 0 then
-                  vim.notify("Obsidian Vault sync failed", vim.log.levels.ERROR)
-                  callback(false)
-                else
-                  vim.notify("Obsidian Vault sync successful", vim.log.levels.INFO)
-                  callback(true)
+          -- For push operation, first add and commit changes
+          if operation == "push" then
+            -- First add changes
+            Job:new({
+              command = "git",
+              args = { "add", "." },
+              cwd = vault_path,
+              on_exit = function(j2, add_return_val)
+                if add_return_val ~= 0 then
+                  vim.schedule(function()
+                    vim.notify("Failed to stage changes", vim.log.levels.ERROR)
+                    callback(false)
+                  end)
+                  return
                 end
-              end)
-            end,
-          }):start()
+
+                -- Then commit
+                Job:new({
+                  command = "git",
+                  args = { "commit", "-m", "Auto-commit: " .. os.date("%Y-%m-%d %H:%M:%S") },
+                  cwd = vault_path,
+                  on_exit = function(j3, commit_return_val)
+                    if commit_return_val ~= 0 then
+                      vim.schedule(function()
+                        vim.notify("No changes to commit", vim.log.levels.INFO)
+                        callback(true)
+                      end)
+                      return
+                    end
+
+                    -- Finally push
+                    Job:new({
+                      command = "git",
+                      args = { "push" },
+                      cwd = vault_path,
+                      on_exit = function(j4, push_return_val)
+                        vim.schedule(function()
+                          if push_return_val ~= 0 then
+                            vim.notify("Push failed", vim.log.levels.ERROR)
+                            callback(false)
+                          else
+                            vim.notify("Changes saved online successfully", vim.log.levels.INFO)
+                            callback(true)
+                          end
+                        end)
+                      end,
+                    }):start()
+                  end,
+                }):start()
+              end,
+            }):start()
+          else
+            -- For pull operation
+            Job:new({
+              command = "git",
+              args = { "pull" },
+              cwd = vault_path,
+              on_exit = function(j2, pull_return_val)
+                vim.schedule(function()
+                  if pull_return_val ~= 0 then
+                    vim.notify("Pull failed", vim.log.levels.ERROR)
+                    callback(false)
+                  else
+                    vim.notify("Synchronized successfully", vim.log.levels.INFO)
+                    callback(true)
+                  end
+                end)
+              end,
+            }):start()
+          end
         end,
       }):start()
     end
 
     -- Helper function to create a note with template
-    local function create_note_with_template(date_str, is_tomorrow)
+    local function create_note_with_template(date_str)
       local file_path = vim.fn.expand("~/Developments/obsidian/journal/" .. date_str .. ".md")
 
-      -- Create the file if it doesn't exist
       if vim.fn.filereadable(file_path) == 0 then
         local file = io.open(file_path, "w")
         if file then
@@ -277,35 +249,50 @@ return {
         end
       end
 
-      -- Open the file
       vim.cmd("edit " .. file_path)
     end
 
     -- Function to create today's note
     local function create_daily_note_with_title()
       local date = os.date(opts.daily_notes.date_format)
-      create_note_with_template(date, false)
-      -- Perform git operations after opening the file
-      perform_git_operations(function(_) end)
+      create_note_with_template(date)
     end
 
     -- Function to create tomorrow's note
     local function create_tomorrow_note_with_title()
-      local tomorrow = os.time() + 86400 -- 86400 seconds = 1 day
+      local tomorrow = os.time() + 86400
       local date = os.date(opts.daily_notes.date_format, tomorrow)
-      create_note_with_template(date, true)
-      -- Perform git operations after opening the file
-      perform_git_operations(function(_) end)
+      create_note_with_template(date)
     end
 
     -- Function to create yesterday's note
     local function create_yesterday_note_with_title()
-      local yesterday = os.time() - 86400 -- 86400 seconds = 1 day
+      local yesterday = os.time() - 86400
       local date = os.date(opts.daily_notes.date_format, yesterday)
-      create_note_with_template(date, false)
-      -- Perform git operations after opening the file
-      perform_git_operations(function(_) end)
+      create_note_with_template(date)
     end
+
+    -- Set up autocommands for git operations
+    local vault_path = vim.fn.expand("~/Developments/obsidian")
+    local group = vim.api.nvim_create_augroup("ObsidianGitOps", { clear = true })
+
+    -- Auto-pull when opening any .md file in the vault
+    vim.api.nvim_create_autocmd({ "BufReadPost" }, {
+      group = group,
+      pattern = vault_path .. "/**.*",
+      callback = function()
+        perform_git_operations("pull", function(_) end)
+      end,
+    })
+
+    -- Auto-push when saving any .md file in the vault
+    vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+      group = group,
+      pattern = vault_path .. "/**.*",
+      callback = function()
+        perform_git_operations("push", function(_) end)
+      end,
+    })
 
     -- Override the ObsidianToday command
     vim.api.nvim_create_user_command("ObsidianToday", create_daily_note_with_title, {})
@@ -328,8 +315,8 @@ return {
     { "<leader>ob", "<cmd>ObsidianBacklinks<cr>", desc = "Show backlinks" },
     { "<leader>oT", "<cmd>ObsidianTemplate<cr>", desc = "Templates" },
     { "<leader>od", "<cmd>ObsidianToday<cr>", desc = "Open today's daily note" },
-    { "<leader>ot", "<cmd>ObsidianTomorrow<cr>", desc = "Paste image into the file" },
-    { "<leader>oy", "<cmd>ObsidianYesterday<cr>", desc = "Paste image into the file" },
+    { "<leader>ot", "<cmd>ObsidianTomorrow<cr>", desc = "Open tomorrow's note" },
+    { "<leader>oy", "<cmd>ObsidianYesterday<cr>", desc = "Open yesterday's note" },
     { "<leader>pi", "<cmd>ObsidianPasteImg<cr>", desc = "Paste image into the file" },
   },
 }
