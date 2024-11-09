@@ -223,28 +223,6 @@ return {
   config = function(_, opts)
     require("obsidian").setup(opts)
 
-    -- Helper function to perform git operations
-    local function perform_git_operations()
-      local vault_path = vim.fn.expand("~/Developments/obsidian")
-
-      -- Check if we're in a git repository
-      local is_git = vim.fn.system("cd " .. vault_path .. " && git rev-parse --is-inside-work-tree 2>/dev/null")
-      if vim.v.shell_error ~= 0 then
-        vim.notify("Obsidian Vault is Not a git repository", vim.log.levels.WARN)
-        return false
-      end
-
-      -- Perform git pull
-      local pull_result = vim.fn.system("cd " .. vault_path .. " && git pull")
-      if vim.v.shell_error ~= 0 then
-        vim.notify("Obsidian Vault sync failed: " .. pull_result, vim.log.levels.ERROR)
-        return false
-      end
-
-      vim.notify("Obsidian Vault sync successful", vim.log.levels.INFO)
-      return true
-    end
-
     -- Helper function to create a note with template
     local function create_note_with_template(date_str, is_tomorrow)
       local file_path = vim.fn.expand("~/Developments/obsidian/journal/" .. date_str .. ".md")
@@ -265,14 +243,12 @@ return {
 
     -- Function to create today's note
     local function create_daily_note_with_title()
-      perform_git_operations()
       local date = os.date(opts.daily_notes.date_format)
       create_note_with_template(date, false)
     end
 
     -- Function to create tomorrow's note
     local function create_tomorrow_note_with_title()
-      perform_git_operations()
       local tomorrow = os.time() + 86400 -- 86400 seconds = 1 day
       local date = os.date(opts.daily_notes.date_format, tomorrow)
       create_note_with_template(date, true)
@@ -280,7 +256,6 @@ return {
 
     -- Function to create yesterday's note
     local function create_yesterday_note_with_title()
-      perform_git_operations()
       local yesterday = os.time() - 86400 -- 86400 seconds = 1 day
       local date = os.date(opts.daily_notes.date_format, yesterday)
       create_note_with_template(date, false)
