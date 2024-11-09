@@ -144,7 +144,8 @@ local function set_cwd_to_project_root()
     local ok, err = pcall(vim.cmd, "lcd " .. root)
     if ok then
       if root ~= "." and root ~= vim.fn.getcwd() then
-        print("CWD changed to: " .. root)
+        -- Optional Notification
+        -- print("CWD changed to: " .. root)
       end
     else
       print("Failed to change CWD: " .. err)
