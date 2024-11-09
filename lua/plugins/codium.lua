@@ -26,7 +26,7 @@ return {
 
     vim.g.codeium_filetypes = {
       ["*"] = true,
-      ["markdown"] = false,
+      ["markdown"] = true,
       -- Add more filetype-specific settings as needed
     }
 
