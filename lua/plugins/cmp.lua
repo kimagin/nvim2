@@ -2,43 +2,117 @@ return {
   {
     "hrsh7th/nvim-cmp",
     dependencies = {
-      -- Ensure LuaSnip and related sources are properly loaded
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
-      "saadparwaiz1/cmp_luasnip", -- For LuaSnip completion
+      "saadparwaiz1/cmp_luasnip",
     },
     opts = function(_, opts)
       local cmp = require("cmp")
-      local ls = require("luasnip")
-
-      -- Intelligent Tab function
-      local has_words_before = function()
-        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-        return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match("^%s*$") == nil
-      end
-
-      -- Border styles
-      local border_styles = {
-        default = { "┌", "─", "┐", "│", "┘", "─", "└", "│" },
-        minimal = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
-        rounded = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
-        solid = { "▄", "▄", "▄", "█", "▀", "▀", "▀", "█" },
-        dots = { ".", ".", ".", ":", ".", ".", ".", ":" },
-        none = { "", "", "", "", "", "", "", "" },
+      local colors = {
+        border = "#303446",
+        icon = "#fff09a",
+        match = "#a88bfa",
+        match_fuzzy = "#c298dd",
+        fn = "#aeffd6",
+        method = "#fff09a",
+        variable = "#c298dd",
+        keyword = "#a88bfa",
+        field = "#e0af68",
+        source = "#626880", -- Added dimmed color for source names
       }
 
-      -- Function to select border style (you can change 'default' to any other style)
-      local function select_border_style()
-        return border_styles.default
+      -- Custom icons for different kinds
+      local kind_icons = {
+        Field = "",
+        Property = "",
+        Method = "",
+        Function = "",
+        Constructor = "󰩀",
+        Class = "",
+        Interface = "",
+        Variable = "",
+        Constant = "",
+        String = "",
+        Number = "",
+        Boolean = "",
+        Array = "",
+        Object = "",
+        Key = "",
+        Null = "∅",
+        EnumMember = "",
+        Struct = "",
+        Event = "",
+        Operator = "",
+        TypeParameter = "",
+        Component = "󰐖",
+        Text = "󰦨",
+        Snippet = "",
+        Keyword = "󰌋",
+        File = "󰈙",
+        Reference = "󰈇",
+        Folder = "󰉋",
+        Enum = "󰕘",
+      }
+      -- Set up highlights in a single batch
+      local highlights = {
+        CmpBorderIcon = { fg = colors.icon, bold = true },
+        CmpBorder = { fg = colors.border },
+        CmpItemAbbrMatch = { fg = colors.match, bold = true },
+        CmpItemAbbrMatchFuzzy = { fg = colors.match_fuzzy, bold = true },
+        PmenuSel = { bg = colors.border, bold = true },
+        Pmenu = { bg = "none", fg = colors.match, bold = true },
+        CmpItemKindFunction = { fg = colors.fn },
+        CmpItemKindMethod = { fg = colors.method },
+        CmpItemKindVariable = { fg = colors.variable },
+        CmpItemKindKeyword = { fg = colors.keyword },
+        CmpItemKindField = { fg = colors.field },
+        CmpItemMenu = { fg = colors.source }, -- Added highlight for source name
+      }
+
+      for group, settings in pairs(highlights) do
+        vim.api.nvim_set_hl(0, group, settings)
       end
-      -- Setup custom window options
+
+      -- Border configuration
+      local border = {
+        { "󱐋", "CmpBorderIcon" },
+        { "─", "CmpBorder" },
+        { "┐", "CmpBorder" },
+        { "│", "CmpBorder" },
+        { "┘", "CmpBorder" },
+        { "─", "CmpBorder" },
+        { "└", "CmpBorder" },
+        { "│", "CmpBorder" },
+      }
+
+      -- Custom formatting function with dimmed source names
+      local format = {
+        format = function(entry, vim_item)
+          local kind = vim_item.kind
+          vim_item.kind = (kind_icons[kind] or "") .. " " .. kind
+
+          -- Set menu source name with special highlight group
+          local menu_map = {
+            nvim_lsp = "󰇺",
+            luasnip = "",
+            buffer = "󰈙",
+            path = "..",
+          }
+
+          -- Using %#HighlightGroup# syntax to apply the dimmed color
+          vim_item.menu = string.format(" %s", menu_map[entry.source.name] or entry.source.name)
+          return vim_item
+        end,
+      }
+
+      -- Rest of your configuration remains the same
       opts.window = {
         completion = {
-          border = select_border_style(),
+          border = border,
           col_offset = -3,
           side_padding = 1,
-          winhighlight = "Normal:CmpPmenu,CursorLine:PmenuSel,Search:None",
+          winhighlight = "Normal:CmpPmenu,CursorLine:PmenuSel,Search:None,FloatBorder:CmpBorder",
           scrollbar = false,
         },
         documentation = {
@@ -48,28 +122,9 @@ return {
         },
       }
 
-      -- Set colors for nvim-cmp
-      -- Note: These highlight groups are specific to nvim-cmp
-      -- vim.api.nvim_set_hl(0, "CmpItemAbbrDefault", { fg = "#00ff00" })
-      vim.api.nvim_set_hl(0, "CmpItemAbbrMatch", { fg = "#a88bfa", bold = true })
-      vim.api.nvim_set_hl(0, "CmpItemAbbrMatchFuzzy", { fg = "#c298dd", bold = true })
-      -- vim.api.nvim_set_hl(0, "CmpItemKindDefault", { fg = "#00ff00" })
-      -- vim.api.nvim_set_hl(0, "CmpItemMenuDefault", { fg = "#00cc00" })
-
-      vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#303446", bold = true })
-      vim.api.nvim_set_hl(0, "Pmenu", { bg = "none", fg = "#a88bfa", bold = true })
-
-      -- vim.api.nvim_set_hl(0, "CmpPmenu", { fg = "#291c39", bg = "#00ff00" })
-      vim.api.nvim_set_hl(0, "CmpItemKindFunction", { fg = "#aeffd6" })
-      vim.api.nvim_set_hl(0, "CmpItemKindMethod", { fg = "#fff09a" })
-      vim.api.nvim_set_hl(0, "CmpItemKindVariable", { fg = "#c298dd" })
-      vim.api.nvim_set_hl(0, "CmpItemKindKeyword", { fg = "#a88bfa" })
-
-      -- Mapping setup
       opts.mapping = vim.tbl_extend("force", opts.mapping, {
         ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
         ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-
         ["<Tab>"] = cmp.mapping(function(fallback)
           if vim.fn["codeium#Accept"] ~= nil and vim.fn["codeium#Accept"]() ~= "" then
             vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<C-g>", true, true, true), "")
@@ -77,41 +132,35 @@ return {
             fallback()
           end
         end, { "i", "s" }),
-
-        -- ["<S-Tab>"] = cmp.mapping(function(fallback)
-        --   if cmp.visible() then
-        --     cmp.select_prev_item()
-        --   else
-        --     fallback()
-        --   end
-        -- end, { "i", "s" }),
-
         ["<CR>"] = cmp.mapping.confirm({ select = true }),
         ["<C-u>"] = cmp.mapping.scroll_docs(-4),
         ["<C-d>"] = cmp.mapping.scroll_docs(4),
       })
-      opts.experimental = {
-        ghost_text = false,
-      }
 
-      -- Define default sources
+      opts.experimental = { ghost_text = false }
+      opts.formatting = format
+
       local sources = {
         { name = "luasnip", priority = 1400 },
-        -- { name = "codeium", priority = 1200 },
         { name = "nvim_lsp", priority = 1500 },
         { name = "buffer", priority = 1000 },
         { name = "path", priority = 800 },
       }
       opts.sources = cmp.config.sources(sources)
 
-      -- Filetype-specific setups
-      local special_filetypes =
-        { "astro", "javascript", "typescript", "javascriptreact", "typescriptreact", "markdown" }
+      local special_filetypes = {
+        "astro",
+        "javascript",
+        "typescript",
+        "javascriptreact",
+        "typescriptreact",
+        "markdown",
+      }
+
       for _, ft in ipairs(special_filetypes) do
-        cmp.setup.filetype(ft, {
-          sources = cmp.config.sources(sources),
-        })
+        cmp.setup.filetype(ft, { sources = cmp.config.sources(sources) })
       end
+
       return opts
     end,
   },
