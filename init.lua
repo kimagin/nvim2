@@ -24,7 +24,7 @@ vim.api.nvim_create_autocmd("ColorScheme", {
     vim.api.nvim_set_hl(0, "@markup.heading.5.markdown", { fg = "#A88BFA" })
     vim.api.nvim_set_hl(0, "@markup.heading.6.markdown", { fg = "#A88BFA" })
 
-    vim.api.nvim_set_hl(0, "@markup.quote", { fg = "#ea928a" })
+    vim.api.nvim_set_hl(0, "@markup.quote", { fg = "#C6D0F6" })
 
     vim.api.nvim_set_hl(0, "@markup.list", { fg = "#A88BFA" })
 
