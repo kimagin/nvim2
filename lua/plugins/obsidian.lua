@@ -288,7 +288,7 @@ return {
       -- Create new timer
       auto_save_timer = vim.loop.new_timer()
       auto_save_timer:start(
-        10000,
+        25000,
         0,
         vim.schedule_wrap(function()
           -- Only save if buffer is modified
@@ -301,11 +301,11 @@ return {
     end
 
     -- Set up auto-save for markdown files in vault
-    vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
+    vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged", "TextChangedI" }, {
       group = group,
       pattern = vault_path .. "/*.md",
       callback = function()
-        setup_auto_save()
+        setup_auto_save() -- Reset timer on any text change or insert mode exit
       end,
     })
 
