@@ -167,7 +167,13 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.number = false
     vim.opt_local.relativenumber = false
     vim.api.nvim_set_hl(0, "LineNr", { fg = "#1f1e21" })
-    vim.opt_local.signcolumn = "yes:1"
+    vim.opt_local.signcolumn = "yes:3" -- Increased to 3 to accommodate both gitsigns and autosuggestions
+    -- Configure mini.diff for this buffer
+    local ok, mini_diff = pcall(require, "mini.diff")
+    if ok then
+      vim.b.minidiff_config = { view = { style = "number" } }
+      pcall(mini_diff.refresh)
+    end
   end,
 })
 
