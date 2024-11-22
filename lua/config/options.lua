@@ -10,10 +10,10 @@ vim.opt.fileencoding = "utf-8"
 vim.opt.termguicolors = true
 
 -- UI related
-vim.opt.winbar = " "
+-- vim.opt.winbar = " "
 vim.opt.pumblend = 0
 vim.opt.shortmess:append("I")
-vim.opt.showtabline = 0 -- Hide tabs
+-- vim.opt.showtabline = 0 -- Hide tabs
 vim.opt.wrap = true
 
 -- Clipboard configuration with WSL support

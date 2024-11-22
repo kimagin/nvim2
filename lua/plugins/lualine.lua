@@ -64,7 +64,7 @@ return {
         lualine_c = {
           {
             "mode",
-            padding = { left = 3, right = 0 },
+            padding = { left = 0, right = 0 },
           },
           {
             "diagnostics",

@@ -110,7 +110,7 @@ vim.api.nvim_create_autocmd({ "FileType", "BufEnter", "BufWritePost" }, {
 })
 
 -- Keeping all your original highlight configurations
-vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none", fg = "#141317" })
+-- vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none", fg = "#141317" })
 
 vim.api.nvim_create_autocmd("FileType", {
   group = vim.api.nvim_create_augroup("lazyvim_wrap_spell", { clear = true }),
@@ -167,7 +167,7 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.number = false
     vim.opt_local.relativenumber = false
     vim.api.nvim_set_hl(0, "LineNr", { fg = "#1f1e21" })
-    vim.opt_local.signcolumn = "yes:3" -- Increased to 3 to accommodate both gitsigns and autosuggestions
+    vim.opt_local.signcolumn = "yes:2" -- Increased to 3 to accommodate both gitsigns and autosuggestions
     -- Configure mini.diff for this buffer
     local ok, mini_diff = pcall(require, "mini.diff")
     if ok then
