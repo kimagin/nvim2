@@ -144,6 +144,7 @@ return {
     new_note_template = "default.md",
     sort_by = "modified",
   },
+
   config = function(_, opts)
     require("obsidian").setup(opts)
 

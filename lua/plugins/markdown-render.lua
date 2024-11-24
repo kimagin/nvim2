@@ -45,10 +45,10 @@ return {
       -- Replaces '#+' of 'atx_h._marker'
       -- The number of '#' in the heading determines the 'level'
       -- The 'level' is used to index into the list using a cycle
-      icons = { "", "󰎩", "󰎬", "", "", "" },
+      icons = { " ", "󰎩 ", "󰎬 ", " ", " ", " " },
       -- Added to the sign column if enabled
       -- The 'level' is used to index into the list using a cycle
-      signs = { " ", " ", " ", " ", " ", " " },
+      signs = { "", "", "", "", "", "" },
       -- Width of the heading background:
       --  block: width of the heading text
       --  full:  full width of the window
@@ -115,13 +115,13 @@ return {
       -- Turn on / off code block & inline code rendering
       enabled = true,
       -- Turn on / off any sign column related rendering
-      sign = true,
+      sign = false,
       -- Determines how code blocks & inline code are rendered:
       --  none:     disables all rendering
       --  normal:   adds highlight group to code blocks & inline code, adds padding to code blocks
       --  language: adds language icon to sign column if enabled and icon + name above code blocks
       --  full:     normal + language
-      style = "language",
+      style = "full",
       -- Determines where language icon is rendered:
       --  right: right side of code block
       --  left:  left side of code block
@@ -137,17 +137,17 @@ return {
       -- Width of the code block background:
       --  block: width of the code block
       --  full:  full width of the window
-      width = "block",
+      width = "full",
       -- Amount of margin to add to the left of code blocks
       -- If a floating point value < 1 is provided it is treated as a percentage of the available window space
       -- Margin available space is computed after accounting for padding
       left_margin = 0,
       -- Amount of padding to add to the left of code blocks
       -- If a floating point value < 1 is provided it is treated as a percentage of the available window space
-      left_pad = 4,
+      left_pad = 2,
       -- Amount of padding to add to the right of code blocks when width is 'block'
       -- If a floating point value < 1 is provided it is treated as a percentage of the available window space
-      right_pad = 4,
+      right_pad = 2,
       -- Minimum width to use for code blocks when width is 'block'
       min_width = 0,
       -- Determins how the top / bottom of code block are rendered:
@@ -155,13 +155,13 @@ return {
       --  thin:  when lines are empty overlay the above & below icons
       border = "thin",
       -- Used above code blocks for thin border
-      -- above = "▄",
+      above = "",
       -- Used below code blocks for thin border
-      -- below = "▀",
+      below = "",
       -- Highlight for code blocks
       highlight = "RenderMarkdownCode",
       -- Highlight for inline code
-      highlight_inline = "RenderMarkdownCodeInline",
+      highlight_inline = "RenderMarkdownCode",
       -- Highlight for language, overrides icon provider value
       highlight_language = nil,
     },
@@ -278,6 +278,7 @@ return {
       note = { raw = "[!NOTE]", rendered = "󰋽 Note", highlight = "RenderMarkdownInfo" },
       tip = { raw = "[!TIP]", rendered = "󰌶 Tip", highlight = "RenderMarkdownSuccess" },
       important = { raw = "[!IMPORTANT]", rendered = "󰅾 Important", highlight = "RenderMarkdownWarn" },
+      today = { raw = "[!TODAY]", rendered = "󰃶 Today", highlight = "RenderMarkdownWarn" },
       late = { raw = "[!LATE]", rendered = "󰚌 Late", highlight = "RenderMarkdownError" },
       warning = { raw = "[!WARNING]", rendered = "󰀪 Warning", highlight = "RenderMarkdownWarn" },
       caution = { raw = "[!CAUTION]", rendered = "󰳦 Caution", highlight = "RenderMarkdownError" },

@@ -76,11 +76,13 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 
     -- Visual mode and selection colors
     vim.api.nvim_set_hl(0, "Visual", { bg = "#31294c", reverse = false })
-    vim.api.nvim_set_hl(0, "CursorLine", { bg = "#1e192b", blend = 50 })
+    vim.api.nvim_set_hl(0, "CursorLine", { bg = "#2b2245", blend = 10 })
     vim.api.nvim_set_hl(0, "Folded", { fg = "#58468c", blend = 10, italic = true })
 
+    vim.api.nvim_set_hl(0, "LineNr", { fg = "#2e2736" })
     -- Render markdown colors
-    vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#111112" })
+    vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#1e182c" })
+    vim.api.nvim_set_hl(0, "RenderMarkdownCodeInline", { bg = "#111112" })
     vim.api.nvim_set_hl(0, "RenderMarkdownBullet", { fg = "#A88BFA", bold = true })
     vim.api.nvim_set_hl(0, "RenderMarkdownWarn", { fg = "#f8da90", bold = true })
     vim.api.nvim_set_hl(0, "RenderMarkdownLink", { fg = "#85c1dc", bold = true })
