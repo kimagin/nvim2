@@ -316,3 +316,21 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.keymap.set("n", "<leader>h", function()
   print(vim.treesitter.get_captures_at_cursor()[1])
 end, { desc = "Show Tree-sitter highlight group" })
+
+local function open_tasks()
+  local tasks_path = "~/Developments/obsidian/tasks.md"
+
+  -- Check if tasks.md buffer exists and delete it
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_get_name(buf):match("tasks.md$") then
+      vim.api.nvim_buf_delete(buf, { force = true })
+      break
+    end
+  end
+
+  -- Open tasks.md in a new buffer
+  vim.cmd("edit " .. tasks_path)
+end
+
+-- Add keymap to open tasks
+vim.keymap.set("n", "<leader>od", open_tasks, { desc = "Open daily tasks overview" })
