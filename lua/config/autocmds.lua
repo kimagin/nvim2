@@ -176,6 +176,141 @@ vim.api.nvim_create_autocmd("FileType", {
     end
   end,
 })
+-- Function to navigate to next/previous markdown elements
+local function create_markdown_navigation()
+  -- Function to find next/previous pattern
+  local function find_pattern(pattern, reverse)
+    local current_line = vim.fn.line(".")
+    local current_col = vim.fn.col(".")
+    local last_line = vim.fn.line("$")
+
+    if not reverse then
+      -- Search in current line after cursor
+      local line_content = vim.fn.getline(current_line)
+      local match_in_current = vim.fn.match(line_content:sub(current_col + 1), pattern)
+
+      if match_in_current >= 0 then
+        vim.fn.cursor(current_line, current_col + 1 + match_in_current)
+        return true
+      end
+
+      -- Search in subsequent lines
+      for line_num = current_line + 1, last_line do
+        local line_content = vim.fn.getline(line_num)
+        local match_pos = vim.fn.match(line_content, pattern)
+        if match_pos >= 0 then
+          vim.fn.cursor(line_num, match_pos + 1)
+          return true
+        end
+      end
+
+      -- Wrap to beginning if not found
+      for line_num = 1, current_line - 1 do
+        local line_content = vim.fn.getline(line_num)
+        local match_pos = vim.fn.match(line_content, pattern)
+        if match_pos >= 0 then
+          vim.fn.cursor(line_num, match_pos + 1)
+          return true
+        end
+      end
+    else
+      -- Search in current line before cursor
+      local line_content = vim.fn.getline(current_line)
+      local before_cursor = line_content:sub(1, current_col - 1)
+      local last_match = nil
+      local pos = 0
+
+      while true do
+        local match_pos = vim.fn.match(before_cursor:sub(pos + 1), pattern)
+        if match_pos == -1 then
+          break
+        end
+        last_match = pos + match_pos + 1
+        pos = pos + match_pos + 1
+      end
+
+      if last_match then
+        vim.fn.cursor(current_line, last_match)
+        return true
+      end
+
+      -- Search in previous lines
+      for line_num = current_line - 1, 1, -1 do
+        local line_content = vim.fn.getline(line_num)
+        local last_match = nil
+        local pos = 0
+
+        while true do
+          local match_pos = vim.fn.match(line_content:sub(pos + 1), pattern)
+          if match_pos == -1 then
+            break
+          end
+          last_match = pos + match_pos + 1
+          pos = pos + match_pos + 1
+        end
+
+        if last_match then
+          vim.fn.cursor(line_num, last_match)
+          return true
+        end
+      end
+
+      -- Wrap to end if not found
+      for line_num = last_line, current_line + 1, -1 do
+        local line_content = vim.fn.getline(line_num)
+        local last_match = nil
+        local pos = 0
+
+        while true do
+          local match_pos = vim.fn.match(line_content:sub(pos + 1), pattern)
+          if match_pos == -1 then
+            break
+          end
+          last_match = pos + match_pos + 1
+          pos = pos + match_pos + 1
+        end
+
+        if last_match then
+          vim.fn.cursor(line_num, last_match)
+          return true
+        end
+      end
+    end
+
+    return false
+  end
+
+  -- Set up keymaps for markdown files
+  vim.keymap.set("n", "]l", function()
+    if not find_pattern("\\[\\[", false) then
+      vim.notify("No more links found", vim.log.levels.INFO)
+    end
+  end, { buffer = true, desc = "Go to next markdown link" })
+
+  vim.keymap.set("n", "[l", function()
+    if not find_pattern("\\[\\[", true) then
+      vim.notify("No previous links found", vim.log.levels.INFO)
+    end
+  end, { buffer = true, desc = "Go to previous markdown link" })
+
+  vim.keymap.set("n", "]t", function()
+    if not find_pattern("^\\s*- \\[ \\]", false) then
+      vim.notify("No more tasks found", vim.log.levels.INFO)
+    end
+  end, { buffer = true, desc = "Go to next markdown task" })
+
+  vim.keymap.set("n", "[t", function()
+    if not find_pattern("^\\s*- \\[ \\]", true) then
+      vim.notify("No previous tasks found", vim.log.levels.INFO)
+    end
+  end, { buffer = true, desc = "Go to previous markdown task" })
+end
+
+-- Add markdown navigation keymaps
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = create_markdown_navigation,
+})
 
 -- Function to show highlight group under cursor
 vim.keymap.set("n", "<leader>h", function()

@@ -45,7 +45,7 @@ return {
       -- Replaces '#+' of 'atx_h._marker'
       -- The number of '#' in the heading determines the 'level'
       -- The 'level' is used to index into the list using a cycle
-      icons = { "", "󰎩", "󰎬", "", "󰎰", "▷" },
+      icons = { "", "󰎩", "󰎬", "", "", "" },
       -- Added to the sign column if enabled
       -- The 'level' is used to index into the list using a cycle
       signs = { " ", " ", " ", " ", " ", " " },
@@ -277,7 +277,8 @@ return {
     callout = {
       note = { raw = "[!NOTE]", rendered = "󰋽 Note", highlight = "RenderMarkdownInfo" },
       tip = { raw = "[!TIP]", rendered = "󰌶 Tip", highlight = "RenderMarkdownSuccess" },
-      important = { raw = "[!IMPORTANT]", rendered = "󰅾 Important", highlight = "RenderMarkdownHint" },
+      important = { raw = "[!IMPORTANT]", rendered = "󰅾 Important", highlight = "RenderMarkdownWarn" },
+      late = { raw = "[!LATE]", rendered = "󰚌 Late", highlight = "RenderMarkdownError" },
       warning = { raw = "[!WARNING]", rendered = "󰀪 Warning", highlight = "RenderMarkdownWarn" },
       caution = { raw = "[!CAUTION]", rendered = "󰳦 Caution", highlight = "RenderMarkdownError" },
       -- Obsidian: https://help.obsidian.md/Editing+and+formatting/Callouts
@@ -286,7 +287,7 @@ return {
       tldr = { raw = "[!TLDR]", rendered = "󰨸 Tldr", highlight = "RenderMarkdownInfo" },
       info = { raw = "[!INFO]", rendered = "󰋽 Info", highlight = "RenderMarkdownInfo" },
       todo = { raw = "[!TODO]", rendered = "󰗡 Todo", highlight = "RenderMarkdownInfo" },
-      hint = { raw = "[!HINT]", rendered = "󰌶 Hint", highlight = "RenderMarkdownSuccess" },
+      hint = { raw = "[!HINT]", rendered = "󰌶 Hint", highlight = "RenderMarkdownWarn" },
       success = { raw = "[!SUCCESS]", rendered = "󰄬 Success", highlight = "RenderMarkdownSuccess" },
       check = { raw = "[!CHECK]", rendered = "󰄬 Check", highlight = "RenderMarkdownSuccess" },
       done = { raw = "[!DONE]", rendered = "󰄬 Done", highlight = "RenderMarkdownSuccess" },

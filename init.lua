@@ -8,14 +8,14 @@ vim.api.nvim_create_autocmd("ColorScheme", {
     vim.api.nvim_set_hl(0, "markdownH3", { fg = "#806abf" })
     vim.api.nvim_set_hl(0, "markdownH4", { fg = "#A88BFA", bold = true })
     vim.api.nvim_set_hl(0, "markdownH5", { fg = "#806abf" })
-    vim.api.nvim_set_hl(0, "markdownH6", { fg = "#fae0d0" })
+    vim.api.nvim_set_hl(0, "markdownH6", { fg = "#fae0d0", italic = true })
 
     vim.api.nvim_set_hl(0, "RenderMarkdownH1", { fg = "#A88BFA", bold = true })
     vim.api.nvim_set_hl(0, "RenderMarkdownH2", { fg = "#806abf" })
     vim.api.nvim_set_hl(0, "RenderMarkdownH3", { fg = "#806abf" })
     vim.api.nvim_set_hl(0, "RenderMarkdownH4", { fg = "#A88BFA", bold = true })
     vim.api.nvim_set_hl(0, "RenderMarkdownH5", { fg = "#806abf" })
-    vim.api.nvim_set_hl(0, "RenderMarkdownH6", { fg = "#fae0d0" })
+    vim.api.nvim_set_hl(0, "RenderMarkdownH6", { fg = "#fae0d0", italic = true })
 
     vim.api.nvim_set_hl(0, "@markup.heading.1.markdown", { fg = "#A88BFA", bold = true, underline = true })
     vim.api.nvim_set_hl(0, "@markup.heading.2.markdown", { fg = "#A88BFA", bold = true })
@@ -88,6 +88,8 @@ vim.api.nvim_create_autocmd("ColorScheme", {
     vim.api.nvim_set_hl(0, "Comment", { fg = "#6a6e83" })
   end,
 })
+
+require("config.tasks-collector").setup()
 
 -- bootstrap lazy.nvim, LazyVim and your plugins
 require("config.lazy")

@@ -103,7 +103,11 @@ return {
     note_frontmatter_func = function(note)
       local note_path = type(note.path) == "table" and note.path[1] or note.path
 
-      if string.match(tostring(note_path), "^" .. vim.fn.expand("~/Developments/obsidian/journal/")) then
+      local note_path_str = tostring(note_path)
+      if
+        string.match(note_path_str, "^" .. vim.fn.expand("~/Developments/obsidian/journal/"))
+        or string.match(note_path_str, "tasks%.md$")
+      then
         return {}
       else
         local current_time = os.time()
