@@ -334,3 +334,6 @@ end
 
 -- Add keymap to open tasks
 vim.keymap.set("n", "<leader>od", open_tasks, { desc = "Open daily tasks overview" })
+
+-- Initiating Task Collector
+require("config.tasks-collector").setup()
