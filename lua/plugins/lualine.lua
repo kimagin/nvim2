@@ -18,14 +18,42 @@ return {
     local function get_toggleterm_name()
       local term = vim.b.toggle_number
       if term then
-        return string.format(" Terminal %d", term)
+        return string.format("󰁔 Terminal %d", term)
       end
       return ""
     end
 
     return {
       options = {
-        theme = "auto",
+        --- @usage 'rose-pine' | 'rose-pine-alt'
+        theme = {
+          normal = {
+            a = { fg = "#e0def4", bg = "none" },
+            b = { fg = "#e0def4", bg = "none" },
+            c = { fg = "#e0def4", bg = "none" },
+          },
+          insert = {
+            a = { fg = "#31748f", bg = "none" },
+            b = { fg = "#31748f", bg = "none" },
+          },
+          command = {
+            a = { fg = "#ebbcba", bg = "none" },
+            b = { fg = "#ebbcba", bg = "none" },
+          },
+          visual = {
+            a = { fg = "#c4a7e7", bg = "none" },
+            b = { fg = "#c4a7e7", bg = "none" },
+          },
+          replace = {
+            a = { fg = "#eb6f92", bg = "none" },
+            b = { fg = "#eb6f92", bg = "none" },
+          },
+          inactive = {
+            a = { fg = "#6e6a86", bg = "none" },
+            b = { fg = "#6e6a86", bg = "none" },
+            c = { fg = "#6e6a86", bg = "none" },
+          },
+        },
         globalstatus = true,
         disabled_filetypes = { statusline = { "dashboard", "alpha" } },
         component_separators = " ",

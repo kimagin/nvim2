@@ -6,7 +6,6 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   vim.fn.system({ "git", "clone", "--filter=blob:none", "https://github.com/folke/lazy.nvim.git", "--branch=stable", lazypath })
 end
 vim.opt.rtp:prepend(lazypath)
-vim.cmd("autocmd BufNewFile,BufRead *.astro set filetype=astro")
 vim.opt.laststatus = 3
 vim.opt.splitkeep = "screen"
 
@@ -28,9 +27,6 @@ require("lazy").setup({
     version = false, -- always use the latest git commit
     -- version = "*", -- try installing the latest stable version for plugins that support semver
   },
-  install = { colorscheme = { "catppuccin" } },
-
-  colorscheme = "catppuccin",
 
   checker = { enabled = false }, -- automatically check for plugin updates
 
@@ -50,3 +46,6 @@ require("lazy").setup({
     },
   },
 })
+
+-- color-scheme
+vim.cmd("colorscheme rose-pine")
