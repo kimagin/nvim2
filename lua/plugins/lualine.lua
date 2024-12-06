@@ -25,28 +25,27 @@ return {
 
     return {
       options = {
-        --- @usage 'rose-pine' | 'rose-pine-alt'
         theme = {
           normal = {
-            a = { fg = "#e0def4", bg = "none" },
-            b = { fg = "#e0def4", bg = "none" },
-            c = { fg = "#e0def4", bg = "none" },
+            a = { fg = "#A88BFA", bg = "none" },
+            b = { fg = "#908caa", bg = "none" },
+            c = { fg = "#908caa", bg = "none" },
           },
           insert = {
-            a = { fg = "#31748f", bg = "none" },
-            b = { fg = "#31748f", bg = "none" },
-          },
-          command = {
-            a = { fg = "#ebbcba", bg = "none" },
-            b = { fg = "#ebbcba", bg = "none" },
+            a = { fg = "#F8D2C9", bg = "none" },
+            b = { fg = "#A88BFA", bg = "none" },
           },
           visual = {
-            a = { fg = "#c4a7e7", bg = "none" },
-            b = { fg = "#c4a7e7", bg = "none" },
+            a = { fg = "#9ccfd8", bg = "none" },
+            b = { fg = "#A88BFA", bg = "none" },
           },
           replace = {
             a = { fg = "#eb6f92", bg = "none" },
-            b = { fg = "#eb6f92", bg = "none" },
+            b = { fg = "#A88BFA", bg = "none" },
+          },
+          command = {
+            a = { fg = "#ebbcba", bg = "none" },
+            b = { fg = "#A88BFA", bg = "none" },
           },
           inactive = {
             a = { fg = "#6e6a86", bg = "none" },
@@ -55,18 +54,36 @@ return {
           },
         },
         globalstatus = true,
-        disabled_filetypes = { statusline = { "dashboard", "alpha" } },
+        disabled_filetypes = { statusline = { "dashboard", "alpha", "lazy", "lazygit" } },
         component_separators = " ",
         section_separators = "",
         refresh = {
-          statusline = 200,
+          statusline = 100,
           tabline = 200,
           winbar = 200,
         },
       },
       sections = {
-        lualine_a = {},
-        lualine_b = {},
+        lualine_a = {
+          {
+            "mode",
+            fmt = function(str)
+              return "" .. str:upper() .. ""
+            end,
+            padding = { left = 0, right = 0 },
+          },
+        },
+        lualine_b = {
+          {
+            "diagnostics",
+            symbols = {
+              error = icons.diagnostics.Error,
+              warn = icons.diagnostics.Warn,
+              info = icons.diagnostics.Info,
+              hint = icons.diagnostics.Hint,
+            },
+          },
+        },
         lualine_x = {
           { "filetype", icon_only = true, separator = "", padding = { left = 3, right = 1 } },
           {
@@ -89,27 +106,12 @@ return {
             color = { fg = "#a88bfa" }, -- You can adjust this color to match your theme
           },
         },
-        lualine_c = {
-          {
-            "mode",
-            padding = { left = 0, right = 0 },
-          },
-          {
-            "diagnostics",
-            symbols = {
-              error = icons.diagnostics.Error,
-              warn = icons.diagnostics.Warn,
-              info = icons.diagnostics.Info,
-              hint = icons.diagnostics.Hint,
-            },
-          },
-        },
+        lualine_c = {},
         lualine_y = {},
         lualine_z = { "searchcount" },
       },
       extensions = {
         "lazy",
-
         {
           sections = {
             lualine_a = {

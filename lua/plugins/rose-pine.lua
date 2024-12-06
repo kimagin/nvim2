@@ -57,7 +57,7 @@ return {
         base = "#191724",
         surface = "#1f1d2e",
         overlay = "#26233a",
-        muted = "#4A4E60",
+        muted = "#4F5365",
         subtle = "#69617C",
         text = "#e0def4",
         love = "#eb6f92",
@@ -77,10 +77,11 @@ return {
     highlight_groups = {
       -- Comment = { fg = "foam" },
       -- VertSplit = { fg = "muted", bg = "muted" },
-      -- StatusLine = { bg = "love" },
+      -- StatusLine = { bg = "love", fg = "surface", bold = true },
       -- StatusLineNC = { bg = "love" },
       lineNr = { fg = "highlight_low" },
       cursorlineNr = { fg = "rose" },
+      StatusLineTerm = { bg = "none", fg = "surface", bold = true },
     },
   },
   config = function(_, opts)
