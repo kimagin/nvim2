@@ -1,5 +1,6 @@
 {
-    "diagnostics.globals": [
-        "util"
-    ]
+  "diagnostics.globals": [
+    "util"
+  ],
+  "completion.autoRequire": true
 }

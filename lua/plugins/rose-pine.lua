@@ -82,6 +82,8 @@ return {
       lineNr = { fg = "highlight_low" },
       cursorlineNr = { fg = "rose" },
       StatusLineTerm = { bg = "none", fg = "surface", bold = true },
+      NeotreeTitleBar = { fg = "foam", bg = "none" },
+      NeotreeFloatBorder = { fg = "foam", bg = "none" },
     },
   },
   config = function(_, opts)

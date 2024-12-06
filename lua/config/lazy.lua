@@ -6,6 +6,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   vim.fn.system({ "git", "clone", "--filter=blob:none", "https://github.com/folke/lazy.nvim.git", "--branch=stable", lazypath })
 end
 vim.opt.rtp:prepend(lazypath)
+vim.cmd("autocmd BufNewFile,BufRead *.astro set filetype=astro")
 vim.opt.laststatus = 3
 vim.opt.splitkeep = "screen"
 
@@ -29,7 +30,6 @@ require("lazy").setup({
   },
 
   checker = { enabled = false }, -- automatically check for plugin updates
-
   performance = {
     rtp = {
       -- disable some rtp plugins
