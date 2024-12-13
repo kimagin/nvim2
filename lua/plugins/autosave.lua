@@ -10,9 +10,21 @@ return {
 
     -- Custom save function for all modified buffers
     local function save_all_modified_buffers()
+      -- Don't save if we're in a diff mode
+      if vim.wo.diff then
+        return
+      end
+
       local saved = false
       for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].modifiable and vim.bo[buf].modified then
+        -- Skip buffers in diff mode or Avante buffers
+        if
+          vim.api.nvim_buf_is_valid(buf)
+          and vim.bo[buf].modifiable
+          and vim.bo[buf].modified
+          and not vim.wo[vim.api.nvim_get_current_win()].diff
+          and not string.match(vim.api.nvim_buf_get_name(buf), "Avante")
+        then
           local bufname = vim.api.nvim_buf_get_name(buf)
           if bufname ~= "" then -- Only save named buffers
             vim.api.nvim_buf_call(buf, function()
