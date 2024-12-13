@@ -312,6 +312,29 @@ vim.api.nvim_create_autocmd("FileType", {
   callback = create_markdown_navigation,
 })
 
+-- Function to open URLs with system default application
+local function open_with_system_app()
+  local file_path = vim.fn.expand("<cfile>")
+  if file_path == "" then
+    return
+  end
+
+  -- Determine the operating system and use appropriate command
+  if vim.fn.has("mac") == 1 then
+    vim.fn.system({ "open", file_path })
+  elseif vim.fn.has("unix") == 1 then
+    vim.fn.system({ "xdg-open", file_path })
+  elseif vim.fn.has("win32") == 1 then
+    vim.fn.system({ "cmd", "/c", "start", "", file_path })
+  end
+end
+
+-- Add keybinding for opening URLs
+vim.keymap.set("n", "gtx", open_with_system_app, {
+  desc = "Open link under cursor with system app",
+  silent = true,
+})
+
 -- Function to show highlight group under cursor
 vim.keymap.set("n", "<leader>h", function()
   print(vim.treesitter.get_captures_at_cursor()[1])
