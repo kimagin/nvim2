@@ -84,6 +84,7 @@ return {
       StatusLineTerm = { bg = "none", fg = "surface", bold = true },
       NeotreeTitleBar = { fg = "foam", bg = "none" },
       NeotreeFloatBorder = { fg = "foam", bg = "none" },
+      Folded = { fg = "rose", bg = "pine", italic = true, blend = 10 },
     },
   },
   config = function(_, opts)
