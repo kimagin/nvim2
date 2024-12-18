@@ -8,6 +8,8 @@ vim.opt.ttyfast = true -- Faster terminal connection
 vim.opt.encoding = "utf-8"
 vim.opt.fileencoding = "utf-8"
 vim.opt.termguicolors = true
+vim.opt.ambiwidth = "single"
+vim.scriptencoding = "utf-8"
 
 -- UI related
 -- vim.opt.winbar = " "
@@ -16,20 +18,21 @@ vim.opt.shortmess:append("I")
 vim.opt.showtabline = 0 -- Hide tabs
 vim.opt.wrap = true
 
--- Clipboard configuration with WSL support
+-- WSL2-Windows clipboard configuration for Scoop installation
 vim.opt.clipboard = "unnamedplus"
+
 if vim.fn.has("wsl") == 1 then
   vim.g.clipboard = {
-    name = "WslClipboard",
+    name = "win32yank-wsl",
     copy = {
-      ["+"] = "clip.exe",
-      ["*"] = "clip.exe",
+      ["+"] = "/mnt/c/Users/info/scoop/apps/win32yank/current/win32yank.exe -i --crlf",
+      ["*"] = "/mnt/c/Users/info/scoop/apps/win32yank/current/win32yank.exe -i --crlf",
     },
     paste = {
-      ["+"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
-      ["*"] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+      ["+"] = "/mnt/c/Users/info/scoop/apps/win32yank/current/win32yank.exe -o --lf",
+      ["*"] = "/mnt/c/Users/info/scoop/apps/win32yank/current/win32yank.exe -o --lf",
     },
-    cache_enabled = 1, -- Enable cache for better performance
+    cache_enabled = false,
   }
 end
 
