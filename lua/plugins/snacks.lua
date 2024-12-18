@@ -13,5 +13,6 @@ return {
     words = { enabled = true },
     dashboard = { enabled = false },
     lazygit = { enabled = true },
+    indent = { enabled = false },
   },
 }
