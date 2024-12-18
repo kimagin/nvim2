@@ -1,25 +1,84 @@
--- Autocmds are automatically loaded on the VeryLazy event
--- Default autocmds that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/autocmds.lua
+---@brief [[
+--- Autocmds configuration for LazyVim
+--- Loaded on VeryLazy event
+--- Default autocmds: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/autocmds.lua
+---@brief ]]
 
--- Create view directory if it doesn't exist
+-- Initialize cache for file size checks
+local file_size_cache = {}
+
+-- Create augroups for better organization
+local groups = {
+  buffer_management = vim.api.nvim_create_augroup("BufferManagement", { clear = true }),
+  markdown = vim.api.nvim_create_augroup("MarkdownEnhancements", { clear = true }),
+  project_root = vim.api.nvim_create_augroup("ProjectRoot", { clear = true }),
+  file_handling = vim.api.nvim_create_augroup("FileHandling", { clear = true }),
+}
+
+---@section View Management
+-- Configure view directory for buffer persistence
 local view_dir = vim.fn.stdpath("data") .. "/views/bufs"
 if vim.fn.isdirectory(view_dir) == 0 then
   vim.fn.mkdir(view_dir, "p")
 end
 
--- Large file detection
+---@param bufnr number Buffer number to check
+---@return boolean true if file is larger than 1MB
 local function is_large_file(bufnr)
+  local name = vim.api.nvim_buf_get_name(bufnr)
+
+  -- Check cache first
+  if file_size_cache[name] ~= nil then
+    return file_size_cache[name]
+  end
+
   local max_size = 1024 * 1024 -- 1MB
-  local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(bufnr))
-  return ok and stats and stats.size > max_size
+  local ok, stats = pcall(vim.loop.fs_stat, name)
+  local is_large = ok and stats and stats.size > max_size
+
+  -- Cache the result
+  file_size_cache[name] = is_large
+  return is_large
 end
 
--- Optimize view management
+-- Clear cache on file write
+vim.api.nvim_create_autocmd("BufWritePost", {
+  group = groups.buffer_management,
+  callback = function(args)
+    file_size_cache[vim.api.nvim_buf_get_name(args.buf)] = nil
+  end,
+})
+
+---@param bufnr number Buffer number to check
+---@return boolean true if buffer should have view saved/loaded
 local function should_handle_view(bufnr)
   local ft = vim.bo[bufnr].filetype
   local name = vim.api.nvim_buf_get_name(bufnr)
+  -- Skip empty buffers, git commits, and unnamed files
   return ft ~= "" and ft ~= "gitcommit" and name ~= ""
 end
+
+-- Handle buffer view persistence
+local function handle_view(args)
+  if not is_large_file(args.buf) and should_handle_view(args.buf) then
+    if args.event == "BufWinLeave" then
+      vim.cmd("silent! mkview")
+    elseif args.event == "BufWinEnter" then
+      vim.schedule(function()
+        if vim.api.nvim_buf_is_valid(args.buf) then
+          vim.cmd("silent! loadview")
+        end
+      end)
+    end
+  end
+end
+
+-- Set up view management autocmds
+vim.api.nvim_create_autocmd({ "BufWinLeave", "BufWinEnter" }, {
+  group = groups.buffer_management,
+  pattern = "*.*",
+  callback = handle_view,
+})
 
 -- Adding strikethrough to completed tasks
 local function setup_markdown_task_highlighting(bufnr)
@@ -67,6 +126,7 @@ vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
 
 -- Large file optimizations
 vim.api.nvim_create_autocmd("BufReadPre", {
+  group = groups.file_handling,
   pattern = "*",
   callback = function(args)
     if is_large_file(args.buf) then
@@ -83,6 +143,7 @@ vim.api.nvim_create_autocmd("BufReadPre", {
 
 -- Clean up old view files
 vim.api.nvim_create_autocmd("VimLeavePre", {
+  group = groups.buffer_management,
   callback = function()
     local view_files = vim.fn.glob(view_dir .. "/*", true, true)
     for _, file in ipairs(view_files) do
