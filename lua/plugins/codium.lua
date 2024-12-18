@@ -37,7 +37,7 @@ return {
   -- Copilot
   {
     "zbirenbaum/copilot.lua",
-    event = "InsertEnter",
+    event = "FileType",
     config = function()
       require("copilot").setup({
         panel = {
