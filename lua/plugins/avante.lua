@@ -5,6 +5,21 @@ return {
   version = false, -- set this if you want to always pull the latest change
   opts = {
     -- add any opts here
+    provider = "openai",
+    -- auto_suggestions_provider = "copilot",
+    openai = {
+      endpoint = "https://api.x.ai/v1/",
+      model = "grok-beta",
+      api_key = os.getenv("XAI_API_KEY"),
+    },
+
+    dual_boost = {
+      enabled = true,
+      first_provider = "openai",
+      second_provider = "claude",
+      prompt = "Based on the two reference outputs below, generate a response that incorporates elements from both but reflects your own judgment and unique perspective. Do not provide any explanation, just give the response directly. Reference Output 1: [{{provider1_output}}], Reference Output 2: [{{provider2_output}}]",
+      timeout = 60000, -- Timeout in milliseconds
+    },
     behaviour = {
       auto_suggestions = false,
       debounce_ms = 150,
@@ -72,7 +87,7 @@ return {
     "MunifTanjim/nui.nvim",
     --- The below dependencies are optional,
     "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
-    "zbirenbaum/copilot.lua", -- for providers='copilot'
+    -- "zbirenbaum/copilot.lua", -- for providers='copilot'
     {
       -- support for image pasting
       "HakonHarnes/img-clip.nvim",

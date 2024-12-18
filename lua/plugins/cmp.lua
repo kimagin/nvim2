@@ -125,14 +125,14 @@ return {
       opts.mapping = vim.tbl_extend("force", opts.mapping, {
         ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
         ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-        ["<Tab>"] = cmp.mapping(function(fallback)
-          if vim.fn["codeium#Accept"] ~= nil and vim.fn["codeium#Accept"]() ~= "" then
-            vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<C-g>", true, true, true), "")
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
-        ["<CR>"] = cmp.mapping.confirm({ select = true }),
+        -- ["<Tab>"] = cmp.mapping(function(fallback)
+        --   if vim.fn["codeium#Accept"] ~= nil and vim.fn["codeium#Accept"]() ~= "" then
+        --     vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<C-g>", true, true, true), "")
+        --   else
+        --     fallback()
+        --   end
+        -- end, { "i", "s" }),
+        -- ["<CR>"] = cmp.mapping.confirm({ select = true }),
         ["<C-u>"] = cmp.mapping.scroll_docs(-4),
         ["<C-d>"] = cmp.mapping.scroll_docs(4),
       })
@@ -141,6 +141,7 @@ return {
       opts.formatting = format
 
       local sources = {
+        -- { name = "copilot", priority = 1600 },
         { name = "luasnip", priority = 1400 },
         { name = "nvim_lsp", priority = 1500 },
         { name = "buffer", priority = 1000 },

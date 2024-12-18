@@ -55,7 +55,7 @@ return {
         },
         globalstatus = true,
         disabled_filetypes = { statusline = { "dashboard", "alpha", "lazy", "lazygit" } },
-        component_separators = " ",
+        component_separators = " ",
         section_separators = "",
         refresh = {
           statusline = 100,
@@ -75,6 +75,31 @@ return {
         },
         lualine_b = {
           {
+            "copilot",
+            padding = { left = 1, right = 0 },
+            symbols = {
+              status = {
+                icons = {
+                  enabled = "",
+                  sleep = "", -- auto-trigger disabled
+                  warning = "",
+                  unknown = " ",
+                },
+                hl = {
+                  enabled = "#50FA7B",
+                  sleep = "#67FFBE",
+                  disabled = "#6272A4",
+                  warning = "#FFB86C",
+                  unknown = "#FF5555",
+                },
+              },
+              spinners = require("copilot-lualine.spinners").dots,
+              spinner_color = "#a88bfa",
+            },
+            show_colors = true,
+            show_loading = true,
+          },
+          {
             "diagnostics",
             symbols = {
               error = icons.diagnostics.Error,
@@ -82,6 +107,7 @@ return {
               info = icons.diagnostics.Info,
               hint = icons.diagnostics.Hint,
             },
+            padding = { left = 1, right = 0 },
           },
         },
         lualine_x = {
