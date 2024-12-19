@@ -195,7 +195,7 @@ return {
             { name = "DiagnosticSignInfo", text = "" },
           },
         },
-        virtual_text = false,
+        virtual_text = true,
         float = {
           focusable = true,
           style = "minimal",
