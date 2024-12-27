@@ -53,28 +53,38 @@ return {
       },
       -- Limit search depth to avoid going too deep
       search_limit = 10, -- limits the search depth to 10 levels
-    },
-    window = {
-      width = 30, -- Smaller window size (customize as needed)
-      mappings = {
-        -- Open with System's explorer.exe on Windows
-        ["O"] = {
-          function(state)
-            local node = state.tree:get_node()
-            local path = node:get_id()
-
-            -- Windows-specific command to open explorer.exe
-            if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
-              vim.fn.jobstart({ "explorer.exe", path })
-            else
-              require("lazy.util").open(path, { system = true })
-            end
-          end,
-          desc = "Open with System File Explorer",
+      window = {
+        width = 30, -- Smaller window size (customize as needed)
+        mappings = {
+          ["O"] = "system_open",
         },
-        -- Disable unnecessary keymaps (optional)
-        [""] = "none",
       },
+    },
+    commands = {
+      system_open = function(state)
+        local node = state.tree:get_node()
+        local path = node:get_id()
+
+        -- Check if running in WSL2
+        local is_wsl = vim.fn.systemlist("uname -r")[1]:lower():match("wsl")
+
+        if is_wsl then
+          -- Convert WSL2 path to Windows path
+          local windows_path = vim.fn.systemlist("wslpath -w " .. vim.fn.shellescape(path))[1]
+          -- If the path is a file, get its parent directory
+          if vim.fn.isdirectory(windows_path) == 0 then
+            windows_path = vim.fn.fnamemodify(windows_path, ":h")
+          end
+          -- Use OneCommander to open the folder, fallback to explorer.exe if not found
+          local success = pcall(vim.fn.system, "OneCommander.exe " .. vim.fn.shellescape(windows_path))
+          if not success then
+            vim.fn.system("explorer.exe " .. vim.fn.shellescape(windows_path))
+          end
+        else
+          -- For non-WSL environments, use xdg-open
+          vim.fn.jobstart({ "xdg-open", path }, { detach = true })
+        end
+      end,
     },
   },
 }
