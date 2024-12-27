@@ -222,3 +222,11 @@ end, { desc = "Wrap line in console.log" })
 
 -- Split buffer vertically
 vim.keymap.set("n", "<leader>_", "<cmd>:split<cr>", { desc = "Split buffer vertically" })
+
+-- map gx to open file in default program
+vim.api.nvim_set_keymap(
+  "n",
+  "gx",
+  '<Cmd>execute "!xdg-open " . shellescape("<cfile>")<CR>',
+  { noremap = true, silent = true }
+)
