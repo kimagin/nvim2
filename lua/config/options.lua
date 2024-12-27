@@ -18,19 +18,19 @@ vim.opt.shortmess:append("I")
 vim.opt.showtabline = 0 -- Hide tabs
 vim.opt.wrap = true
 
--- WSL2-Windows clipboard configuration for Scoop installation
+-- WSL2-Windows clipboard configuration using clip.exe and powershell.exe
 vim.opt.clipboard = "unnamedplus"
 
 if vim.fn.has("wsl") == 1 then
   vim.g.clipboard = {
-    name = "win32yank-wsl",
+    name = "Win32Yank",
     copy = {
-      ["+"] = "/mnt/c/Users/info/scoop/apps/win32yank/current/win32yank.exe -i --crlf",
-      ["*"] = "/mnt/c/Users/info/scoop/apps/win32yank/current/win32yank.exe -i --crlf",
+      ["+"] = "win32yank -i --crlf",
+      ["*"] = "win32yank -i --crlf",
     },
     paste = {
-      ["+"] = "/mnt/c/Users/info/scoop/apps/win32yank/current/win32yank.exe -o --lf",
-      ["*"] = "/mnt/c/Users/info/scoop/apps/win32yank/current/win32yank.exe -o --lf",
+      ["+"] = "win32yank -o --lf",
+      ["*"] = "win32yank -o --lf",
     },
     cache_enabled = false,
   }
