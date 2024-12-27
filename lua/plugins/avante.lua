@@ -8,21 +8,24 @@ return {
     provider = "openai",
     -- auto_suggestions_provider = "copilot",
     openai = {
-      endpoint = "https://api.x.ai/v1/",
-      model = "grok-beta",
-      api_key = os.getenv("XAI_API_KEY"),
+      endpoint = "https://api.deepseek.com/v1",
+      model = "deepseek-chat",
+      timeout = 30000, -- Timeout in milliseconds
+      temperature = 0,
+      max_tokens = 4096,
+      ["local"] = false,
     },
 
-    dual_boost = {
-      enabled = true,
-      first_provider = "openai",
-      second_provider = "claude",
-      prompt = "Based on the two reference outputs below, generate a response that incorporates elements from both but reflects your own judgment and unique perspective. Do not provide any explanation, just give the response directly. Reference Output 1: [{{provider1_output}}], Reference Output 2: [{{provider2_output}}]",
-      timeout = 60000, -- Timeout in milliseconds
-    },
+    -- dual_boost = {
+    --   enabled = false,
+    --   first_provider = "openai",
+    --   second_provider = "openai",
+    --   prompt = "Based on the two reference outputs below, generate a response that incorporates elements from both but reflects your own judgment and unique perspective. Do not provide any explanation, just give the response directly. Reference Output 1: [{{provider1_output}}], Reference Output 2: [{{provider2_output}}]",
+    --   timeout = 60000, -- Timeout in milliseconds
+    -- },
     behaviour = {
       auto_suggestions = false,
-      debounce_ms = 150,
+      debounce_ms = 300,
       max_lines = 1000,
       trim_text = true,
       show_debug_info = false,
