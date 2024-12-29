@@ -3,6 +3,7 @@ vim.opt.updatetime = 50 -- Faster completion and better UX
 vim.opt.timeoutlen = 250 -- Faster key sequence completion
 vim.opt.redrawtime = 1500 -- Allow more time for loading syntax on large files
 vim.opt.ttyfast = true -- Faster terminal connection
+vim.opt.maxmempattern = 2000 -- Increase memory for pattern matching
 
 -- File handling and encoding
 vim.opt.encoding = "utf-8"

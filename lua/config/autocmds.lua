@@ -25,7 +25,14 @@ end
 ---@param bufnr number Buffer number to check
 ---@return boolean true if file is larger than 1MB
 local function is_large_file(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) then
+    return false
+  end
+
   local name = vim.api.nvim_buf_get_name(bufnr)
+  if name == "" then
+    return false
+  end
 
   -- Check cache first
   if file_size_cache[name] ~= nil then
@@ -34,9 +41,12 @@ local function is_large_file(bufnr)
 
   local max_size = 1024 * 1024 -- 1MB
   local ok, stats = pcall(vim.loop.fs_stat, name)
-  local is_large = ok and stats and stats.size > max_size
+  if not ok or not stats then
+    file_size_cache[name] = false
+    return false
+  end
 
-  -- Cache the result
+  local is_large = stats.size > max_size
   file_size_cache[name] = is_large
   return is_large
 end
@@ -59,16 +69,26 @@ local function should_handle_view(bufnr)
 end
 
 -- Handle buffer view persistence
+local view_handlers = {
+  BufWinLeave = function(buf)
+    if vim.api.nvim_buf_is_valid(buf) then
+      vim.cmd("silent! mkview")
+    end
+  end,
+  BufWinEnter = function(buf)
+    vim.defer_fn(function()
+      if vim.api.nvim_buf_is_valid(buf) then
+        vim.cmd("silent! loadview")
+      end
+    end, 20)
+  end,
+}
+
 local function handle_view(args)
   if not is_large_file(args.buf) and should_handle_view(args.buf) then
-    if args.event == "BufWinLeave" then
-      vim.cmd("silent! mkview")
-    elseif args.event == "BufWinEnter" then
-      vim.schedule(function()
-        if vim.api.nvim_buf_is_valid(args.buf) then
-          vim.cmd("silent! loadview")
-        end
-      end)
+    local handler = view_handlers[args.event]
+    if handler then
+      handler(args.buf)
     end
   end
 end
@@ -185,15 +205,26 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "none", fg = "#141317" })
 
 -- Project root detection
+local project_root_cache = {}
+local root_patterns = { ".git", ".svn", ".hg", "package.json", "Cargo.toml" }
+
 local function find_project_root()
-  local root_patterns = { ".git", ".svn", ".hg", "package.json", "Cargo.toml" }
+  local current_dir = vim.fn.expand("%:p:h")
+  if project_root_cache[current_dir] then
+    return project_root_cache[current_dir]
+  end
+
   for _, pattern in ipairs(root_patterns) do
-    local root = vim.fn.finddir(pattern, vim.fn.expand("%:p:h") .. ";")
+    local root = vim.fn.finddir(pattern, current_dir .. ";")
     if root ~= "" then
-      return vim.fn.fnamemodify(root, ":h")
+      local project_root = vim.fn.fnamemodify(root, ":h")
+      project_root_cache[current_dir] = project_root
+      return project_root
     end
   end
-  return vim.fn.expand("%:p:h")
+
+  project_root_cache[current_dir] = current_dir
+  return current_dir
 end
 
 local function set_cwd_to_project_root()
@@ -202,7 +233,9 @@ local function set_cwd_to_project_root()
   end
   local root = find_project_root()
   if root ~= vim.fn.getcwd() then
-    local ok, err = pcall(vim.cmd, "lcd " .. root)
+    local ok, err = pcall(function()
+      vim.cmd("lcd " .. root)
+    end)
     if ok then
       if root ~= "." and root ~= vim.fn.getcwd() then
         -- Optional Notification
@@ -238,17 +271,23 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 -- Function to navigate to next/previous markdown elements
+local markdown_nav_cache = {}
+
 local function create_markdown_navigation()
   -- Function to find next/previous pattern
   local function find_pattern(pattern, reverse)
+    local cache_key = pattern .. (reverse and "_reverse" or "_forward")
+    if markdown_nav_cache[cache_key] then
+      return markdown_nav_cache[cache_key]
+    end
     local current_line = vim.fn.line(".")
     local current_col = vim.fn.col(".")
     local last_line = vim.fn.line("$")
 
     if not reverse then
       -- Search in current line after cursor
-      local line_content = vim.fn.getline(current_line)
-      local match_in_current = vim.fn.match(line_content:sub(current_col + 1), pattern)
+      local current_line_content = vim.fn.getline(current_line)
+      local match_in_current = vim.fn.match(current_line_content:sub(current_col + 1), pattern)
 
       if match_in_current >= 0 then
         vim.fn.cursor(current_line, current_col + 1 + match_in_current)
@@ -257,8 +296,8 @@ local function create_markdown_navigation()
 
       -- Search in subsequent lines
       for line_num = current_line + 1, last_line do
-        local line_content = vim.fn.getline(line_num)
-        local match_pos = vim.fn.match(line_content, pattern)
+        local subsequent_line_content = vim.fn.getline(line_num)
+        local match_pos = vim.fn.match(subsequent_line_content, pattern)
         if match_pos >= 0 then
           vim.fn.cursor(line_num, match_pos + 1)
           return true
@@ -267,8 +306,8 @@ local function create_markdown_navigation()
 
       -- Wrap to beginning if not found
       for line_num = 1, current_line - 1 do
-        local line_content = vim.fn.getline(line_num)
-        local match_pos = vim.fn.match(line_content, pattern)
+        local wrapped_line_content = vim.fn.getline(line_num)
+        local match_pos = vim.fn.match(wrapped_line_content, pattern)
         if match_pos >= 0 then
           vim.fn.cursor(line_num, match_pos + 1)
           return true
@@ -276,63 +315,63 @@ local function create_markdown_navigation()
       end
     else
       -- Search in current line before cursor
-      local line_content = vim.fn.getline(current_line)
-      local before_cursor = line_content:sub(1, current_col - 1)
-      local last_match = nil
-      local pos = 0
+      local current_line_content = vim.fn.getline(current_line)
+      local before_cursor = current_line_content:sub(1, current_col - 1)
+      local last_found_match = nil
+      local current_pos = 0
 
       while true do
-        local match_pos = vim.fn.match(before_cursor:sub(pos + 1), pattern)
+        local match_pos = vim.fn.match(before_cursor:sub(current_pos + 1), pattern)
         if match_pos == -1 then
           break
         end
-        last_match = pos + match_pos + 1
-        pos = pos + match_pos + 1
+        last_found_match = current_pos + match_pos + 1
+        current_pos = current_pos + match_pos + 1
       end
 
-      if last_match then
-        vim.fn.cursor(current_line, last_match)
+      if last_found_match then
+        vim.fn.cursor(current_line, last_found_match)
         return true
       end
 
       -- Search in previous lines
       for line_num = current_line - 1, 1, -1 do
-        local line_content = vim.fn.getline(line_num)
-        local last_match = nil
-        local pos = 0
+        local previous_line_content = vim.fn.getline(line_num)
+        local last_found_match = nil
+        local current_pos = 0
 
         while true do
-          local match_pos = vim.fn.match(line_content:sub(pos + 1), pattern)
+          local match_pos = vim.fn.match(previous_line_content:sub(current_pos + 1), pattern)
           if match_pos == -1 then
             break
           end
-          last_match = pos + match_pos + 1
-          pos = pos + match_pos + 1
+          last_found_match = current_pos + match_pos + 1
+          current_pos = current_pos + match_pos + 1
         end
 
-        if last_match then
-          vim.fn.cursor(line_num, last_match)
+        if last_found_match then
+          vim.fn.cursor(line_num, last_found_match)
           return true
         end
       end
 
       -- Wrap to end if not found
       for line_num = last_line, current_line + 1, -1 do
-        local line_content = vim.fn.getline(line_num)
-        local last_match = nil
-        local pos = 0
+        local wrapped_line_content = vim.fn.getline(line_num)
+        local last_found_match = nil
+        local current_pos = 0
 
         while true do
-          local match_pos = vim.fn.match(line_content:sub(pos + 1), pattern)
+          local match_pos = vim.fn.match(wrapped_line_content:sub(current_pos + 1), pattern)
           if match_pos == -1 then
             break
           end
-          last_match = pos + match_pos + 1
-          pos = pos + match_pos + 1
+          last_found_match = current_pos + match_pos + 1
+          current_pos = current_pos + match_pos + 1
         end
 
-        if last_match then
-          vim.fn.cursor(line_num, last_match)
+        if last_found_match then
+          vim.fn.cursor(line_num, last_found_match)
           return true
         end
       end
@@ -377,16 +416,26 @@ vim.api.nvim_create_autocmd("FileType", {
 local function open_with_system_app()
   local file_path = vim.fn.expand("<cfile>")
   if file_path == "" then
+    vim.notify("No file under cursor", vim.log.levels.WARN)
     return
   end
 
-  -- Determine the operating system and use appropriate command
+  local open_cmd = nil
   if vim.fn.has("mac") == 1 then
-    vim.fn.system({ "open", file_path })
+    open_cmd = { "open", file_path }
   elseif vim.fn.has("unix") == 1 then
-    vim.fn.system({ "xdg-open", file_path })
+    open_cmd = { "xdg-open", file_path }
   elseif vim.fn.has("win32") == 1 then
-    vim.fn.system({ "cmd", "/c", "start", "", file_path })
+    open_cmd = { "cmd", "/c", "start", "", file_path }
+  end
+
+  if open_cmd then
+    local ok, err = pcall(vim.fn.system, open_cmd)
+    if not ok then
+      vim.notify("Failed to open file: " .. err, vim.log.levels.ERROR)
+    end
+  else
+    vim.notify("Unsupported platform", vim.log.levels.ERROR)
   end
 end
 
