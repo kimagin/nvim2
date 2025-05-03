@@ -1,3 +1,18 @@
+-- Special Colors for CMP
+
+local colors = {
+  border = "#303446",
+  icon = "#fff09a",
+  match = "#a88bfa",
+  match_fuzzy = "#c298dd",
+  fn = "#aeffd6",
+  method = "#fff09a",
+  variable = "#c298dd",
+  keyword = "#a88bfa",
+  field = "#e0af68",
+  source = "#626880", -- Dimmed color for source names
+}
+
 return {
   "rose-pine/neovim",
   name = "rose-pine",
@@ -9,7 +24,7 @@ return {
 
     enable = {
       terminal = true,
-      legacy_highlights = false, -- Improve compatibility for previous versions of Neovim
+      legacy_highlights = true, -- Improve compatibility for previous versions of Neovim
       migrations = true, -- Handle deprecated options automatically
     },
 
@@ -85,6 +100,18 @@ return {
       NeotreeTitleBar = { fg = "foam", bg = "none" },
       NeotreeFloatBorder = { fg = "foam", bg = "none" },
       Folded = { fg = "rose", bg = "pine", italic = true, blend = 10 },
+      CmpBorderIcon = { fg = colors.icon, bold = true },
+      CmpBorder = { fg = colors.border },
+      CmpItemAbbrMatch = { fg = colors.match, bold = true },
+      CmpItemAbbrMatchFuzzy = { fg = colors.match_fuzzy, bold = true },
+      PmenuSel = { bg = colors.border, bold = true },
+      Pmenu = { bg = "none", fg = colors.match, bold = true },
+      CmpItemKindFunction = { fg = colors.fn },
+      CmpItemKindMethod = { fg = colors.method },
+      CmpItemKindVariable = { fg = colors.variable },
+      CmpItemKindKeyword = { fg = colors.keyword },
+      CmpItemKindField = { fg = colors.field },
+      CmpItemMenu = { fg = colors.source },
     },
   },
   config = function(_, opts)

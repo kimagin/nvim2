@@ -6,9 +6,25 @@ return {
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
       "saadparwaiz1/cmp_luasnip",
+      "onsails/lspkind.nvim", -- For better icons and UI
+      "rafamadriz/friendly-snippets", -- Pre-configured snippets
+      "L3MON4D3/LuaSnip", -- Snippet engine
+      "windwp/nvim-autopairs", -- Auto-pairing for brackets, quotes, etc.
+      "windwp/nvim-ts-autotag", -- Auto-tagging for HTML/JSX
     },
-    opts = function(_, opts)
+    event = "InsertEnter",
+    config = function()
       local cmp = require("cmp")
+      local luasnip = require("luasnip")
+      local lspkind = require("lspkind")
+      local autopairs = require("nvim-autopairs")
+      local autotag = require("nvim-ts-autotag")
+
+      -- Set up autopairs and autotag
+      autopairs.setup()
+      autotag.setup()
+
+      -- Custom colors for highlights
       local colors = {
         border = "#303446",
         icon = "#fff09a",
@@ -19,42 +35,44 @@ return {
         variable = "#c298dd",
         keyword = "#a88bfa",
         field = "#e0af68",
-        source = "#626880", -- Added dimmed color for source names
+        source = "#626880", -- Dimmed color for source names
       }
 
       -- Custom icons for different kinds
       local kind_icons = {
-        Field = "",
-        Property = "",
+        Text = "󰦨",
         Method = "",
         Function = "",
         Constructor = "󰩀",
+        Field = "",
+        Variable = "",
         Class = "",
         Interface = "",
-        Variable = "",
-        Constant = "",
-        String = "",
-        Number = "",
-        Boolean = "",
-        Array = "",
-        Object = "",
-        Key = "",
-        Null = "∅",
+        Module = "󰕘",
+        Property = "",
+        Unit = "",
+        Value = "",
+        Enum = "",
+        Keyword = "󰌋",
+        Snippet = "",
+        Color = "",
+        File = "󰈙",
+        Reference = "󰈇",
+        Folder = "󰉋",
         EnumMember = "",
+        Constant = "",
         Struct = "",
         Event = "",
         Operator = "",
         TypeParameter = "",
         Component = "󰐖",
-        Text = "󰦨",
-        Snippet = "",
-        Keyword = "󰌋",
-        File = "󰈙",
-        Reference = "󰈇",
-        Folder = "󰉋",
-        Enum = "󰕘",
+        Null = "∅",
+        Key = "",
+        Array = "",
+        Object = "",
       }
-      -- Set up highlights in a single batch
+
+      -- Set up custom highlights
       local highlights = {
         CmpBorderIcon = { fg = colors.icon, bold = true },
         CmpBorder = { fg = colors.border },
@@ -67,9 +85,10 @@ return {
         CmpItemKindVariable = { fg = colors.variable },
         CmpItemKindKeyword = { fg = colors.keyword },
         CmpItemKindField = { fg = colors.field },
-        CmpItemMenu = { fg = colors.source }, -- Added highlight for source name
+        CmpItemMenu = { fg = colors.source }, -- Dimmed color for source names
       }
 
+      -- Apply highlights
       for group, settings in pairs(highlights) do
         vim.api.nvim_set_hl(0, group, settings)
       end
@@ -86,8 +105,9 @@ return {
         { "│", "CmpBorder" },
       }
 
-      -- Custom formatting function with dimmed source names
+      -- Custom formatting function to display name before type
       local format = {
+        fields = { "abbr", "kind", "menu" }, -- Reorder fields
         format = function(entry, vim_item)
           local kind = vim_item.kind
           vim_item.kind = (kind_icons[kind] or "") .. " " .. kind
@@ -100,69 +120,95 @@ return {
             path = "..",
           }
 
-          -- Using %#HighlightGroup# syntax to apply the dimmed color
+          -- Display name before type
           vim_item.menu = string.format(" %s", menu_map[entry.source.name] or entry.source.name)
           return vim_item
         end,
       }
 
-      -- Rest of your configuration remains the same
-      opts.window = {
-        completion = {
-          border = border,
-          col_offset = -3,
-          side_padding = 1,
-          winhighlight = "Normal:CmpPmenu,CursorLine:PmenuSel,Search:None,FloatBorder:CmpBorder",
-          scrollbar = false,
+      -- Set up nvim-cmp
+      cmp.setup({
+        snippet = {
+          expand = function(args)
+            luasnip.lsp_expand(args.body)
+          end,
         },
-        documentation = {
-          border = "single",
-          winhighlight = "Normal:CmpDocumentation,CursorLine:CmpDocumentationCursorLine",
-          scrollbar = true,
+        window = {
+          completion = {
+            border = border,
+            col_offset = -3,
+            side_padding = 1,
+            winhighlight = "Normal:CmpPmenu,CursorLine:PmenuSel,Search:None,FloatBorder:CmpBorder",
+            scrollbar = false,
+          },
+          documentation = {
+            border = "single",
+            winhighlight = "Normal:CmpDocumentation,CursorLine:CmpDocumentationCursorLine",
+            scrollbar = true,
+          },
         },
-      }
+        mapping = {
+          ["<Down>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+          ["<Up>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+          ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+          ["<C-f>"] = cmp.mapping.scroll_docs(4),
+          ["<C-Space>"] = cmp.mapping.complete(),
+          ["<C-e>"] = cmp.mapping.abort(),
+          ["<CR>"] = cmp.mapping.confirm({ select = true }),
+          ["<Tab>"] = cmp.mapping(function(fallback)
+            if luasnip.expand_or_jumpable() then
+              luasnip.expand_or_jump()
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
+          ["<S-Tab>"] = cmp.mapping(function(fallback)
+            if luasnip.jumpable(-1) then
+              luasnip.jump(-1)
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
+        },
+        formatting = format,
+        sources = cmp.config.sources({
+          { name = "nvim_lsp", priority = 1500 },
+          { name = "luasnip", priority = 1400 },
+          { name = "buffer", priority = 1000 },
+          { name = "path", priority = 800 },
+        }),
+        experimental = {
+          ghost_text = false,
+        },
 
-      opts.mapping = vim.tbl_extend("force", opts.mapping, {
-        ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-        ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-        -- ["<Tab>"] = cmp.mapping(function(fallback)
-        --   if vim.fn["codeium#Accept"] ~= nil and vim.fn["codeium#Accept"]() ~= "" then
-        --     vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<C-g>", true, true, true), "")
-        --   else
-        --     fallback()
-        --   end
-        -- end, { "i", "s" }),
-        -- ["<CR>"] = cmp.mapping.confirm({ select = true }),
-        ["<C-u>"] = cmp.mapping.scroll_docs(-4),
-        ["<C-d>"] = cmp.mapping.scroll_docs(4),
+        completion = {
+          trigger_characters = { ".", ":", "<", ">", "/", " ", "\t" }, -- Add more if needed
+        },
       })
 
-      opts.experimental = { ghost_text = false }
-      opts.formatting = format
+      -- Enable Emmet for HTML and JSX
+      cmp.setup.filetype({ "html", "javascript", "javascriptreact", "typescript", "typescriptreact" }, {
+        sources = cmp.config.sources({
+          { name = "nvim_lsp", priority = 1500 },
+          { name = "luasnip", priority = 1400 },
+          { name = "buffer", priority = 1000 },
+          { name = "path", priority = 800 },
+          { name = "emmet", priority = 1200 }, -- Add Emmet as a source
+        }),
+      })
 
-      local sources = {
-        -- { name = "copilot", priority = 1600 },
-        { name = "luasnip", priority = 1400 },
-        { name = "nvim_lsp", priority = 1500 },
-        { name = "buffer", priority = 1000 },
-        { name = "path", priority = 800 },
-      }
-      opts.sources = cmp.config.sources(sources)
+      -- Enable Astro-specific configuration
+      cmp.setup.filetype("astro", {
+        sources = cmp.config.sources({
+          { name = "nvim_lsp", priority = 1500 },
+          { name = "luasnip", priority = 1400 },
+          { name = "buffer", priority = 1000 },
+          { name = "path", priority = 800 },
+        }),
+      })
 
-      local special_filetypes = {
-        "astro",
-        "javascript",
-        "typescript",
-        "javascriptreact",
-        "typescriptreact",
-        "markdown",
-      }
-
-      for _, ft in ipairs(special_filetypes) do
-        cmp.setup.filetype(ft, { sources = cmp.config.sources(sources) })
-      end
-
-      return opts
+      -- Load friendly-snippets
+      require("luasnip.loaders.from_vscode").lazy_load()
     end,
   },
 }

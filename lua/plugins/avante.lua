@@ -1,7 +1,7 @@
 return {
   "yetone/avante.nvim",
   event = "VeryLazy",
-  lazy = true,
+  lazy = false,
   version = false, -- set this if you want to always pull the latest change
   opts = {
     -- add any opts here
@@ -9,11 +9,25 @@ return {
     -- auto_suggestions_provider = "copilot",
     openai = {
       endpoint = "https://api.deepseek.com/v1",
-      model = "deepseek-chat",
-      timeout = 30000, -- Timeout in milliseconds
+      model = "deepseek-reasonerreasoning",
+      timeout = 60000, -- Timeout in milliseconds
       temperature = 0,
-      max_tokens = 4096,
+      max_tokens = 8000,
       ["local"] = false,
+    },
+
+    -- openai = {
+    --   endpoint = "https://api.x.ai/v1/",
+    --   model = "grok-beta",
+    --   timeout = 60000, -- Timeout in milliseconds
+    --   temperature = 0,
+    --   max_tokens = 4096,
+    --   ["local"] = false,
+    -- },
+    behaviour = {
+      auto_suggestions = false,
+      auto_set_highlight_group = true,
+      support_paste_from_clipboard = true,
     },
 
     -- dual_boost = {
@@ -38,23 +52,23 @@ return {
     --     dismiss = "<C-x>",
     --   },
     -- },
-    -- windows = {
-    --   width = 40,
-    --   max_height = 20,
-    --   sidebar_header = {
-    --     align = "right",
-    --     rounded = false,
-    --   },
-    --   border = "rounded", -- Rounded borders for better aesthetics
-    --   padding = { 1, 1, 1, 1 },
-    --   win_options = {
-    --     wrap = true,
-    --     linebreak = true,
-    --     foldcolumn = "0",
-    --     winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
-    --   },
-    -- },
-    -- hints = { enabled = false },
+    windows = {
+      width = 40,
+      max_height = 10,
+      sidebar_header = {
+        align = "right",
+        rounded = false,
+      },
+      border = "rounded", -- Rounded borders for better aesthetics
+      padding = { 1, 1, 1, 1 },
+      win_options = {
+        wrap = true,
+        linebreak = true,
+        foldcolumn = "0",
+        winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+      },
+    },
+    hints = { enabled = false },
     -- ui = {
     --   icons = {
     --     enabled = true,
