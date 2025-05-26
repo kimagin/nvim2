@@ -20,8 +20,8 @@ return {
       --  dash, bullet, check_icon, check_scope, quote, table_border, callout, link, sign
       ignore = {
         code_background = true,
-        code = true,
-        checkbox = true,
+        -- code = true,
+        -- checkbox = true,
         sign = true,
         table_border = true,
         code_language = true,
@@ -200,7 +200,7 @@ return {
       -- Determines how icons fill the available space:
       --  inline:  underlying text is concealed resulting in a left aligned icon
       --  overlay: result is left padded with spaces to hide any additional text
-      position = "inline",
+      -- position = "inline",
       unchecked = {
         -- Replaces '[ ]' of 'task_list_marker_unchecked'
         icon = "󰄱",

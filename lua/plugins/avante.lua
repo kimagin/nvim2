@@ -127,7 +127,7 @@ return {
       "MeanderingProgrammer/render-markdown.nvim",
       opts = {
         file_types = { "markdown", "Avante" },
-        highlight_code_blocks = true,
+        -- highlight_code_blocks = true,
       },
       ft = { "markdown", "Avante" },
     },
