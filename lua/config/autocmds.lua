@@ -454,8 +454,42 @@ local function open_tasks()
     end
   end
 
-  -- Open tasks.md in a new buffer
-  vim.cmd("edit " .. tasks_path)
+  -- Clean up any existing swap files more aggressively
+  local expanded_path = vim.fn.expand(tasks_path)
+  local swap_dir = vim.fn.expand("~/.local/state/nvim/swap/")
+  local encoded_path = vim.fn.substitute(expanded_path, "/", "%%", "g")
+  local swap_patterns = {
+    expanded_path .. ".swp",
+    expanded_path .. ".swo", 
+    swap_dir .. encoded_path .. ".swp",
+    swap_dir .. encoded_path .. ".swo"
+  }
+  
+  for _, swap_path in ipairs(swap_patterns) do
+    if vim.fn.filereadable(swap_path) == 1 then
+      pcall(os.remove, swap_path)
+    end
+  end
+
+  -- Open with swap file handling
+  local cmd = string.format('edit %s', vim.fn.fnameescape(tasks_path))
+  
+  -- Handle swap file prompts automatically
+  vim.cmd("set shortmess+=A")  -- Avoid swap file attention message
+  
+  local ok, err = pcall(vim.cmd, cmd)
+  if not ok then
+    -- If there's still a swap file issue, recover and delete swap
+    if err:match("E325") then
+      vim.cmd("recover")
+      -- Try to remove swap files again after recovery
+      for _, swap_path in ipairs(swap_patterns) do
+        pcall(os.remove, swap_path)
+      end
+    end
+  end
+  
+  vim.cmd("set shortmess-=A")  -- Restore normal messages
 end
 
 -- Add keymap to open tasks

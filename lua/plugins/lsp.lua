@@ -8,7 +8,7 @@ end
 return {
   {
     "neovim/nvim-lspconfig",
-    lazy = false,  -- Load immediately for better LSP experience
+    event = { "BufReadPre", "BufNewFile" },  -- Load when opening files
 
     opts = {
       servers = {

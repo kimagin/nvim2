@@ -1,7 +1,7 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    lazy = false,  -- Load immediately for syntax highlighting
+    event = { "BufReadPost", "BufNewFile", "BufWritePre" },  -- Load when opening/editing files
     opts = function(_, opts)
       -- Ensure markdown is in the list of ensured_installed parsers
       if type(opts.ensure_installed) == "table" then

@@ -148,7 +148,23 @@ function M.update_tasks()
 
   find_command:close()
   write_tasks(tasks_by_date)
-  vim.cmd("edit!")
+  -- Reload buffer content without conflicts
+  local bufnr = vim.fn.bufnr("tasks.md")
+  if bufnr ~= -1 and vim.api.nvim_buf_is_loaded(bufnr) then
+    -- Read the updated file content
+    local updated_content = {}
+    local file = io.open(vim.fn.expand("~/Developments/obsidian/tasks.md"), "r")
+    if file then
+      for line in file:lines() do
+        table.insert(updated_content, line)
+      end
+      file:close()
+      
+      -- Update buffer with new content
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, updated_content)
+      vim.api.nvim_buf_set_option(bufnr, "modified", false)
+    end
+  end
 end
 
 -- Set up autocommand to run on file open and buffer write
@@ -160,7 +176,13 @@ function M.setup()
     group = group,
     pattern = "*/obsidian/tasks.md",
     callback = function()
-      M.update_tasks()
+      -- Disable swap file for this specific buffer to prevent conflicts
+      vim.bo.swapfile = false
+      
+      -- Small delay to ensure file is fully loaded
+      vim.defer_fn(function()
+        M.update_tasks()
+      end, 50)
     end,
     desc = "Update tasks from journal files",
   })
