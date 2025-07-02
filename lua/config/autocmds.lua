@@ -4,8 +4,9 @@
 --- Default autocmds: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/autocmds.lua
 ---@brief ]]
 
--- Initialize cache for file size checks
+-- Initialize cache for optimizations
 local file_size_cache = {}
+local project_root_cache = {}
 
 -- Create augroups for better organization
 local groups = {
@@ -100,11 +101,10 @@ vim.api.nvim_create_autocmd({ "BufWinLeave", "BufWinEnter" }, {
   callback = handle_view,
 })
 
--- Adding strikethrough to completed tasks
+-- Markdown task highlighting setup
 local function setup_markdown_task_highlighting(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
 
-  -- Check if highlighting is already set up
   if vim.b[bufnr].task_highlighting_setup then
     return
   end
@@ -114,35 +114,8 @@ local function setup_markdown_task_highlighting(bufnr)
   end)
 
   vim.api.nvim_set_hl(0, "markdownTaskListDone", { fg = "#A88BFA", strikethrough = true, italic = true })
-  vim.cmd([[highlight link markdownTaskListDone markdownTaskListDone]])
-
   vim.b[bufnr].task_highlighting_setup = true
 end
-
-local markdown_highlight_group = vim.api.nvim_create_augroup("MarkdownTaskListDone", { clear = true })
-
--- Buffer persistence with Treesitter-aware view loading
-vim.api.nvim_create_autocmd({ "BufWinLeave" }, {
-  pattern = { "*.*" },
-  callback = function(args)
-    if not is_large_file(args.buf) and should_handle_view(args.buf) then
-      vim.cmd("silent! mkview")
-    end
-  end,
-})
-
-vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
-  pattern = { "*.*" },
-  callback = function(args)
-    if not is_large_file(args.buf) and should_handle_view(args.buf) then
-      vim.defer_fn(function()
-        if vim.api.nvim_buf_is_valid(args.buf) then
-          vim.cmd("silent! loadview")
-        end
-      end, 20)
-    end
-  end,
-})
 
 -- Large file optimizations
 vim.api.nvim_create_autocmd("BufReadPre", {
@@ -175,18 +148,11 @@ vim.api.nvim_create_autocmd("VimLeavePre", {
   end,
 })
 
-vim.api.nvim_create_autocmd({ "FileType", "BufEnter", "BufWritePost" }, {
-  group = markdown_highlight_group,
-  pattern = "*.md",
+vim.api.nvim_create_autocmd("FileType", {
+  group = groups.markdown,
+  pattern = "markdown",
   callback = function(args)
-    if vim.bo[args.buf].filetype == "markdown" then
-      setup_markdown_task_highlighting(args.buf)
-      vim.defer_fn(function()
-        if vim.api.nvim_buf_is_valid(args.buf) then
-          setup_markdown_task_highlighting(args.buf)
-        end
-      end, 50)
-    end
+    setup_markdown_task_highlighting(args.buf)
   end,
 })
 
@@ -204,13 +170,10 @@ vim.api.nvim_create_autocmd("FileType", {
 -- Remove eob ~ from the neotree panel
 vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "none", fg = "#141317" })
 
--- Project root detection
-local project_root_cache = {}
-
+-- Project root detection using LazyVim's utility
 local function find_project_root()
   local current_dir = vim.fn.expand("%:p:h")
   
-  -- Return early if current buffer has no valid path
   if current_dir == "" or current_dir == "." then
     return vim.fn.getcwd()
   end
@@ -219,7 +182,17 @@ local function find_project_root()
     return project_root_cache[current_dir]
   end
 
-  -- Look for .git directory by walking up the tree
+  -- Use LazyVim's root detection if available
+  local ok, lazyvim_util = pcall(require, "lazyvim.util")
+  if ok and lazyvim_util.root then
+    local root = lazyvim_util.root.get({ normalize = true })
+    if root and root ~= vim.fn.getcwd() then
+      project_root_cache[current_dir] = root
+      return root
+    end
+  end
+
+  -- Fallback to simple git detection
   local dir = current_dir
   while dir ~= "/" and dir ~= "" do
     if vim.fn.isdirectory(dir .. "/.git") == 1 then
@@ -228,19 +201,7 @@ local function find_project_root()
     end
     dir = vim.fn.fnamemodify(dir, ":h")
   end
-  
-  -- Look for other root markers (files)
-  local root_files = { "package.json", "Cargo.toml", ".svn", ".hg" }
-  for _, pattern in ipairs(root_files) do
-    local found = vim.fn.findfile(pattern, current_dir .. ";")
-    if found ~= "" then
-      local project_root = vim.fn.fnamemodify(found, ":p:h")
-      project_root_cache[current_dir] = project_root
-      return project_root
-    end
-  end
 
-  -- Fallback to current directory if it exists, otherwise use vim's cwd
   local fallback = vim.fn.isdirectory(current_dir) == 1 and current_dir or vim.fn.getcwd()
   project_root_cache[current_dir] = fallback
   return fallback
@@ -290,10 +251,9 @@ local function set_cwd_to_project_root()
 end
 
 vim.api.nvim_create_autocmd("BufEnter", {
+  group = groups.project_root,
   pattern = "*",
-  callback = function()
-    vim.defer_fn(set_cwd_to_project_root, 0)
-  end,
+  callback = set_cwd_to_project_root,
 })
 
 -- Disable line numbers in Markdown files
@@ -312,16 +272,9 @@ vim.api.nvim_create_autocmd("FileType", {
     end
   end,
 })
--- Function to navigate to next/previous markdown elements
-local markdown_nav_cache = {}
-
+-- Markdown navigation functions
 local function create_markdown_navigation()
-  -- Function to find next/previous pattern
   local function find_pattern(pattern, reverse)
-    local cache_key = pattern .. (reverse and "_reverse" or "_forward")
-    if markdown_nav_cache[cache_key] then
-      return markdown_nav_cache[cache_key]
-    end
     local current_line = vim.fn.line(".")
     local current_col = vim.fn.col(".")
     local last_line = vim.fn.line("$")
@@ -421,35 +374,36 @@ local function create_markdown_navigation()
 
     return false
   end
-
-  -- Set up keymaps for markdown files
+  -- Buffer-local keymaps
+  local opts = { buffer = true, silent = true }
   vim.keymap.set("n", "]l", function()
     if not find_pattern("\\[\\[", false) then
       vim.notify("No more links found", vim.log.levels.INFO)
     end
-  end, { buffer = true, desc = "Go to next markdown link" })
+  end, vim.tbl_extend("force", opts, { desc = "Go to next markdown link" }))
 
   vim.keymap.set("n", "[l", function()
     if not find_pattern("\\[\\[", true) then
       vim.notify("No previous links found", vim.log.levels.INFO)
     end
-  end, { buffer = true, desc = "Go to previous markdown link" })
+  end, vim.tbl_extend("force", opts, { desc = "Go to previous markdown link" }))
 
   vim.keymap.set("n", "]t", function()
     if not find_pattern("^\\s*- \\[ \\]", false) then
       vim.notify("No more tasks found", vim.log.levels.INFO)
     end
-  end, { buffer = true, desc = "Go to next markdown task" })
+  end, vim.tbl_extend("force", opts, { desc = "Go to next markdown task" }))
 
   vim.keymap.set("n", "[t", function()
     if not find_pattern("^\\s*- \\[ \\]", true) then
       vim.notify("No previous tasks found", vim.log.levels.INFO)
     end
-  end, { buffer = true, desc = "Go to previous markdown task" })
+  end, vim.tbl_extend("force", opts, { desc = "Go to previous markdown task" }))
 end
 
 -- Add markdown navigation keymaps
 vim.api.nvim_create_autocmd("FileType", {
+  group = groups.markdown,
   pattern = "markdown",
   callback = create_markdown_navigation,
 })
@@ -472,10 +426,7 @@ local function open_with_system_app()
   end
 
   if open_cmd then
-    local ok, err = pcall(vim.fn.system, open_cmd)
-    if not ok then
-      vim.notify("Failed to open file: " .. err, vim.log.levels.ERROR)
-    end
+    vim.fn.jobstart(open_cmd, { detach = true })
   else
     vim.notify("Unsupported platform", vim.log.levels.ERROR)
   end

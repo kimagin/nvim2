@@ -8,7 +8,7 @@ end
 return {
   {
     "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile" },
+    lazy = false,  -- Load immediately for better LSP experience
 
     opts = {
       servers = {
@@ -214,7 +214,7 @@ return {
   },
   {
     "mfussenegger/nvim-lint",
-    event = { "BufReadPre", "BufNewFile" },
+    lazy = false,  -- Load immediately
     opts = {
       linters_by_ft = {
         -- Add linters here if needed
@@ -223,7 +223,7 @@ return {
   },
   {
     "stevearc/conform.nvim",
-    event = { "BufReadPre", "BufNewFile" },
+    lazy = false,  -- Load immediately
     opts = {
       formatters_by_ft = {
         markdown = { "deno_fmt" },
