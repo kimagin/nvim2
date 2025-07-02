@@ -1,9 +1,5 @@
 return {
   {
-    "nvim-lua/plenary.nvim",
-    lazy = true,
-  },
-  {
     "akinsho/toggleterm.nvim",
     version = "*",
     config = function()

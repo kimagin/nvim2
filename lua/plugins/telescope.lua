@@ -102,6 +102,93 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
     },
+    keys = {
+      -- Enhanced file finder from project root
+      {
+        "<leader><leader>",
+        function()
+          local function find_project_root()
+            local current_file = vim.fn.expand("%:p")
+            local current_dir = vim.fn.fnamemodify(current_file, ":h")
+            return vim.fn.finddir(".git/..", current_dir .. ";")
+          end
+
+          local root = find_project_root()
+          if root == "" then
+            root = vim.fn.getcwd()
+          end
+
+          require("telescope.builtin").find_files({
+            cwd = root,
+            hidden = true,
+            no_ignore = false,
+            find_command = {
+              "fd", "--type", "f", "--hidden", "--follow",
+              "--exclude", ".cargo", "--exclude", ".git", "--exclude", "node_modules",
+              "--exclude", "dist", "--exclude", ".local", "--exclude", ".Trash",
+              "--exclude", ".vscode", "--exclude", ".cache", "--exclude", ".npm",
+              "--exclude", ".pnpm", "--exclude", "undodir", "--exclude", ".rustup",
+            },
+          })
+        end,
+        desc = "Find files from project root",
+      },
+      -- Git repository picker
+      {
+        "<leader>fg",
+        function()
+          local pickers = require("telescope.pickers")
+          local finders = require("telescope.finders")
+          local conf = require("telescope.config").values
+          local actions = require("telescope.actions")
+          local action_state = require("telescope.actions.state")
+          
+          local function get_git_repos()
+            local search_dir = os.getenv("HOME")
+            local cmd = string.format(
+              [[fd --hidden --type d --max-depth 5 --exclude '.local' --exclude '.cargo' ".git$" "%s" | xargs -n1 dirname | sort -u]],
+              search_dir
+            )
+            local handle = io.popen(cmd)
+            local result = handle:read("*a")
+            handle:close()
+            local repos = {}
+            for repo in result:gmatch("[^\r\n]+") do
+              table.insert(repos, repo)
+            end
+            return repos
+          end
+          
+          pickers.new({
+            layout_strategy = "vertical",
+            layout_config = { width = 0.6, height = 0.5, prompt_position = "bottom" },
+          }, {
+            prompt_title = "Git Repositories",
+            finder = finders.new_table({
+              results = get_git_repos(),
+              entry_maker = function(entry)
+                local repo_name = entry:match("([^/]+)$")
+                return { value = entry, display = repo_name, ordinal = repo_name }
+              end,
+            }),
+            sorter = conf.generic_sorter({}),
+            attach_mappings = function(prompt_bufnr, map)
+              actions.select_default:replace(function()
+                actions.close(prompt_bufnr)
+                local selection = action_state.get_selected_entry()
+                vim.cmd("cd " .. selection.value)
+                require("telescope.builtin").find_files({
+                  hidden = true,
+                  find_command = { "fd", "--type", "f", "--hidden", "--follow", "--exclude", ".git", "--exclude", "node_modules" },
+                })
+              end)
+              return true
+            end,
+          }):find()
+        end,
+        desc = "Find Git Repositories",
+      },
+    },
   },
   -- Optionally disable fzf-native if you're not using it
   { "nvim-telescope/telescope-fzf-native.nvim", enabled = false },
