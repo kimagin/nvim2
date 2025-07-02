@@ -1,6 +1,7 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
+    event = { "BufReadPost", "BufNewFile" },
     opts = function(_, opts)
       -- Ensure markdown is in the list of ensured_installed parsers
       if type(opts.ensure_installed) == "table" then

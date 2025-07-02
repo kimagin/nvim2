@@ -8,6 +8,7 @@ end
 return {
   {
     "neovim/nvim-lspconfig",
+    event = { "BufReadPre", "BufNewFile" },
 
     opts = {
       servers = {
@@ -195,7 +196,7 @@ return {
             { name = "DiagnosticSignInfo", text = "" },
           },
         },
-        virtual_text = true,
+        virtual_text = false,
         float = {
           focusable = true,
           style = "minimal",
@@ -204,7 +205,7 @@ return {
           header = "",
           prefix = "",
         },
-        virtual_lines = { only_active_buffers = true },
+        virtual_lines = false,
         update_in_insert = false,
         underline = true,
         severity_sort = true,
@@ -213,6 +214,7 @@ return {
   },
   {
     "mfussenegger/nvim-lint",
+    event = { "BufReadPre", "BufNewFile" },
     opts = {
       linters_by_ft = {
         -- Add linters here if needed
@@ -221,6 +223,7 @@ return {
   },
   {
     "stevearc/conform.nvim",
+    event = { "BufReadPre", "BufNewFile" },
     opts = {
       formatters_by_ft = {
         markdown = { "deno_fmt" },

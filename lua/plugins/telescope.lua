@@ -1,8 +1,8 @@
 return {
   {
     "nvim-telescope/telescope.nvim",
+    event = "VeryLazy",
     opts = function(_, opts)
-      local fzf_lua = require("fzf-lua")
       local actions = require("telescope.actions")
       local action_state = require("telescope.actions.state")
 
@@ -50,9 +50,8 @@ return {
         border = true,
         borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
 
-        -- FZF-lua specific configurations
+        -- Fuzzy finding configuration
         fuzzy = true,
-        vimgrep_arguments = fzf_lua.defaults.grep.cmd,
 
         mappings = {
           i = {
@@ -88,13 +87,7 @@ return {
         },
       })
 
-      opts.pickers = vim.tbl_deep_extend("force", opts.pickers or {}, {
-        find_files = {
-          find_command = fzf_lua.defaults.files.cmd,
-        },
-      })
-
-      -- Use fzf-lua for the fuzzy finding
+      -- Telescope native fuzzy finding configuration
       opts.extensions = vim.tbl_deep_extend("force", opts.extensions or {}, {
         fzf = {
           fuzzy = true,
@@ -108,7 +101,6 @@ return {
     end,
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "ibhagwan/fzf-lua",
     },
   },
   -- Optionally disable fzf-native if you're not using it

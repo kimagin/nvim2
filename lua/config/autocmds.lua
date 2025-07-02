@@ -206,43 +206,85 @@ vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "none", fg = "#141317" })
 
 -- Project root detection
 local project_root_cache = {}
-local root_patterns = { ".git", ".svn", ".hg", "package.json", "Cargo.toml" }
 
 local function find_project_root()
   local current_dir = vim.fn.expand("%:p:h")
+  
+  -- Return early if current buffer has no valid path
+  if current_dir == "" or current_dir == "." then
+    return vim.fn.getcwd()
+  end
+  
   if project_root_cache[current_dir] then
     return project_root_cache[current_dir]
   end
 
-  for _, pattern in ipairs(root_patterns) do
-    local root = vim.fn.finddir(pattern, current_dir .. ";")
-    if root ~= "" then
-      local project_root = vim.fn.fnamemodify(root, ":h")
+  -- Look for .git directory by walking up the tree
+  local dir = current_dir
+  while dir ~= "/" and dir ~= "" do
+    if vim.fn.isdirectory(dir .. "/.git") == 1 then
+      project_root_cache[current_dir] = dir
+      return dir
+    end
+    dir = vim.fn.fnamemodify(dir, ":h")
+  end
+  
+  -- Look for other root markers (files)
+  local root_files = { "package.json", "Cargo.toml", ".svn", ".hg" }
+  for _, pattern in ipairs(root_files) do
+    local found = vim.fn.findfile(pattern, current_dir .. ";")
+    if found ~= "" then
+      local project_root = vim.fn.fnamemodify(found, ":p:h")
       project_root_cache[current_dir] = project_root
       return project_root
     end
   end
 
-  project_root_cache[current_dir] = current_dir
-  return current_dir
+  -- Fallback to current directory if it exists, otherwise use vim's cwd
+  local fallback = vim.fn.isdirectory(current_dir) == 1 and current_dir or vim.fn.getcwd()
+  project_root_cache[current_dir] = fallback
+  return fallback
 end
 
 local function set_cwd_to_project_root()
-  if vim.bo.buftype ~= "" then
+  -- Skip for non-file buffers, temporary buffers, and special buffer types
+  if vim.bo.buftype ~= "" or vim.bo.filetype == "" then
     return
   end
+  
+  -- Skip for certain buffer types that shouldn't trigger CWD changes
+  local skip_filetypes = {
+    "help", "qf", "netrw", "NvimTree", "neo-tree", "Trouble", "alpha",
+    "dashboard", "TelescopePrompt", "lazy", "mason", "notify", "toggleterm"
+  }
+  
+  for _, ft in ipairs(skip_filetypes) do
+    if vim.bo.filetype == ft then
+      return
+    end
+  end
+  
   local root = find_project_root()
-  if root ~= vim.fn.getcwd() then
+  local current_cwd = vim.fn.getcwd()
+  
+  -- Only change if different and root is valid
+  if root ~= current_cwd and root ~= "" and vim.fn.isdirectory(root) == 1 then
     local ok, err = pcall(function()
-      vim.cmd("lcd " .. root)
+      -- Properly escape the path to handle spaces and special characters
+      vim.cmd("lcd " .. vim.fn.fnameescape(root))
     end)
+    
     if ok then
-      if root ~= "." and root ~= vim.fn.getcwd() then
-        -- Optional Notification
-        -- print("CWD changed to: " .. root)
-      end
+      -- Success notification with shortened path
+      local display_path = root:gsub(vim.fn.expand("~"), "~")  -- Replace home with ~
+      local project_name = vim.fn.fnamemodify(root, ":t")  -- Get just the folder name from original root
+      vim.notify("CWD changed to: " .. project_name .. " (" .. display_path .. ")", vim.log.levels.INFO)
     else
-      print("Failed to change CWD: " .. err)
+      -- More informative error message
+      vim.notify("Failed to change directory to: " .. root .. "\nError: " .. tostring(err), vim.log.levels.WARN)
+      -- Clear the cache entry to prevent repeated failures
+      local current_dir = vim.fn.expand("%:p:h")
+      project_root_cache[current_dir] = nil
     end
   end
 end
