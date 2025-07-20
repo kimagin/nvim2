@@ -79,42 +79,88 @@ return {
           local conf = require("telescope.config").values
           local actions = require("telescope.actions")
           local action_state = require("telescope.actions.state")
-          local function get_git_repos()
-            local search_dir = os.getenv("HOME")
-            local cmd = string.format(
-              [[fd --hidden --type d --max-depth 5 --exclude '.local' --exclude '.cargo' --exclude ".Trash" --exclude ".vscode" --exclude ".tldrc" --exclude "Library/*" --exclude ".cache" --exclude ".vscode-server" --exclude "node_modules" --exclude ".npm" --exclude ".pnpm" ".git$" "%s" | xargs -n1 dirname | sort -u]],
-              search_dir
-            )
-            local handle = io.popen(cmd)
-            local result = handle:read("*a")
-            handle:close()
-            local repos = {}
-            for repo in result:gmatch("[^\r\n]+") do
-              table.insert(repos, repo)
+
+          -- Pure Lua function to find git repositories
+          local function find_git_repos_lua()
+            local results = {}
+            local search_paths = {
+              vim.fn.expand("~/Developments"),
+              vim.fn.expand("~/.config"),
+            }
+            local ignore_dirs = {
+              "node_modules",
+              ".cache",
+              "yay",
+              ".local",
+              "target",
+              "dist",
+              "build",
+              "venv",
+              "site-packages",
+            }
+            local ignore_map = {}
+            for _, dir in ipairs(ignore_dirs) do
+              ignore_map[dir] = true
             end
-            return repos
+
+            local function search(path)
+              -- Use pcall to gracefully handle potential permission errors
+              local ok, handle = pcall(vim.loop.fs_scandir, path)
+              if not ok or not handle then
+                return
+              end
+
+              while true do
+                local name, type = vim.loop.fs_scandir_next(handle)
+                if not name then
+                  break
+                end
+
+                local full_path = path .. "/" .. name
+                if type == "directory" then
+                  if name == ".git" then
+                    table.insert(results, path)
+                    -- Don't recurse further into the .git directory
+                    goto continue
+                  end
+
+                  if not ignore_map[name] then
+                    -- Recurse into the directory
+                    search(full_path)
+                  end
+                end
+                ::continue::
+              end
+            end
+
+            for _, path in ipairs(search_paths) do
+              search(path)
+            end
+
+            -- Remove duplicates
+            local unique_results = {}
+            local seen = {}
+            for _, res in ipairs(results) do
+              if not seen[res] then
+                table.insert(unique_results, res)
+                seen[res] = true
+              end
+            end
+
+            return unique_results
           end
+
           pickers
             .new({
               layout_strategy = "vertical",
-
-              layout_config = {
-                width = 0.6,
-                height = 0.5,
-                prompt_position = "bottom",
-              },
+              layout_config = { width = 0.6, height = 0.5, prompt_position = "bottom" },
             }, {
               prompt_title = "Git Repositories",
-
               finder = finders.new_table({
-                results = get_git_repos(),
+                results = find_git_repos_lua(),
                 entry_maker = function(entry)
                   local repo_name = entry:match("([^/]+)$")
-                  return {
-                    value = entry,
-                    display = repo_name,
-                    ordinal = repo_name,
-                  }
+                  return { value = entry, display = repo_name, ordinal = repo_name }
                 end,
               }),
               sorter = conf.generic_sorter({}),
@@ -125,7 +171,6 @@ return {
                   vim.cmd("cd " .. selection.value)
                   require("telescope.builtin").find_files({
                     hidden = true,
-                    no_ignore = true,
                     find_command = {
                       "fd",
                       "--type",
@@ -136,10 +181,6 @@ return {
                       ".git",
                       "--exclude",
                       "node_modules",
-                      "--exclude",
-                      "dist",
-                      "--exclude",
-                      "public",
                     },
                   })
                 end)

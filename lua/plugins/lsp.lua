@@ -195,7 +195,7 @@ return {
             { name = "DiagnosticSignInfo", text = "" },
           },
         },
-        virtual_text = true,
+        virtual_text = false,
         float = {
           focusable = true,
           style = "minimal",
@@ -204,7 +204,7 @@ return {
           header = "",
           prefix = "",
         },
-        virtual_lines = { only_active_buffers = true },
+        -- virtual_lines = { only_active_buffers = true },
         update_in_insert = false,
         underline = true,
         severity_sort = true,
@@ -224,9 +224,9 @@ return {
     opts = {
       formatters_by_ft = {
         markdown = { "deno_fmt" },
-        javascript = { "dprint" },
-        typescript = { "dprint" },
-        astro = { "dprint" },
+        javascript = { "prettierd" },
+        typescript = { "prettierd" },
+        astro = { "prettierd" },
       },
     },
   },

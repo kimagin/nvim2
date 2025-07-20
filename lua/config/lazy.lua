@@ -10,6 +10,9 @@ vim.cmd("autocmd BufNewFile,BufRead *.astro set filetype=astro")
 vim.opt.laststatus = 3
 vim.opt.splitkeep = "screen"
 
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_node_provider = 0
+
 require("lazy").setup({
   spec = {
     -- add LazyVim and import its plugins
