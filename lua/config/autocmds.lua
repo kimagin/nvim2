@@ -4,23 +4,25 @@
 --- Default autocmds: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/autocmds.lua
 ---@brief ]]
 
--- Initialize cache for file size checks
+-- ============================================================================
+-- GLOBAL CACHES AND CONSTANTS
+-- ============================================================================
+
 local file_size_cache = {}
+local project_root_cache = {}
+local markdown_nav_cache = {}
 
--- Create augroups for better organization
-local groups = {
-  buffer_management = vim.api.nvim_create_augroup("BufferManagement", { clear = true }),
-  markdown = vim.api.nvim_create_augroup("MarkdownEnhancements", { clear = true }),
-  project_root = vim.api.nvim_create_augroup("ProjectRoot", { clear = true }),
-  file_handling = vim.api.nvim_create_augroup("FileHandling", { clear = true }),
-}
-
----@section View Management
--- Configure view directory for buffer persistence
+local root_patterns = { ".git", ".svn", ".hg", "package.json", "Cargo.toml" }
 local view_dir = vim.fn.stdpath("data") .. "/views/bufs"
+
+-- Ensure view directory exists
 if vim.fn.isdirectory(view_dir) == 0 then
   vim.fn.mkdir(view_dir, "p")
 end
+
+-- ============================================================================
+-- UTILITY FUNCTIONS
+-- ============================================================================
 
 ---@param bufnr number Buffer number to check
 ---@return boolean true if file is larger than 1MB
@@ -51,14 +53,6 @@ local function is_large_file(bufnr)
   return is_large
 end
 
--- Clear cache on file write
-vim.api.nvim_create_autocmd("BufWritePost", {
-  group = groups.buffer_management,
-  callback = function(args)
-    file_size_cache[vim.api.nvim_buf_get_name(args.buf)] = nil
-  end,
-})
-
 ---@param bufnr number Buffer number to check
 ---@return boolean true if buffer should have view saved/loaded
 local function should_handle_view(bufnr)
@@ -67,146 +61,6 @@ local function should_handle_view(bufnr)
   -- Skip empty buffers, git commits, and unnamed files
   return ft ~= "" and ft ~= "gitcommit" and name ~= ""
 end
-
--- Handle buffer view persistence
-local view_handlers = {
-  BufWinLeave = function(buf)
-    if vim.api.nvim_buf_is_valid(buf) then
-      vim.cmd("silent! mkview")
-    end
-  end,
-  BufWinEnter = function(buf)
-    vim.defer_fn(function()
-      if vim.api.nvim_buf_is_valid(buf) then
-        vim.cmd("silent! loadview")
-      end
-    end, 20)
-  end,
-}
-
-local function handle_view(args)
-  if not is_large_file(args.buf) and should_handle_view(args.buf) then
-    local handler = view_handlers[args.event]
-    if handler then
-      handler(args.buf)
-    end
-  end
-end
-
--- Set up view management autocmds
-vim.api.nvim_create_autocmd({ "BufWinLeave", "BufWinEnter" }, {
-  group = groups.buffer_management,
-  pattern = "*.*",
-  callback = handle_view,
-})
-
--- Adding strikethrough to completed tasks
-local function setup_markdown_task_highlighting(bufnr)
-  bufnr = bufnr or vim.api.nvim_get_current_buf()
-
-  -- Check if highlighting is already set up
-  if vim.b[bufnr].task_highlighting_setup then
-    return
-  end
-
-  vim.api.nvim_buf_call(bufnr, function()
-    vim.cmd([[syntax match markdownTaskListDone /^\s*[-*]\s\[x\].*$/]])
-  end)
-
-  vim.api.nvim_set_hl(0, "markdownTaskListDone", { fg = "#A88BFA", strikethrough = true, italic = true })
-  vim.cmd([[highlight link markdownTaskListDone markdownTaskListDone]])
-
-  vim.b[bufnr].task_highlighting_setup = true
-end
-
-local markdown_highlight_group = vim.api.nvim_create_augroup("MarkdownTaskListDone", { clear = true })
-
--- Buffer persistence with Treesitter-aware view loading
-vim.api.nvim_create_autocmd({ "BufWinLeave" }, {
-  pattern = { "*.*" },
-  callback = function(args)
-    if not is_large_file(args.buf) and should_handle_view(args.buf) then
-      vim.cmd("silent! mkview")
-    end
-  end,
-})
-
-vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
-  pattern = { "*.*" },
-  callback = function(args)
-    if not is_large_file(args.buf) and should_handle_view(args.buf) then
-      vim.defer_fn(function()
-        if vim.api.nvim_buf_is_valid(args.buf) then
-          vim.cmd("silent! loadview")
-        end
-      end, 20)
-    end
-  end,
-})
-
--- Large file optimizations
-vim.api.nvim_create_autocmd("BufReadPre", {
-  group = groups.file_handling,
-  pattern = "*",
-  callback = function(args)
-    if is_large_file(args.buf) then
-      vim.opt_local.foldmethod = "manual"
-      vim.opt_local.foldenable = false
-      vim.opt_local.swapfile = false
-      vim.b[args.buf].large_file = true
-      vim.opt_local.syntax = "on"
-      vim.opt_local.spell = false
-      vim.opt_local.undofile = false
-    end
-  end,
-})
-
--- Clean up old view files
-vim.api.nvim_create_autocmd("VimLeavePre", {
-  group = groups.buffer_management,
-  callback = function()
-    local view_files = vim.fn.glob(view_dir .. "/*", true, true)
-    for _, file in ipairs(view_files) do
-      local last_modified = vim.uv.fs_stat(file).mtime.sec
-      if os.time() - last_modified > 7 * 24 * 60 * 60 then
-        os.remove(file)
-      end
-    end
-  end,
-})
-
-vim.api.nvim_create_autocmd({ "FileType", "BufEnter", "BufWritePost" }, {
-  group = markdown_highlight_group,
-  pattern = "*.md",
-  callback = function(args)
-    if vim.bo[args.buf].filetype == "markdown" then
-      setup_markdown_task_highlighting(args.buf)
-      vim.defer_fn(function()
-        if vim.api.nvim_buf_is_valid(args.buf) then
-          setup_markdown_task_highlighting(args.buf)
-        end
-      end, 50)
-    end
-  end,
-})
-
--- Keeping all your original highlight configurations
--- vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none", fg = "#141317" })
-
-vim.api.nvim_create_autocmd("FileType", {
-  group = vim.api.nvim_create_augroup("lazyvim_wrap_spell", { clear = true }),
-  pattern = { "gitcommit", "markdown", "tex", "text", "typ" },
-  callback = function()
-    -- Do nothing, effectively disabling the original autocmd
-  end,
-})
-
--- Remove eob ~ from the neotree panel
-vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "none", fg = "#141317" })
-
--- Project root detection
-local project_root_cache = {}
-local root_patterns = { ".git", ".svn", ".hg", "package.json", "Cargo.toml" }
 
 local function find_project_root()
   local current_dir = vim.fn.expand("%:p:h")
@@ -247,6 +101,150 @@ local function set_cwd_to_project_root()
   end
 end
 
+-- ============================================================================
+-- BUFFER VIEW MANAGEMENT
+-- ============================================================================
+
+-- Clear file size cache on write
+vim.api.nvim_create_autocmd("BufWritePost", {
+  callback = function(args)
+    file_size_cache[vim.api.nvim_buf_get_name(args.buf)] = nil
+  end,
+})
+
+-- Enhanced buffer validation for view operations
+---@param bufnr number Buffer number to check
+---@return boolean true if buffer is safe for view operations
+local function is_view_safe(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) then
+    return false
+  end
+
+  local buftype = vim.bo[bufnr].buftype
+  local filetype = vim.bo[bufnr].filetype
+
+  -- Skip special buffer types that cause issues with views
+  local skip_buftypes = { "quickfix", "help", "nofile", "terminal", "prompt" }
+  local skip_filetypes = { "gitcommit", "gitrebase", "neo-tree", "oil", "alpha" }
+
+  for _, bt in ipairs(skip_buftypes) do
+    if buftype == bt then
+      return false
+    end
+  end
+
+  for _, ft in ipairs(skip_filetypes) do
+    if filetype == ft then
+      return false
+    end
+  end
+
+  -- Check for command-line window (causes crashes)
+  local win = vim.fn.bufwinid(bufnr)
+  if win ~= -1 and vim.fn.win_gettype(win) == "command" then
+    return false
+  end
+
+  return should_handle_view(bufnr) and not is_large_file(bufnr)
+end
+
+-- Save buffer view when leaving
+vim.api.nvim_create_autocmd("BufWinLeave", {
+  pattern = "*.*",
+  callback = function(args)
+    -- Add extra safety checks
+    if not is_view_safe(args.buf) then
+      return
+    end
+
+    -- Use pcall to catch any errors and prevent crashes
+    local success, err = pcall(function()
+      vim.cmd("silent! mkview")
+    end)
+
+    if not success then
+      -- Don't show errors, just silently fail to prevent disruption
+      -- You can uncomment this for debugging:
+      -- vim.notify("mkview failed: " .. tostring(err), vim.log.levels.DEBUG)
+    end
+  end,
+})
+
+-- Load buffer view when entering
+vim.api.nvim_create_autocmd("BufWinEnter", {
+  pattern = "*.*",
+  callback = function(args)
+    -- Add extra safety checks
+    if not is_view_safe(args.buf) then
+      return
+    end
+
+    -- Increase defer time and add more safety checks
+    vim.defer_fn(function()
+      -- Double-check buffer is still valid after defer
+      if not vim.api.nvim_buf_is_valid(args.buf) or not is_view_safe(args.buf) then
+        return
+      end
+
+      -- Use pcall to catch any errors and prevent crashes
+      local success, err = pcall(function()
+        vim.cmd("silent! loadview")
+      end)
+
+      if not success then
+        -- Don't show errors, just silently fail to prevent disruption
+        -- You can uncomment this for debugging:
+        -- vim.notify("loadview failed: " .. tostring(err), vim.log.levels.DEBUG)
+      end
+    end, 100) -- Increased delay to ensure buffer is fully loaded
+  end,
+})
+
+-- Clean up old view files on exit
+vim.api.nvim_create_autocmd("VimLeavePre", {
+  callback = function()
+    local success, err = pcall(function()
+      local view_files = vim.fn.glob(view_dir .. "/*", true, true)
+      for _, file in ipairs(view_files) do
+        local stat = vim.uv.fs_stat(file)
+        if stat and stat.mtime then
+          local last_modified = stat.mtime.sec
+          if os.time() - last_modified > 7 * 24 * 60 * 60 then
+            os.remove(file)
+          end
+        end
+      end
+    end)
+
+    if not success then
+      -- Silently fail cleanup to avoid exit issues
+    end
+  end,
+})
+
+-- ============================================================================
+-- LARGE FILE OPTIMIZATIONS
+-- ============================================================================
+
+vim.api.nvim_create_autocmd("BufReadPre", {
+  pattern = "*",
+  callback = function(args)
+    if is_large_file(args.buf) then
+      vim.opt_local.foldmethod = "manual"
+      vim.opt_local.foldenable = false
+      vim.opt_local.swapfile = false
+      vim.b[args.buf].large_file = true
+      vim.opt_local.syntax = "on"
+      vim.opt_local.spell = false
+      vim.opt_local.undofile = false
+    end
+  end,
+})
+
+-- ============================================================================
+-- PROJECT ROOT DETECTION
+-- ============================================================================
+
 vim.api.nvim_create_autocmd("BufEnter", {
   pattern = "*",
   callback = function()
@@ -254,25 +252,30 @@ vim.api.nvim_create_autocmd("BufEnter", {
   end,
 })
 
--- Disable line numbers in Markdown files
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "markdown",
-  callback = function()
-    vim.opt_local.number = false
-    vim.opt_local.relativenumber = false
-    vim.api.nvim_set_hl(0, "LineNr", { fg = "#2e2736" })
-    vim.opt_local.signcolumn = "yes:2" -- Increased to 3 to accommodate both gitsigns and autosuggestions
-    -- Configure mini.diff for this buffer
-    local ok, mini_diff = pcall(require, "mini.diff")
-    if ok then
-      vim.b.minidiff_config = { view = { style = "number" } }
-      pcall(mini_diff.refresh)
-    end
-  end,
-})
--- Function to navigate to next/previous markdown elements
-local markdown_nav_cache = {}
+-- ============================================================================
+-- MARKDOWN ENHANCEMENTS
+-- ============================================================================
 
+-- Markdown task highlighting setup
+local function setup_markdown_task_highlighting(bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+
+  -- Check if highlighting is already set up
+  if vim.b[bufnr].task_highlighting_setup then
+    return
+  end
+
+  vim.api.nvim_buf_call(bufnr, function()
+    vim.cmd([[syntax match markdownTaskListDone /^\s*[-*]\s\[x\].*$/]])
+  end)
+
+  vim.api.nvim_set_hl(0, "markdownTaskListDone", { fg = "#A88BFA", strikethrough = true, italic = true })
+  vim.cmd([[highlight link markdownTaskListDone markdownTaskListDone]])
+
+  vim.b[bufnr].task_highlighting_setup = true
+end
+
+-- Markdown navigation functions
 local function create_markdown_navigation()
   -- Function to find next/previous pattern
   local function find_pattern(pattern, reverse)
@@ -406,11 +409,61 @@ local function create_markdown_navigation()
   end, { buffer = true, desc = "Go to previous markdown task" })
 end
 
--- Add markdown navigation keymaps
+-- Configure markdown files
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
-  callback = create_markdown_navigation,
+  callback = function()
+    -- Disable line numbers
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+    vim.api.nvim_set_hl(0, "LineNr", { fg = "#2e2736" })
+    vim.opt_local.signcolumn = "yes:2"
+
+    -- Configure mini.diff for this buffer
+    local ok, mini_diff = pcall(require, "mini.diff")
+    if ok then
+      vim.b.minidiff_config = { view = { style = "number" } }
+      pcall(mini_diff.refresh)
+    end
+
+    -- Set up navigation
+    create_markdown_navigation()
+  end,
 })
+
+-- Set up markdown task highlighting
+vim.api.nvim_create_autocmd({ "FileType", "BufEnter", "BufWritePost" }, {
+  pattern = "*.md",
+  callback = function(args)
+    if vim.bo[args.buf].filetype == "markdown" then
+      setup_markdown_task_highlighting(args.buf)
+      vim.defer_fn(function()
+        if vim.api.nvim_buf_is_valid(args.buf) then
+          setup_markdown_task_highlighting(args.buf)
+        end
+      end, 50)
+    end
+  end,
+})
+
+-- ============================================================================
+-- UI CUSTOMIZATIONS
+-- ============================================================================
+
+-- Disable LazyVim's default wrap and spell for certain file types
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "gitcommit", "markdown", "tex", "text", "typ" },
+  callback = function()
+    -- Do nothing, effectively disabling the original autocmd
+  end,
+})
+
+-- Remove end of buffer ~ from neotree panel
+vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "none", fg = "#141317" })
+
+-- ============================================================================
+-- CUSTOM KEYMAPS AND FUNCTIONS
+-- ============================================================================
 
 -- Function to open URLs with system default application
 local function open_with_system_app()
@@ -439,17 +492,7 @@ local function open_with_system_app()
   end
 end
 
--- Add keybinding for opening URLs
-vim.keymap.set("n", "gtx", open_with_system_app, {
-  desc = "Open link under cursor with system app",
-  silent = true,
-})
-
--- Function to show highlight group under cursor
-vim.keymap.set("n", "<leader>h", function()
-  print(vim.treesitter.get_captures_at_cursor()[1])
-end, { desc = "Show Tree-sitter highlight group" })
-
+-- Function to open tasks file
 local function open_tasks()
   local tasks_path = "~/Developments/obsidian/tasks.md"
 
@@ -465,8 +508,21 @@ local function open_tasks()
   vim.cmd("edit " .. tasks_path)
 end
 
--- Add keymap to open tasks
+-- Global keymaps
+vim.keymap.set("n", "gtx", open_with_system_app, {
+  desc = "Open link under cursor with system app",
+  silent = true,
+})
+
+vim.keymap.set("n", "<leader>h", function()
+  print(vim.treesitter.get_captures_at_cursor()[1])
+end, { desc = "Show Tree-sitter highlight group" })
+
 vim.keymap.set("n", "<leader>od", open_tasks, { desc = "Open daily tasks overview" })
 
--- Initiating Task Collector
+-- ============================================================================
+-- MODULE INITIALIZATION
+-- ============================================================================
+
+-- Initialize Task Collector
 require("config.tasks-collector").setup()
