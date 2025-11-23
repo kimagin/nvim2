@@ -34,7 +34,7 @@ return {
   -- { "williamboman/mason.nvim", enabled = false },
   -- { "williamboman/mason-lspconfig.nvim", enabled = false },
   -- { "neovim/nvim-lspconfig", enabled = false },
-  { "jose-elias-alvarez/null-ls.nvim", enabled = false },
+  { "nvimtools/none-ls.nvim", enabled = false },
   -- { "stevearc/conform.nvim", enabled = false },
   { "nvimdev/dashboard-nvim", enabled = false },
   -- { "ggandor/leap.nvim", enabled = false },

@@ -73,7 +73,7 @@ return {
         -- end,
         --
         vtsls = function()
-          require("lazyvim.util").lsp.on_attach(function(client, bufnr)
+          Snacks.util.lsp.on(function(client, bufnr)
             if client.name == "vtsls" then
               client.server_capabilities.documentFormattingProvider = true
             end
