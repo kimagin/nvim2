@@ -73,8 +73,9 @@ return {
         -- end,
         --
         vtsls = function()
-          Snacks.util.lsp.on(function(client, bufnr)
-            if client.name == "vtsls" then
+          require("snacks.util").lsp.on(function(client_id, bufnr)
+            local client = vim.lsp.get_client_by_id(client_id)
+            if client and client.name == "vtsls" then
               client.server_capabilities.documentFormattingProvider = true
             end
           end)
