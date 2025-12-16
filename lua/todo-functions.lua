@@ -2,7 +2,8 @@ local M = {}
 
 -- Function to open todo file
 function M.open_todo()
-  local todo_path = vim.fn.expand("~/Developments/obsidian/todo.md")
+  local is_windows = vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1
+  local todo_path = is_windows and vim.fn.expand("~/Documents/Obsidian/todo.md") or vim.fn.expand("~/Developments/obsidian/todo.md")
   
   -- Create todo file if it doesn't exist
   if vim.fn.filereadable(todo_path) == 0 then
@@ -24,7 +25,8 @@ function M.add_task(priority)
     return
   end
   
-  local todo_path = vim.fn.expand("~/Developments/obsidian/todo.md")
+  local is_windows = vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1
+  local todo_path = is_windows and vim.fn.expand("~/Documents/Obsidian/todo.md") or vim.fn.expand("~/Developments/obsidian/todo.md")
   
   -- Ensure todo file exists
   if vim.fn.filereadable(todo_path) == 0 then
@@ -119,7 +121,8 @@ end
 
 -- Function to toggle task completion (works globally)
 function M.toggle_task()
-  local todo_path = vim.fn.expand("~/Developments/obsidian/todo.md")
+  local is_windows = vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1
+  local todo_path = is_windows and vim.fn.expand("~/Documents/Obsidian/todo.md") or vim.fn.expand("~/Developments/obsidian/todo.md")
   
   -- Check if we're in todo.md buffer
   if not vim.fn.expand("%:t"):match("todo%.md$") then

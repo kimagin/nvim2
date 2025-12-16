@@ -230,3 +230,15 @@ vim.api.nvim_set_keymap(
   '<Cmd>execute "!xdg-open " . shellescape("<cfile>")<CR>',
   { noremap = true, silent = true }
 )
+
+-- Disable Ctrl+/ to avoid confusion with Ctrl+\
+vim.keymap.set({ "n", "i", "t", "v" }, "<C-/>", "<Nop>", { desc = "Disable Ctrl+/" })
+vim.keymap.set({ "n", "i", "t", "v" }, "<C-_>", "<Nop>", { desc = "Disable Ctrl+Shift+-" })
+
+-- Also try to disable any terminal mappings
+vim.api.nvim_create_autocmd("TermOpen", {
+  callback = function()
+    vim.keymap.set("t", "<C-/>", "<Nop>", { buffer = 0, desc = "Disable Ctrl+/ in terminal" })
+    vim.keymap.set("t", "<C-_>", "<Nop>", { buffer = 0, desc = "Disable Ctrl+Shift+- in terminal" })
+  end,
+})

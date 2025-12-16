@@ -4,8 +4,8 @@ return {
   lazy = true,
   ft = "markdown",
   event = {
-    "BufReadPre " .. vim.fn.expand("~") .. "/Developments/obsidian/**.md",
-    "BufNewFile " .. vim.fn.expand("~") .. "/Developments/obsidian/**.md",
+    "BufReadPre " .. vim.fn.expand("~") .. "/Documents/Obsidian/**.md",
+    "BufNewFile " .. vim.fn.expand("~") .. "/Documents/Obsidian/**.md",
   },
   dependencies = {
     "nvim-lua/plenary.nvim",
@@ -54,7 +54,7 @@ return {
     workspaces = {
       {
         name = "main",
-        path = vim.fn.expand("~/Developments/obsidian"),
+        path = vim.fn.expand("~/Documents/Obsidian"),
       },
     },
     completion = {
@@ -102,12 +102,14 @@ return {
     preferred_link_style = "wiki",
     note_frontmatter_func = function(note)
       local note_path = type(note.path) == "table" and note.path[1] or note.path
-
       local note_path_str = tostring(note_path)
+      
+      -- Check if it's a journal, tasks, or todo file
       if
-        string.match(note_path_str, "^" .. vim.fn.expand("~/Developments/obsidian/journal/"))
-        or string.match(note_path_str, "tasks%.md$")
-        or string.match(note_path_str, "todo%.md$")
+        note_path_str:match("journal") or
+        note_path_str:match("tasks%.md$") or
+        note_path_str:match("todo%.md$") or
+        note_path_str:lower():find("journal")
       then
         return {}
       else
@@ -212,6 +214,8 @@ return {
           HOME = vim.fn.expand("~"),
           USERPROFILE = vim.fn.expand("~"),
         } or nil,
+        -- Windows-specific shell options
+        shell = is_windows and "cmd.exe" or nil,
       }):start()
     end
 
@@ -540,10 +544,37 @@ return {
     -- ENHANCED GIT OPERATIONS
     -- ============================================================================
 
-    -- Enhanced git operations with better error handling
-    local function perform_git_operations(operation, callback)
-      local Job = require("plenary.job")
+    -- Check and setup git credentials for Windows
+    local function setup_git_credentials()
+      if not is_windows() then return true end
+      
       local vault_path = get_vault_path()
+      
+      -- Check if git credentials are configured
+      local credential_check = vim.fn.system("git config --get credential.helper")
+      if vim.v.shell_error == 0 and credential_check:gsub("%s", "") ~= "" then
+        return true
+      end
+      
+      -- Try to setup Windows credential manager
+      vim.fn.system("git config --global credential.helper manager")
+      vim.fn.system("git config --global credential.manager \"manager-core\"")
+      
+      return true
+    end
+
+    -- Simplified git operations using vim.fn.system for better Windows compatibility
+    local function perform_git_operations(operation, callback)
+      local vault_path = get_vault_path()
+      
+      -- Setup credentials on Windows
+      if not setup_git_credentials() then
+        vim.schedule(function()
+          vim.notify("Failed to setup git credentials", vim.log.levels.ERROR)
+          callback(false)
+        end)
+        return
+      end
 
       -- Check if git is available
       if vim.fn.executable("git") == 0 then
@@ -554,108 +585,62 @@ return {
         return
       end
 
-      -- Check if we're in a git repository
-      Job:new({
-        command = "git",
-        args = { "rev-parse", "--is-inside-work-tree" },
-        cwd = vault_path,
-        on_exit = function(j, return_val)
-          if return_val ~= 0 then
-            vim.schedule(function()
-              vim.notify("Obsidian Vault is not a git repository", vim.log.levels.WARN)
-              callback(false)
-            end)
+      -- Check if vault directory exists
+      if vim.fn.isdirectory(vault_path) == 0 then
+        vim.schedule(function()
+          callback(false)
+        end)
+        return
+      end
+
+      local function git_command(args)
+        local cmd = 'cd "' .. vault_path .. '" && git ' .. args
+        local result = vim.fn.system(cmd)
+        return vim.v.shell_error == 0, result
+      end
+
+      vim.schedule(function()
+        if operation == "push" then
+          -- Check if there are changes
+          local ok, status_output = git_command("status --porcelain")
+          if not ok then
+            callback(false)
             return
           end
 
-          -- For push operation, first check if there are changes
-          if operation == "push" then
-            Job:new({
-              command = "git",
-              args = { "status", "--porcelain" },
-              cwd = vault_path,
-              on_exit = function(j2, status_return_val)
-                if status_return_val == 0 then
-                  local output = table.concat(j2:result() or {}, "\n")
-                  if output:match("^%s*$") then
-                    vim.schedule(function()
-                      vim.notify("No changes to commit", vim.log.levels.INFO)
-                      callback(true)
-                    end)
-                    return
-                  end
-                end
-
-                -- Has changes, proceed with add, commit, push
-                Job:new({
-                  command = "git",
-                  args = { "add", "." },
-                  cwd = vault_path,
-                  on_exit = function(j3, add_return_val)
-                    if add_return_val ~= 0 then
-                      vim.schedule(function()
-                        vim.notify("Failed to stage changes", vim.log.levels.ERROR)
-                        callback(false)
-                      end)
-                      return
-                    end
-
-                    Job:new({
-                      command = "git",
-                      args = { "commit", "-m", "Auto-commit: " .. os.date("%Y-%m-%d %H:%M:%S") },
-                      cwd = vault_path,
-                      on_exit = function(j4, commit_return_val)
-                        if commit_return_val ~= 0 then
-                          vim.schedule(function()
-                            vim.notify("Failed to commit changes", vim.log.levels.ERROR)
-                            callback(false)
-                          end)
-                          return
-                        end
-
-                        Job:new({
-                          command = "git",
-                          args = { "push" },
-                          cwd = vault_path,
-                          on_exit = function(j5, push_return_val)
-                            vim.schedule(function()
-                              if push_return_val ~= 0 then
-                                vim.notify("Push failed - you may need to sync manually", vim.log.levels.WARN)
-                                callback(false)
-                              else
-                                vim.notify("Changes saved online successfully", vim.log.levels.INFO)
-                                callback(true)
-                              end
-                            end)
-                          end,
-                        }):start()
-                      end,
-                    }):start()
-                  end,
-                }):start()
-              end,
-            }):start()
-          else
-            -- For pull operation
-            Job:new({
-              command = "git",
-              args = { "pull" },
-              cwd = vault_path,
-              on_exit = function(j2, pull_return_val)
-                vim.schedule(function()
-                  if pull_return_val ~= 0 then
-                    vim.notify("Pull failed - you may need to sync manually", vim.log.levels.WARN)
-                    callback(false)
-                  else
-                    vim.notify("Synchronized successfully", vim.log.levels.INFO)
-                    callback(true)
-                  end
-                end)
-              end,
-            }):start()
+          if status_output:gsub("%s", "") == "" then
+            callback(true)
+            return
           end
-        end,
-      }):start()
+
+          -- Add, commit, push
+          git_command("add .")
+          git_command('commit -m "Auto-commit: ' .. os.date("%Y-%m-%d %H:%M:%S") .. '"')
+          local push_ok, push_output = git_command("push")
+          
+          if push_ok then
+            -- Silent success
+          else
+            -- Check if it's an authentication error
+            if push_output:match("authentication") or push_output:match("credential") or push_output:match("login") then
+              vim.notify("Git authentication failed", vim.log.levels.ERROR)
+            end
+          end
+          callback(push_ok)
+
+        elseif operation == "pull" then
+          local pull_ok, pull_output = git_command("pull")
+          if pull_ok then
+            -- Silent success
+          else
+            -- Check if it's an authentication error
+            if pull_output:match("authentication") or pull_output:match("credential") or pull_output:match("login") then
+              vim.notify("Git authentication failed", vim.log.levels.ERROR)
+            end
+          end
+          callback(pull_ok)
+        end
+      end)
     end
 
     -- Debounced git operations
@@ -666,7 +651,7 @@ return {
       end
       
       git_debounce_timer = vim.uv.new_timer()
-      git_debounce_timer:start(5000, 0, vim.schedule_wrap(function()
+      git_debounce_timer:start(2000, 0, vim.schedule_wrap(function()
         perform_git_operations("push", function(_) end)
       end))
     end
@@ -786,21 +771,31 @@ return {
     -- Auto-pull when opening any .md file in the vault
     vim.api.nvim_create_autocmd({ "BufReadPost" }, {
       group = obsidian_group,
-      pattern = vault_path .. "/**/*.md",
+      pattern = "*.md",
       callback = function()
-        perform_git_operations("pull", function(_) end)
+        local file_path = vim.fn.expand("%:p")
+        -- Check if file is in vault using the vault path
+        if file_path:find(vault_path, 1, true) or file_path:lower():find("obsidian") then
+          vim.defer_fn(function()
+            perform_git_operations("pull", function(_) end)
+          end, 500)
+        end
       end,
       desc = "Auto-pull changes when opening Obsidian files",
     })
 
-    -- Debounced auto-push when saving any .md file in the vault
+    -- Auto-push when saving any .md file in the vault
     vim.api.nvim_create_autocmd({ "BufWritePost" }, {
       group = obsidian_group,
-      pattern = vault_path .. "/**/*.md",
+      pattern = "*.md",
       callback = function()
-        schedule_git_push()
+        local file_path = vim.fn.expand("%:p")
+        -- Check if file is in vault using the vault path
+        if file_path:find(vault_path, 1, true) or file_path:lower():find("obsidian") then
+          schedule_git_push()
+        end
       end,
-      desc = "Auto-push changes with debouncing",
+      desc = "Auto-push changes when saving Obsidian files",
     })
 
     -- Update tasks when opening tasks.md (delayed to avoid cursor lock)
@@ -975,24 +970,31 @@ return {
     -- USER COMMANDS
     -- ============================================================================
 
-    vim.api.nvim_create_user_command("ObsidianToday", create_daily_note_with_title, { desc = "Create today's daily note" })
-    vim.api.nvim_create_user_command("ObsidianTomorrow", create_tomorrow_note_with_title, { desc = "Create tomorrow's daily note" })
-    vim.api.nvim_create_user_command("ObsidianYesterday", create_yesterday_note_with_title, { desc = "Create yesterday's daily note" })
-    vim.api.nvim_create_user_command("ObsidianOpenFolder", function()
+    -- Custom commands with unique prefixes to avoid conflicts
+    vim.api.nvim_create_user_command("ObsDailyToday", create_daily_note_with_title, { desc = "Create today's daily note" })
+    vim.api.nvim_create_user_command("ObsDailyTomorrow", create_tomorrow_note_with_title, { desc = "Create tomorrow's daily note" })
+    vim.api.nvim_create_user_command("ObsDailyYesterday", create_yesterday_note_with_title, { desc = "Create yesterday's daily note" })
+    vim.api.nvim_create_user_command("ObsOpenVault", function()
       vim.cmd("edit " .. get_vault_path())
     end, { desc = "Open Obsidian vault folder" })
-    vim.api.nvim_create_user_command("ObsidianOpenTodo", function()
+    vim.api.nvim_create_user_command("ObsOpenTodo", function()
       vim.cmd("lua require('todo-functions').open_todo()")
     end, { desc = "Open todo list" })
-    vim.api.nvim_create_user_command("ObsidianAddTask", function()
+    vim.api.nvim_create_user_command("ObsAddTask", function()
       vim.cmd("lua require('todo-functions').add_task('normal')")
     end, { desc = "Add task to todo list" })
-    vim.api.nvim_create_user_command("ObsidianAddUrgent", function()
+    vim.api.nvim_create_user_command("ObsAddUrgent", function()
       vim.cmd("lua require('todo-functions').add_task('urgent')")
     end, { desc = "Add urgent task" })
-    vim.api.nvim_create_user_command("ObsidianToggleTask", function()
+    vim.api.nvim_create_user_command("ObsToggleTask", function()
       vim.cmd("lua require('todo-functions').toggle_task()")
     end, { desc = "Toggle task completion" })
+    
+
+    
+
+    
+
 
     -- ============================================================================
     -- KEY MAPPINGS (OBSIDIAN-SPECIFIC)
@@ -1011,18 +1013,20 @@ return {
 
   keys = {
     { "<leader>on", "<cmd>ObsidianNew<cr>", desc = "New Obsidian note" },
-    { "<leader>oo", "<cmd>ObsidianOpenFolder<cr>", desc = "Open Obsidian folder" },
+    { "<leader>oo", "<cmd>ObsOpenVault<cr>", desc = "Open Obsidian folder" },
     { "<leader>os", "<cmd>ObsidianSearch<cr>", desc = "Search Obsidian notes" },
     { "<leader>oq", "<cmd>ObsidianQuickSwitch<cr>", desc = "Quick Switch" },
     { "<leader>ob", "<cmd>ObsidianBacklinks<cr>", desc = "Show backlinks" },
     { "<leader>oT", "<cmd>ObsidianTemplate<cr>", desc = "Templates" },
-    { "<leader>ot", "<cmd>ObsidianToday<cr>", desc = "Open today's daily note" },
-    { "<leader>om", "<cmd>ObsidianTomorrow<cr>", desc = "Open tomorrow's note" },
-    { "<leader>oy", "<cmd>ObsidianYesterday<cr>", desc = "Open yesterday's note" },
+    { "<leader>ot", "<cmd>ObsDailyToday<cr>", desc = "Open today's daily note" },
+    { "<leader>om", "<cmd>ObsDailyTomorrow<cr>", desc = "Open tomorrow's note" },
+    { "<leader>oy", "<cmd>ObsDailyYesterday<cr>", desc = "Open yesterday's note" },
     { "<leader>pi", "<cmd>ObsidianPasteImg<cr>", desc = "Paste image into file" },
-    { "<leader>od", "<cmd>ObsidianOpenTodo<cr>", desc = "Open todo list" },
-    { "<leader>oa", "<cmd>ObsidianAddTask<cr>", desc = "Add task to todo list" },
-    { "<leader>ou", "<cmd>ObsidianAddUrgent<cr>", desc = "Add urgent task" },
-    { "<leader>ox", "<cmd>ObsidianToggleTask<cr>", desc = "Toggle task completion" },
+    { "<leader>od", "<cmd>ObsOpenTodo<cr>", desc = "Open todo list" },
+    { "<leader>oa", "<cmd>ObsAddTask<cr>", desc = "Add task to todo list" },
+    { "<leader>ou", "<cmd>ObsAddUrgent<cr>", desc = "Add urgent task" },
+    { "<leader>ox", "<cmd>ObsToggleTask<cr>", desc = "Toggle task completion" },
+
+
   },
 }

@@ -21,13 +21,21 @@ return {
       -- Current terminal mode
       local current_mode = "horizontal"
 
+      local function get_shell_command()
+        if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
+          return "pwsh.exe"
+        else
+          return vim.o.shell
+        end
+      end
+
       local function get_or_create_terminal(cwd, count, direction)
         direction = direction or default_direction
         local key = cwd .. "_" .. count .. "_" .. direction
         if not dir_terminals[key] then
           terminal_count = terminal_count + 1
           dir_terminals[key] = Terminal:new({
-            cmd = vim.o.shell,
+            cmd = get_shell_command(),
             dir = cwd,
             direction = direction,
             count = terminal_count,
@@ -102,7 +110,7 @@ return {
           local cwd, count = key:match("(.*)_(%d+)")
           term:close()
           dir_terminals[key] = Terminal:new({
-            cmd = vim.o.shell,
+            cmd = get_shell_command(),
             dir = cwd,
             direction = default_direction,
             count = tonumber(count),
@@ -198,8 +206,10 @@ return {
 
       -- Add Calcure calendar toggle
       vim.keymap.set("n", "<leader>oc", function()
+        local is_windows = vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1
+        local config_path = is_windows and "$env:USERPROFILE\\Documents\\Obsidian\\calcure\\config.ini" or "$HOME/Developments/obsidian/calcure/config.ini"
         local calcure = Terminal:new({
-          cmd = "calcure --config=$HOME/Developments/obsidian/calcure/config.ini",
+          cmd = "calcure --config=" .. config_path,
           direction = "float",
           hidden = true,
           count = 99,
@@ -211,7 +221,7 @@ return {
           on_open = function(term)
             -- Disable Esc mapping for this specific terminal
             vim.keymap.set("t", "<Esc>", "<Nop>", { buffer = term.bufnr, noremap = true })
-            -- Add q mapping to close the terminal
+            -- Add q mapping to close terminal
             vim.keymap.set("n", "q", function()
               term:close()
             end, { buffer = term.bufnr, noremap = true })
