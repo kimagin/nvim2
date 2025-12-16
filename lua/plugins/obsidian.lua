@@ -107,6 +107,7 @@ return {
       if
         string.match(note_path_str, "^" .. vim.fn.expand("~/Developments/obsidian/journal/"))
         or string.match(note_path_str, "tasks%.md$")
+        or string.match(note_path_str, "todo%.md$")
       then
         return {}
       else
@@ -706,8 +707,7 @@ return {
       if vim.fn.filereadable(file_path) == 0 then
         local file = io.open(file_path, "w")
         if file then
-          local header = "Today's Tasks"
-          file:write("# " .. date_str .. "\n\n\n#### " .. header .. "\n\n- [ ] Task1\n- [ ] Task2\n\n--- ")
+          file:write("# " .. date_str .. "\n\n")
           file:close()
         end
       end
@@ -735,21 +735,7 @@ return {
       create_note_with_template(date)
     end
 
-    -- Function to open tasks file
-    local function open_tasks()
-      local tasks_path = get_obsidian_path("tasks.md")
 
-      -- Check if tasks.md buffer exists and delete it
-      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        if vim.api.nvim_buf_get_name(buf):match("tasks%.md$") then
-          vim.api.nvim_buf_delete(buf, { force = true })
-          break
-        end
-      end
-
-      -- Open tasks.md in a new buffer
-      vim.cmd("edit " .. tasks_path)
-    end
 
     -- Function to open URLs with system default application
     local function open_with_system_app()
@@ -934,6 +920,33 @@ return {
       desc = "Configure markdown display for Obsidian",
     })
 
+    -- Todo-specific keymaps and styling
+    vim.api.nvim_create_autocmd("BufRead", {
+      group = obsidian_group,
+      pattern = "*/obsidian/todo.md",
+      callback = function()
+        -- Add toggle keymap for todo.md
+        vim.keymap.set("n", "<leader>ox", function()
+          vim.cmd("lua require('todo-functions').toggle_task()")
+        end, { desc = "Toggle task completion", buffer = true })
+        vim.keymap.set("n", "<C-Space>", function()
+          vim.cmd("lua require('todo-functions').toggle_task()")
+        end, { desc = "Toggle task completion", buffer = true })
+        vim.keymap.set("i", "<C-Space>", function()
+          vim.cmd("lua require('todo-functions').toggle_task()")
+        end, { desc = "Toggle task completion", buffer = true })
+        
+        -- Add syntax highlighting for completed tasks
+        vim.api.nvim_buf_call(0, function()
+          vim.cmd([[syntax match TodoCompleted /^\s*- \[x\].*$/]])
+        end)
+        
+        vim.api.nvim_set_hl(0, "TodoCompleted", { strikethrough = true, fg = "#888888" })
+        vim.cmd([[highlight link TodoCompleted TodoCompleted]])
+      end,
+      desc = "Setup todo list keymaps and styling",
+    })
+
     -- Clean up all timers on exit
     vim.api.nvim_create_autocmd("VimLeavePre", {
       group = obsidian_group,
@@ -968,9 +981,18 @@ return {
     vim.api.nvim_create_user_command("ObsidianOpenFolder", function()
       vim.cmd("edit " .. get_vault_path())
     end, { desc = "Open Obsidian vault folder" })
-    vim.api.nvim_create_user_command("ObsidianUpdateTasks", function()
-      update_tasks()
-    end, { desc = "Update tasks from journal files" })
+    vim.api.nvim_create_user_command("ObsidianOpenTodo", function()
+      vim.cmd("lua require('todo-functions').open_todo()")
+    end, { desc = "Open todo list" })
+    vim.api.nvim_create_user_command("ObsidianAddTask", function()
+      vim.cmd("lua require('todo-functions').add_task('normal')")
+    end, { desc = "Add task to todo list" })
+    vim.api.nvim_create_user_command("ObsidianAddUrgent", function()
+      vim.cmd("lua require('todo-functions').add_task('urgent')")
+    end, { desc = "Add urgent task" })
+    vim.api.nvim_create_user_command("ObsidianToggleTask", function()
+      vim.cmd("lua require('todo-functions').toggle_task()")
+    end, { desc = "Toggle task completion" })
 
     -- ============================================================================
     -- KEY MAPPINGS (OBSIDIAN-SPECIFIC)
@@ -981,7 +1003,7 @@ return {
       silent = true,
     })
 
-    vim.keymap.set("n", "<leader>od", open_tasks, { desc = "Open daily tasks overview" })
+
 
     -- Remove end of buffer ~ from neotree panel (Obsidian styling)
     vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "none", fg = "#141317" })
@@ -998,6 +1020,9 @@ return {
     { "<leader>om", "<cmd>ObsidianTomorrow<cr>", desc = "Open tomorrow's note" },
     { "<leader>oy", "<cmd>ObsidianYesterday<cr>", desc = "Open yesterday's note" },
     { "<leader>pi", "<cmd>ObsidianPasteImg<cr>", desc = "Paste image into file" },
-    { "<leader>ou", "<cmd>ObsidianUpdateTasks<cr>", desc = "Update tasks from journal" },
+    { "<leader>od", "<cmd>ObsidianOpenTodo<cr>", desc = "Open todo list" },
+    { "<leader>oa", "<cmd>ObsidianAddTask<cr>", desc = "Add task to todo list" },
+    { "<leader>ou", "<cmd>ObsidianAddUrgent<cr>", desc = "Add urgent task" },
+    { "<leader>ox", "<cmd>ObsidianToggleTask<cr>", desc = "Toggle task completion" },
   },
 }
