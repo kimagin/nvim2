@@ -20,15 +20,15 @@ local view_dir = vim.fn.stdpath("data") .. "/views/bufs"
 local function cleanup_caches()
   local current_time = os.time()
   local cleanup_interval = 300 -- 5 minutes
-  
+
   if current_time - cache_last_cleanup < cleanup_interval then
     return
   end
-  
+
   local function clear_expired_cache(cache, max_age)
     local cleaned = 0
     local total = 0
-    
+
     for key, _ in pairs(cache) do
       total = total + 1
       -- Clear entries older than max_age seconds
@@ -45,15 +45,15 @@ local function cleanup_caches()
         end
       end
     end
-    
+
     return cleaned
   end
-  
+
   -- Clean up caches with different retention policies
   clear_expired_cache(file_size_cache, 1800) -- 30 minutes for file sizes
   clear_expired_cache(project_root_cache, 3600) -- 1 hour for project roots
   clear_expired_cache(markdown_nav_cache, 600) -- 10 minutes for markdown nav
-  
+
   cache_last_cleanup = current_time
 end
 
@@ -103,7 +103,7 @@ local function is_large_file(bufnr)
   local is_large = stats.size > max_size
   file_size_cache[name] = {
     value = is_large,
-    timestamp = os.time()
+    timestamp = os.time(),
   }
   return is_large
 end
@@ -263,13 +263,13 @@ vim.api.nvim_create_autocmd("VimLeavePre", {
       cleanup_timer:stop()
       cleanup_timer:close()
     end
-    
+
     -- Stop navigation debounce timer
     if navigation_debounce_timer then
       navigation_debounce_timer:stop()
       navigation_debounce_timer:close()
     end
-    
+
     local success, err = pcall(function()
       local view_files = vim.fn.glob(view_dir .. "/*", true, true)
       for _, file in ipairs(view_files) do
@@ -350,7 +350,7 @@ local function debounce_nav(func, delay)
     navigation_debounce_timer:stop()
     navigation_debounce_timer:close()
   end
-  
+
   navigation_debounce_timer = vim.uv.new_timer()
   navigation_debounce_timer:start(delay, 0, vim.schedule_wrap(func))
 end
@@ -559,7 +559,7 @@ local function open_with_system_app()
 
   local open_cmd = nil
   local shell_cmd = nil
-  
+
   if vim.fn.has("mac") == 1 then
     open_cmd = { "open", file_path }
   elseif vim.fn.has("wsl") == 1 then
@@ -627,11 +627,6 @@ vim.keymap.set("n", "<leader>h", function()
   print(vim.treesitter.get_captures_at_cursor()[1])
 end, { desc = "Show Tree-sitter highlight group" })
 
-vim.keymap.set("n", "<leader>od", open_tasks, { desc = "Open daily tasks overview" })
-
 -- ============================================================================
 -- MODULE INITIALIZATION
 -- ============================================================================
-
--- Initialize Task Collector
-require("config.tasks-collector").setup()
