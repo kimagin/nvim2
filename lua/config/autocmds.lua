@@ -11,9 +11,55 @@
 local file_size_cache = {}
 local project_root_cache = {}
 local markdown_nav_cache = {}
+local cache_last_cleanup = 0
 
 local root_patterns = { ".git", ".svn", ".hg", "package.json", "Cargo.toml" }
 local view_dir = vim.fn.stdpath("data") .. "/views/bufs"
+
+-- Cache cleanup function to prevent memory leaks
+local function cleanup_caches()
+  local current_time = os.time()
+  local cleanup_interval = 300 -- 5 minutes
+  
+  if current_time - cache_last_cleanup < cleanup_interval then
+    return
+  end
+  
+  local function clear_expired_cache(cache, max_age)
+    local cleaned = 0
+    local total = 0
+    
+    for key, _ in pairs(cache) do
+      total = total + 1
+      -- Clear entries older than max_age seconds
+      if type(cache[key]) == "table" and cache[key].timestamp then
+        if current_time - cache[key].timestamp > max_age then
+          cache[key] = nil
+          cleaned = cleaned + 1
+        end
+      else
+        -- Clear simple entries every few cycles
+        if math.random(1, 100) <= 10 then -- 10% chance
+          cache[key] = nil
+          cleaned = cleaned + 1
+        end
+      end
+    end
+    
+    return cleaned
+  end
+  
+  -- Clean up caches with different retention policies
+  clear_expired_cache(file_size_cache, 1800) -- 30 minutes for file sizes
+  clear_expired_cache(project_root_cache, 3600) -- 1 hour for project roots
+  clear_expired_cache(markdown_nav_cache, 600) -- 10 minutes for markdown nav
+  
+  cache_last_cleanup = current_time
+end
+
+-- Schedule periodic cleanup
+local cleanup_timer = vim.uv.new_timer()
+cleanup_timer:start(60000, 300000, vim.schedule_wrap(cleanup_caches))
 
 -- Ensure view directory exists
 if vim.fn.isdirectory(view_dir) == 0 then
@@ -38,7 +84,13 @@ local function is_large_file(bufnr)
 
   -- Check cache first
   if file_size_cache[name] ~= nil then
-    return file_size_cache[name]
+    if type(file_size_cache[name]) == "table" and file_size_cache[name].timestamp then
+      if os.time() - file_size_cache[name].timestamp < 1800 then -- 30 minutes
+        return file_size_cache[name].value
+      end
+    else
+      return file_size_cache[name] -- Legacy cache format
+    end
   end
 
   local max_size = 1024 * 1024 -- 1MB
@@ -49,7 +101,10 @@ local function is_large_file(bufnr)
   end
 
   local is_large = stats.size > max_size
-  file_size_cache[name] = is_large
+  file_size_cache[name] = {
+    value = is_large,
+    timestamp = os.time()
+  }
   return is_large
 end
 
@@ -200,9 +255,21 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
   end,
 })
 
--- Clean up old view files on exit
+-- Clean up old view files on exit and cleanup timer
 vim.api.nvim_create_autocmd("VimLeavePre", {
   callback = function()
+    -- Stop cleanup timer
+    if cleanup_timer then
+      cleanup_timer:stop()
+      cleanup_timer:close()
+    end
+    
+    -- Stop navigation debounce timer
+    if navigation_debounce_timer then
+      navigation_debounce_timer:stop()
+      navigation_debounce_timer:close()
+    end
+    
     local success, err = pcall(function()
       local view_files = vim.fn.glob(view_dir .. "/*", true, true)
       for _, file in ipairs(view_files) do
@@ -275,14 +342,23 @@ local function setup_markdown_task_highlighting(bufnr)
   vim.b[bufnr].task_highlighting_setup = true
 end
 
+-- Debounced markdown navigation
+local navigation_debounce_timer = nil
+
+local function debounce_nav(func, delay)
+  if navigation_debounce_timer then
+    navigation_debounce_timer:stop()
+    navigation_debounce_timer:close()
+  end
+  
+  navigation_debounce_timer = vim.uv.new_timer()
+  navigation_debounce_timer:start(delay, 0, vim.schedule_wrap(func))
+end
+
 -- Markdown navigation functions
 local function create_markdown_navigation()
   -- Function to find next/previous pattern
   local function find_pattern(pattern, reverse)
-    local cache_key = pattern .. (reverse and "_reverse" or "_forward")
-    if markdown_nav_cache[cache_key] then
-      return markdown_nav_cache[cache_key]
-    end
     local current_line = vim.fn.line(".")
     local current_col = vim.fn.col(".")
     local last_line = vim.fn.line("$")
@@ -383,29 +459,37 @@ local function create_markdown_navigation()
     return false
   end
 
-  -- Set up keymaps for markdown files
+  -- Set up keymaps for markdown files with debouncing
   vim.keymap.set("n", "]l", function()
-    if not find_pattern("\\[\\[", false) then
-      vim.notify("No more links found", vim.log.levels.INFO)
-    end
+    debounce_nav(function()
+      if not find_pattern("\\[\\[", false) then
+        vim.notify("No more links found", vim.log.levels.INFO)
+      end
+    end, 50)
   end, { buffer = true, desc = "Go to next markdown link" })
 
   vim.keymap.set("n", "[l", function()
-    if not find_pattern("\\[\\[", true) then
-      vim.notify("No previous links found", vim.log.levels.INFO)
-    end
+    debounce_nav(function()
+      if not find_pattern("\\[\\[", true) then
+        vim.notify("No previous links found", vim.log.levels.INFO)
+      end
+    end, 50)
   end, { buffer = true, desc = "Go to previous markdown link" })
 
   vim.keymap.set("n", "]t", function()
-    if not find_pattern("^\\s*- \\[ \\]", false) then
-      vim.notify("No more tasks found", vim.log.levels.INFO)
-    end
+    debounce_nav(function()
+      if not find_pattern("^\\s*- \\[ \\]", false) then
+        vim.notify("No more tasks found", vim.log.levels.INFO)
+      end
+    end, 50)
   end, { buffer = true, desc = "Go to next markdown task" })
 
   vim.keymap.set("n", "[t", function()
-    if not find_pattern("^\\s*- \\[ \\]", true) then
-      vim.notify("No previous tasks found", vim.log.levels.INFO)
-    end
+    debounce_nav(function()
+      if not find_pattern("^\\s*- \\[ \\]", true) then
+        vim.notify("No previous tasks found", vim.log.levels.INFO)
+      end
+    end, 50)
   end, { buffer = true, desc = "Go to previous markdown task" })
 end
 
@@ -474,27 +558,52 @@ local function open_with_system_app()
   end
 
   local open_cmd = nil
+  local shell_cmd = nil
+  
   if vim.fn.has("mac") == 1 then
     open_cmd = { "open", file_path }
+  elseif vim.fn.has("wsl") == 1 then
+    -- WSL environment - use explorer.exe from Windows
+    open_cmd = { "explorer.exe", file_path }
+  elseif vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
+    -- Native Windows - use start command
+    open_cmd = { "cmd", "/c", "start", "", '""', file_path, '""' }
   elseif vim.fn.has("unix") == 1 then
-    open_cmd = { "xdg-open", file_path }
-  elseif vim.fn.has("win32") == 1 then
-    open_cmd = { "cmd", "/c", "start", "", file_path }
+    if vim.fn.executable("xdg-open") == 1 then
+      open_cmd = { "xdg-open", file_path }
+    elseif vim.fn.executable("gnome-open") == 1 then
+      open_cmd = { "gnome-open", file_path }
+    elseif vim.fn.executable("kde-open") == 1 then
+      open_cmd = { "kde-open", file_path }
+    end
   end
 
   if open_cmd then
-    local ok, err = pcall(vim.fn.system, open_cmd)
+    local ok, result = pcall(vim.fn.system, open_cmd)
     if not ok then
-      vim.notify("Failed to open file: " .. err, vim.log.levels.ERROR)
+      vim.notify("Failed to open file: " .. result, vim.log.levels.ERROR)
+    elseif vim.v.shell_error ~= 0 then
+      vim.notify("Command failed with exit code: " .. vim.v.shell_error, vim.log.levels.ERROR)
     end
   else
-    vim.notify("Unsupported platform", vim.log.levels.ERROR)
+    vim.notify("No suitable application opener found", vim.log.levels.ERROR)
   end
+end
+
+-- Function to get platform-specific Obsidian path
+local function get_obsidian_path(subpath)
+  local base_path
+  if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
+    base_path = vim.fn.expand("~/Documents/Obsidian")
+  else
+    base_path = vim.fn.expand("~/Developments/obsidian")
+  end
+  return base_path .. "/" .. subpath
 end
 
 -- Function to open tasks file
 local function open_tasks()
-  local tasks_path = "~/Developments/obsidian/tasks.md"
+  local tasks_path = get_obsidian_path("tasks.md")
 
   -- Check if tasks.md buffer exists and delete it
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do

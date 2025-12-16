@@ -51,9 +51,20 @@ local function read_file(file_path)
   return content
 end
 
+-- Function to get platform-specific Obsidian path
+local function get_obsidian_path(subpath)
+  local base_path
+  if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
+    base_path = vim.fn.expand("~/Documents/Obsidian")
+  else
+    base_path = vim.fn.expand("~/Developments/obsidian")
+  end
+  return base_path .. "/" .. subpath
+end
+
 -- Function to write tasks to tasks.md
 local function write_tasks(tasks_by_date)
-  local tasks_file_path = vim.fn.expand("~/Developments/obsidian/tasks.md")
+  local tasks_file_path = get_obsidian_path("tasks.md")
   local tasks_file = io.open(tasks_file_path, "w")
   if not tasks_file then
     return
@@ -119,16 +130,65 @@ function M.update_tasks()
     return
   end
 
-  local journal_path = vim.fn.expand("~/Developments/obsidian/journal")
+  local journal_path = get_obsidian_path("journal")
   if vim.fn.isdirectory(journal_path) == 0 then
     return
   end
 
-  local find_command = vim.fn.executable("rg") == 1
-      and io.popen('rg --files --glob "*.md" "' .. journal_path .. '" 2>/dev/null')
-    or io.popen('find "' .. journal_path .. '" -type f -name "*.md" 2>/dev/null')
+  local find_command = nil
+  
+  -- Try multiple file finding methods with fallbacks
+  if vim.fn.executable("rg") == 1 then
+    find_command = io.popen('rg --files --glob "*.md" "' .. journal_path .. '" 2>/dev/null')
+  elseif vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 or vim.fn.has("wsl") == 1 then
+    -- Windows/WSL environment
+    find_command = io.popen('powershell.exe -command "Get-ChildItem -Path \'' .. journal_path .. '\' -Filter *.md -Recurse | Select-Object -ExpandProperty FullName" 2>/dev/null')
+  elseif vim.fn.executable("find") == 1 then
+    find_command = io.popen('find "' .. journal_path .. '" -type f -name "*.md" 2>/dev/null')
+  else
+    -- Fallback to lua-based file search
+    local function find_md_files_recursive(path, results)
+      local handle = vim.loop.fs_scandir(path)
+      if not handle then return end
+      
+      while true do
+        local name, type = vim.loop.fs_scandir_next(handle)
+        if not name then break end
+        
+        local full_path = path .. "/" .. name
+        if type == "directory" then
+          find_md_files_recursive(full_path, results)
+        elseif name:match("%.md$") then
+          table.insert(results, full_path)
+        end
+      end
+    end
+    
+    local files = {}
+    find_md_files_recursive(journal_path, files)
+    
+    -- Process found files
+    local current_time = os.time()
+    local tasks_by_date = {}
+    
+    for _, file in ipairs(files) do
+      local content = read_file(file)
+      if content then
+        local tasks = extract_tasks(content)
+        if #tasks > 0 then
+          local filename = vim.fn.fnamemodify(file, ":t:r")
+          tasks_by_date[filename] = tasks
+        end
+      end
+    end
+    
+    write_tasks(tasks_by_date)
+    vim.cmd("edit!")
+    return
+  end
 
   if not find_command then
+    vim.notify("Could not find markdown files in journal", vim.log.levels.ERROR)
     return
   end
 

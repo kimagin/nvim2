@@ -19,23 +19,121 @@ vim.opt.shortmess:append("I")
 vim.opt.showtabline = 0 -- Hide tabs
 vim.opt.wrap = true
 
--- WSL2-Windows clipboard configuration using clip.exe and powershell.exe
+-- Cross-platform clipboard configuration
 vim.opt.clipboard = "unnamedplus"
 
-if vim.fn.has("wsl") == 1 then
-  vim.g.clipboard = {
-    name = "Win32Yank",
-    copy = {
-      ["+"] = "win32yank.exe -i --crlf",
-      ["*"] = "win32yank.exe -i --crlf",
-    },
-    paste = {
-      ["+"] = "win32yank.exe -o --lf",
-      ["*"] = "win32yank.exe -o --lf",
-    },
-    cache_enabled = false,
-  }
+-- Enhanced clipboard configuration for all platforms
+local function setup_clipboard()
+  if vim.fn.has("wsl") == 1 then
+    -- WSL environment
+    if vim.fn.executable("win32yank.exe") == 1 then
+      vim.g.clipboard = {
+        name = "Win32Yank",
+        copy = {
+          ["+"] = "win32yank.exe -i --crlf",
+          ["*"] = "win32yank.exe -i --crlf",
+        },
+        paste = {
+          ["+"] = "win32yank.exe -o --lf",
+          ["*"] = "win32yank.exe -o --lf",
+        },
+        cache_enabled = false,
+      }
+    else
+      -- Fallback to Windows clip/paste
+      vim.g.clipboard = {
+        name = "WSLClipboard",
+        copy = {
+          ["+"] = "clip.exe",
+          ["*"] = "clip.exe",
+        },
+        paste = {
+          ["+"] = "powershell.exe -command Get-Clipboard",
+          ["*"] = "powershell.exe -command Get-Clipboard",
+        },
+        cache_enabled = false,
+      }
+    end
+  elseif vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
+    -- Native Windows
+    if vim.fn.executable("win32yank.exe") == 1 then
+      vim.g.clipboard = {
+        name = "Win32Yank",
+        copy = {
+          ["+"] = "win32yank.exe -i --crlf",
+          ["*"] = "win32yank.exe -i --crlf",
+        },
+        paste = {
+          ["+"] = "win32yank.exe -o --lf",
+          ["*"] = "win32yank.exe -o --lf",
+        },
+        cache_enabled = false,
+      }
+    else
+      -- Fallback to Windows clipboard
+      vim.g.clipboard = {
+        name = "WindowsClipboard",
+        copy = {
+          ["+"] = "clip",
+          ["*"] = "clip",
+        },
+        paste = {
+          ["+"] = "powershell.exe -command Get-Clipboard",
+          ["*"] = "powershell.exe -command Get-Clipboard",
+        },
+        cache_enabled = false,
+      }
+    end
+  elseif vim.fn.has("mac") == 1 then
+    -- macOS
+    vim.g.clipboard = {
+      name = "macOSClipboard",
+      copy = {
+        ["+"] = "pbcopy",
+        ["*"] = "pbcopy",
+      },
+      paste = {
+        ["+"] = "pbpaste",
+        ["*"] = "pbpaste",
+      },
+      cache_enabled = true,
+    }
+  elseif vim.fn.has("unix") == 1 then
+    -- Linux/Unix
+    if vim.fn.executable("xclip") == 1 then
+      vim.g.clipboard = {
+        name = "XclipClipboard",
+        copy = {
+          ["+"] = "xclip -selection clipboard",
+          ["*"] = "xclip -selection primary",
+        },
+        paste = {
+          ["+"] = "xclip -selection clipboard -o",
+          ["*"] = "xclip -selection primary -o",
+        },
+        cache_enabled = true,
+      }
+    elseif vim.fn.executable("xsel") == 1 then
+      vim.g.clipboard = {
+        name = "XselClipboard",
+        copy = {
+          ["+"] = "xsel --clipboard --input",
+          ["*"] = "xsel --primary --input",
+        },
+        paste = {
+          ["+"] = "xsel --clipboard --output",
+          ["*"] = "xsel --primary --output",
+        },
+        cache_enabled = true,
+      }
+    else
+      -- Fallback to terminal integration
+      vim.opt.clipboard = ""
+    end
+  end
 end
+
+setup_clipboard()
 
 -- Buffer and file management
 vim.opt.hidden = true -- Keep buffers loaded in memory
