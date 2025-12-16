@@ -146,7 +146,75 @@ return {
   },
 
   config = function(_, opts)
-    require("obsidian").setup(opts)
+    -- Function to initialize vault if it doesn't exist (async)
+    local function initialize_vault_async()
+      local is_windows = vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1
+      local vault_path = is_windows and vim.fn.expand("~/Documents/Obsidian") or vim.fn.expand("~/Developments/obsidian")
+      local repo_url = "https://github.com/kimagin/vault.git"
+      local branch = "notes"
+
+      -- Check if vault already exists
+      if vim.fn.isdirectory(vault_path) == 1 then
+        require("obsidian").setup(opts)
+        return
+      end
+
+      -- Create parent directories if they don't exist
+      local parent_dir = vim.fn.fnamemodify(vault_path, ":h")
+      if vim.fn.isdirectory(parent_dir) == 0 then
+        vim.fn.mkdir(parent_dir, "p")
+      end
+
+      vim.notify("Setting up Obsidian vault...", vim.log.levels.INFO)
+
+      -- Check if git is available
+      if vim.fn.executable("git") == 0 then
+        vim.schedule(function()
+          vim.notify("Git is required to set up vault. Please install git.", vim.log.levels.ERROR)
+        end)
+        return
+      end
+
+      -- Use plenary.job for async git clone with Windows-specific handling
+      local Job = require("plenary.job")
+      Job:new({
+        command = "git",
+        args = { "clone", "-b", branch, repo_url, vault_path },
+        on_exit = function(j, return_val)
+          vim.schedule(function()
+            if return_val == 0 then
+              vim.notify("Obsidian vault successfully set up at " .. vault_path, vim.log.levels.INFO)
+              require("obsidian").setup(opts)
+            else
+              local output = table.concat(j:stderr_result(), "\n")
+              if output == "" then
+                output = table.concat(j:result(), "\n") -- Try stdout if stderr is empty
+              end
+              
+              -- Windows-specific error handling
+              if is_windows and output:match("SSL certificate problem") then
+                vim.notify("Git SSL error on Windows. You may need to configure git certificates or use 'git config --global http.sslVerify false'", vim.log.levels.ERROR)
+              else
+                vim.notify("Failed to clone vault repository: " .. output, vim.log.levels.ERROR)
+              end
+            end
+          end)
+        end,
+        on_start = function()
+          vim.schedule(function()
+            vim.notify("Cloning vault repository...", vim.log.levels.INFO)
+          end)
+        end,
+        -- Windows-specific options
+        env = is_windows and {
+          PATH = vim.fn.getenv("PATH"),
+          HOME = vim.fn.expand("~"),
+          USERPROFILE = vim.fn.expand("~"),
+        } or nil,
+      }):start()
+    end
+
+    initialize_vault_async()
 
     -- ============================================================================
     -- SHARED UTILITIES AND CONSTANTS
