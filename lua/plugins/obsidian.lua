@@ -790,8 +790,13 @@ return {
       pattern = "*.md",
       callback = function()
         local file_path = vim.fn.expand("%:p")
-        -- Check if file is in vault using the vault path
-        if file_path:find(vault_path, 1, true) or file_path:lower():find("obsidian") then
+        local file_name = vim.fn.expand("%:t")
+        
+        -- Check if file is in vault using the vault path OR if it's a known obsidian file
+        if file_path:find(vault_path, 1, true) or 
+           file_path:lower():find("obsidian") or
+           file_name == "todo.md" or
+           file_name == "tasks.md" then
           schedule_git_push()
         end
       end,
@@ -990,6 +995,36 @@ return {
       vim.cmd("lua require('todo-functions').toggle_task()")
     end, { desc = "Toggle task completion" })
     
+    -- Open external terminal with today's journal
+    vim.api.nvim_create_user_command("ObsExternalToday", function()
+      local is_windows = vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1
+      if is_windows then
+        local script_path = vim.fn.stdpath("config") .. "\\..\\..\\bin\\obsidian-today.bat"
+        vim.fn.system('start "" "' .. script_path .. '"')
+      else
+        -- For macOS/Linux
+        local days = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" }
+        local date = os.date("*t")
+        local day_name = days[date.wday]
+        local date_str = string.format("%s-%02d-%02d-%d", day_name, date.day, date.month, date.year)
+        local vault_path = vim.fn.expand("~/Developments/obsidian/journal/" .. date_str .. ".md")
+        vim.fn.system('gnome-terminal -- nvim "' .. vault_path .. '" &')
+      end
+    end, { desc = "Open external terminal with today's journal" })
+    
+    -- Open external terminal with todo.md
+    vim.api.nvim_create_user_command("ObsExternalTodo", function()
+      local is_windows = vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1
+      if is_windows then
+        local script_path = vim.fn.stdpath("config") .. "\\..\\..\\bin\\obsidian-todo.bat"
+        vim.fn.system('start "" "' .. script_path .. '"')
+      else
+        -- For macOS/Linux
+        local vault_path = vim.fn.expand("~/Developments/obsidian/todo.md")
+        vim.fn.system('gnome-terminal -- nvim "' .. vault_path .. '" &')
+      end
+    end, { desc = "Open external terminal with todo.md" })
+    
 
     
 
@@ -1026,6 +1061,8 @@ return {
     { "<leader>oa", "<cmd>ObsAddTask<cr>", desc = "Add task to todo list" },
     { "<leader>ou", "<cmd>ObsAddUrgent<cr>", desc = "Add urgent task" },
     { "<leader>ox", "<cmd>ObsToggleTask<cr>", desc = "Toggle task completion" },
+    { "<leader>oe", "<cmd>ObsExternalToday<cr>", desc = "Open external terminal with today's journal" },
+    { "<leader>ot", "<cmd>ObsExternalTodo<cr>", desc = "Open external terminal with todo.md" },
 
 
   },
