@@ -4,8 +4,8 @@ return {
   lazy = true,
   ft = "markdown",
   event = {
-    "BufReadPre " .. vim.fn.expand("~") .. "/Documents/Obsidian/**.md",
-    "BufNewFile " .. vim.fn.expand("~") .. "/Documents/Obsidian/**.md",
+    "BufReadPre " .. vim.fn.expand("~") .. "/Developments/obsidian/**.md",
+    "BufNewFile " .. vim.fn.expand("~") .. "/Developments/obsidian/**.md",
   },
   dependencies = {
     "nvim-lua/plenary.nvim",
@@ -54,7 +54,7 @@ return {
     workspaces = {
       {
         name = "main",
-        path = vim.fn.expand("~/Documents/Obsidian"),
+        path = vim.fn.expand("~/Developments/obsidian"),
       },
     },
     completion = {
@@ -1062,7 +1062,7 @@ return {
     { "<leader>ou", "<cmd>ObsAddUrgent<cr>", desc = "Add urgent task" },
     { "<leader>ox", "<cmd>ObsToggleTask<cr>", desc = "Toggle task completion" },
     { "<leader>oe", "<cmd>ObsExternalToday<cr>", desc = "Open external terminal with today's journal" },
-    { "<leader>ot", "<cmd>ObsExternalTodo<cr>", desc = "Open external terminal with todo.md" },
+    { "<leader>oT", "<cmd>ObsExternalTodo<cr>", desc = "Open external terminal with todo.md" },
 
 
   },
