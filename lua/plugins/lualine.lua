@@ -27,7 +27,7 @@ return {
       options = {
         theme = {
           normal = {
-            a = { fg = "#A88BFA", bg = "none" },
+            a = { fg = "#908caa", bg = "none" },
             b = { fg = "#908caa", bg = "none" },
             c = { fg = "#908caa", bg = "none" },
           },
