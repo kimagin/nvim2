@@ -13,8 +13,8 @@ return {
       -- Enable the default Neovim intro screen
       vim.opt.shortmess:remove("I")
 
-      -- Restore default end-of-buffer markers
-      vim.opt.fillchars = { eob = "⋅" }
+      -- Hide end-of-buffer markers
+      vim.opt.fillchars = { eob = " " }
 
       -- Optimize startup
       vim.g.loaded_python3_provider = 0 -- Disable Python provider if not needed
