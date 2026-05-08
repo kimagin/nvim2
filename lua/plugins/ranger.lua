@@ -1,6 +1,10 @@
 return {
   {
     "kelly-lin/ranger.nvim",
+    keys = {
+      { "<leader>r", desc = "Open Ranger (current file)" },
+      { "<leader>R", desc = "Open Ranger (project root)" },
+    },
     config = function()
       local ranger = require("ranger-nvim")
       ranger.setup({

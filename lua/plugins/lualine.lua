@@ -15,6 +15,9 @@ return {
       end
     end
 
+    local accent_hl = vim.api.nvim_get_hl(0, { name = "@keyword" }) or {}
+    local accent = type(accent_hl.fg) == "number" and string.format("#%06x", accent_hl.fg) or accent_hl.fg or "#A88BFA"
+
     local function get_toggleterm_name()
       local term = vim.b.toggle_number
       if term then
@@ -33,19 +36,19 @@ return {
           },
           insert = {
             a = { fg = "#F8D2C9", bg = "none" },
-            b = { fg = "#A88BFA", bg = "none" },
+            b = { fg = accent, bg = "none" },
           },
           visual = {
             a = { fg = "#9ccfd8", bg = "none" },
-            b = { fg = "#A88BFA", bg = "none" },
+            b = { fg = accent, bg = "none" },
           },
           replace = {
             a = { fg = "#eb6f92", bg = "none" },
-            b = { fg = "#A88BFA", bg = "none" },
+            b = { fg = accent, bg = "none" },
           },
           command = {
             a = { fg = "#ebbcba", bg = "none" },
-            b = { fg = "#A88BFA", bg = "none" },
+            b = { fg = accent, bg = "none" },
           },
           inactive = {
             a = { fg = "#6e6a86", bg = "none" },
@@ -94,7 +97,7 @@ return {
                 },
               },
               spinners = require("copilot-lualine.spinners").dots,
-              spinner_color = "#a88bfa",
+              spinner_color = accent,
             },
             show_colors = true,
             show_loading = true,
@@ -129,7 +132,7 @@ return {
           -- Add the macro recording function here
           {
             macro_recording,
-            color = { fg = "#a88bfa" }, -- You can adjust this color to match your theme
+            color = { fg = accent },
           },
         },
         lualine_c = {},
@@ -143,7 +146,7 @@ return {
             lualine_a = {
               {
                 get_toggleterm_name,
-                color = { fg = "#a88bfa", bg = "none" },
+                color = { fg = accent, bg = "none" },
                 padding = { left = 0, right = 0 },
               },
             },

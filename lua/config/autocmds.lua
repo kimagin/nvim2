@@ -290,25 +290,6 @@ vim.api.nvim_create_autocmd("VimLeavePre", {
 })
 
 -- ============================================================================
--- LARGE FILE OPTIMIZATIONS
--- ============================================================================
-
-vim.api.nvim_create_autocmd("BufReadPre", {
-  pattern = "*",
-  callback = function(args)
-    if is_large_file(args.buf) then
-      vim.opt_local.foldmethod = "manual"
-      vim.opt_local.foldenable = false
-      vim.opt_local.swapfile = false
-      vim.b[args.buf].large_file = true
-      vim.opt_local.syntax = "on"
-      vim.opt_local.spell = false
-      vim.opt_local.undofile = false
-    end
-  end,
-})
-
--- ============================================================================
 -- PROJECT ROOT DETECTION
 -- ============================================================================
 
@@ -336,7 +317,9 @@ local function setup_markdown_task_highlighting(bufnr)
     vim.cmd([[syntax match markdownTaskListDone /^\s*[-*]\s\[x\].*$/]])
   end)
 
-  vim.api.nvim_set_hl(0, "markdownTaskListDone", { fg = "#A88BFA", strikethrough = true, italic = true })
+  local accent_hl = vim.api.nvim_get_hl(0, { name = "@keyword" }) or {}
+  local accent = type(accent_hl.fg) == "number" and string.format("#%06x", accent_hl.fg) or accent_hl.fg or "#A88BFA"
+  vim.api.nvim_set_hl(0, "markdownTaskListDone", { fg = accent, strikethrough = true, italic = true })
   vim.cmd([[highlight link markdownTaskListDone markdownTaskListDone]])
 
   vim.b[bufnr].task_highlighting_setup = true
@@ -516,17 +499,10 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- Set up markdown task highlighting
-vim.api.nvim_create_autocmd({ "FileType", "BufEnter", "BufWritePost" }, {
-  pattern = "*.md",
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
   callback = function(args)
-    if vim.bo[args.buf].filetype == "markdown" then
-      setup_markdown_task_highlighting(args.buf)
-      vim.defer_fn(function()
-        if vim.api.nvim_buf_is_valid(args.buf) then
-          setup_markdown_task_highlighting(args.buf)
-        end
-      end, 50)
-    end
+    setup_markdown_task_highlighting(args.buf)
   end,
 })
 

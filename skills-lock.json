@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "brainstorming": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "skillPath": "skills/brainstorming/SKILL.md",
+      "computedHash": "8df9b47092524833138b58682d03f2e153a242e550d1693657afdbee0cc9cdb0"
+    },
+    "lazy-nvim-optimization": {
+      "source": "kriscard/kriscard-claude-plugins",
+      "sourceType": "github",
+      "skillPath": "plugins/neovim-advisor/skills/lazy-nvim-optimization/SKILL.md",
+      "computedHash": "9b8c696a0f627e824dbdd3fec47c6c59eccbb4cceb622e35a6ad0792a5f00986"
+    },
+    "lua": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "lua/SKILL.md",
+      "computedHash": "46a1cb96c640e5dd186aee548d329217338fc160088b81696fbe5e809b150002"
+    },
+    "vim-neovim": {
+      "source": "absolutelyskilled/absolutelyskilled",
+      "sourceType": "github",
+      "skillPath": "skills/vim-neovim/SKILL.md",
+      "computedHash": "3add706fe51017c36b2d2fce38139b0ec789225d804d625a5dbbed476f3de41c"
+    }
+  }
+}

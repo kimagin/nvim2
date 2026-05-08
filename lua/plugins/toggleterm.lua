@@ -6,6 +6,14 @@ return {
   {
     "akinsho/toggleterm.nvim",
     version = "*",
+    keys = {
+      { "<C-\\>", desc = "Toggle terminal" },
+      { "2<C-\\>", desc = "Toggle terminal 2" },
+      { "3<C-\\>", desc = "Toggle terminal 3" },
+      { "<leader>td", desc = "Close all terminals" },
+      { "<leader>tv", desc = "Toggle vertical terminal" },
+      { "<leader>oc", desc = "Open Calcure Calendar" },
+    },
     config = function()
       local status_ok, toggleterm = pcall(require, "toggleterm")
       if not status_ok then
@@ -126,7 +134,6 @@ return {
       end
 
       toggleterm.setup({
-        open_mapping = [[<C-\>]],
         direction = "horizontal",
         shade_terminals = true,
         start_in_insert = true,
@@ -207,7 +214,8 @@ return {
       -- Add Calcure calendar toggle
       vim.keymap.set("n", "<leader>oc", function()
         local is_windows = vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1
-        local config_path = is_windows and "$env:USERPROFILE\\Documents\\Obsidian\\calcure\\config.ini" or "$HOME/Developments/obsidian/calcure/config.ini"
+        local config_path = is_windows and "$env:USERPROFILE\\Documents\\Obsidian\\calcure\\config.ini"
+          or "$HOME/Developments/obsidian/calcure/config.ini"
         local calcure = Terminal:new({
           cmd = "calcure --config=" .. config_path,
           direction = "float",

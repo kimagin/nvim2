@@ -23,15 +23,11 @@ return {
     ui = {
       enable = false,
       hl_groups = {
-        ObsidianTodo = { bold = true, fg = "#A88BFA" },
-        ObsidianDone = { bold = true, fg = "#A88BFA" },
         ObsidianImportant = { bold = true, fg = "#EA6C73" },
-        ObsidianTag = { fg = "#A88BFA" },
         ObsidianBlockID = { italic = true, bg = "#89ddff" },
         ObsidianHighlightText = { bg = "#FDD899", fg = "#000000", italic = true },
         ObsidianRightArrow = { bold = true, fg = "#f78c6c" },
         ObsidianTilde = { bold = true, fg = "#ff5370" },
-        ObsidianBullet = { bold = true, fg = "#A88BFA" },
         ObsidianRefText = { underline = true, fg = "#A0D3E1", bold = true },
         ObsidianExtLinkIcon = { fg = "#c792ea" },
       },
@@ -103,13 +99,13 @@ return {
     note_frontmatter_func = function(note)
       local note_path = type(note.path) == "table" and note.path[1] or note.path
       local note_path_str = tostring(note_path)
-      
+
       -- Check if it's a journal, tasks, or todo file
       if
-        note_path_str:match("journal") or
-        note_path_str:match("tasks%.md$") or
-        note_path_str:match("todo%.md$") or
-        note_path_str:lower():find("journal")
+        note_path_str:match("journal")
+        or note_path_str:match("tasks%.md$")
+        or note_path_str:match("todo%.md$")
+        or note_path_str:lower():find("journal")
       then
         return {}
       else
@@ -148,16 +144,52 @@ return {
     sort_by = "modified",
   },
 
+  init = function()
+    local is_windows = vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1
+    local vault = is_windows and vim.fn.expand("~/Documents/Obsidian") or vim.fn.expand("~/Developments/obsidian")
+
+    vim.api.nvim_create_user_command("ObsidianToday", function()
+      local date = os.date("%A-%d-%m-%Y")
+      local path = vault .. "/journal/" .. date .. ".md"
+      if vim.fn.filereadable(path) == 0 then
+        local f = io.open(path, "w")
+        if f then
+          f:write("# " .. date .. "\n\n")
+          f:close()
+        end
+      end
+      vim.cmd("edit " .. path)
+    end, { desc = "Open today's daily note" })
+
+    vim.api.nvim_create_user_command("ObsidianTodo", function()
+      require("todo-functions").open_todo()
+    end, { desc = "Open todo list" })
+  end,
+
   config = function(_, opts)
+    -- Apply dynamic theme accent to Obsidian highlights
+    local function setup_obsidian_highlights()
+      local accent_hl = vim.api.nvim_get_hl(0, { name = "@keyword" }) or {}
+      local accent = type(accent_hl.fg) == "number" and string.format("#%06x", accent_hl.fg)
+        or accent_hl.fg
+        or "#A88BFA"
+      vim.api.nvim_set_hl(0, "ObsidianTodo", { bold = true, fg = accent })
+      vim.api.nvim_set_hl(0, "ObsidianDone", { bold = true, fg = accent })
+      vim.api.nvim_set_hl(0, "ObsidianTag", { fg = accent })
+      vim.api.nvim_set_hl(0, "ObsidianBullet", { bold = true, fg = accent })
+    end
+
     -- Function to initialize vault if it doesn't exist (async)
     local function initialize_vault_async()
       local is_windows = vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1
-      local vault_path = is_windows and vim.fn.expand("~/Documents/Obsidian") or vim.fn.expand("~/Developments/obsidian")
+      local vault_path = is_windows and vim.fn.expand("~/Documents/Obsidian")
+        or vim.fn.expand("~/Developments/obsidian")
       local repo_url = "https://github.com/kimagin/vault.git"
       local branch = "notes"
 
       -- Check if vault already exists
       if vim.fn.isdirectory(vault_path) == 1 then
+        setup_obsidian_highlights()
         require("obsidian").setup(opts)
         return
       end
@@ -180,43 +212,49 @@ return {
 
       -- Use plenary.job for async git clone with Windows-specific handling
       local Job = require("plenary.job")
-      Job:new({
-        command = "git",
-        args = { "clone", "-b", branch, repo_url, vault_path },
-        on_exit = function(j, return_val)
-          vim.schedule(function()
-            if return_val == 0 then
-              vim.notify("Obsidian vault successfully set up at " .. vault_path, vim.log.levels.INFO)
-              require("obsidian").setup(opts)
-            else
-              local output = table.concat(j:stderr_result(), "\n")
-              if output == "" then
-                output = table.concat(j:result(), "\n") -- Try stdout if stderr is empty
-              end
-              
-              -- Windows-specific error handling
-              if is_windows and output:match("SSL certificate problem") then
-                vim.notify("Git SSL error on Windows. You may need to configure git certificates or use 'git config --global http.sslVerify false'", vim.log.levels.ERROR)
+      Job
+        :new({
+          command = "git",
+          args = { "clone", "-b", branch, repo_url, vault_path },
+          on_exit = function(j, return_val)
+            vim.schedule(function()
+              if return_val == 0 then
+                vim.notify("Obsidian vault successfully set up at " .. vault_path, vim.log.levels.INFO)
+                setup_obsidian_highlights()
+                require("obsidian").setup(opts)
               else
-                vim.notify("Failed to clone vault repository: " .. output, vim.log.levels.ERROR)
+                local output = table.concat(j:stderr_result(), "\n")
+                if output == "" then
+                  output = table.concat(j:result(), "\n") -- Try stdout if stderr is empty
+                end
+
+                -- Windows-specific error handling
+                if is_windows and output:match("SSL certificate problem") then
+                  vim.notify(
+                    "Git SSL error on Windows. You may need to configure git certificates or use 'git config --global http.sslVerify false'",
+                    vim.log.levels.ERROR
+                  )
+                else
+                  vim.notify("Failed to clone vault repository: " .. output, vim.log.levels.ERROR)
+                end
               end
-            end
-          end)
-        end,
-        on_start = function()
-          vim.schedule(function()
-            vim.notify("Cloning vault repository...", vim.log.levels.INFO)
-          end)
-        end,
-        -- Windows-specific options
-        env = is_windows and {
-          PATH = vim.fn.getenv("PATH"),
-          HOME = vim.fn.expand("~"),
-          USERPROFILE = vim.fn.expand("~"),
-        } or nil,
-        -- Windows-specific shell options
-        shell = is_windows and "cmd.exe" or nil,
-      }):start()
+            end)
+          end,
+          on_start = function()
+            vim.schedule(function()
+              vim.notify("Cloning vault repository...", vim.log.levels.INFO)
+            end)
+          end,
+          -- Windows-specific options
+          env = is_windows and {
+            PATH = vim.fn.getenv("PATH"),
+            HOME = vim.fn.expand("~"),
+            USERPROFILE = vim.fn.expand("~"),
+          } or nil,
+          -- Windows-specific shell options
+          shell = is_windows and "cmd.exe" or nil,
+        })
+        :start()
     end
 
     initialize_vault_async()
@@ -267,25 +305,25 @@ return {
     local function cleanup_caches()
       local current_time = os.time()
       local cleanup_interval = 300 -- 5 minutes
-      
+
       if current_time - cache_last_cleanup < cleanup_interval then
         return
       end
-      
+
       -- Clean up markdown files cache (5 minute TTL)
       for key, entry in pairs(markdown_files_cache) do
         if current_time - entry.timestamp > 300 then
           markdown_files_cache[key] = nil
         end
       end
-      
+
       -- Clean up file size cache (30 minute TTL)
       for key, entry in pairs(file_size_cache) do
         if type(entry) == "table" and entry.timestamp and current_time - entry.timestamp > 1800 then
           file_size_cache[key] = nil
         end
       end
-      
+
       cache_last_cleanup = current_time
     end
 
@@ -296,20 +334,20 @@ return {
     -- Large file detection
     local function is_large_file(file_path)
       local max_size = 1024 * 1024 -- 1MB
-      
+
       -- Check cache first
       if file_size_cache[file_path] and type(file_size_cache[file_path]) == "table" then
         if os.time() - file_size_cache[file_path].timestamp < 1800 then
           return file_size_cache[file_path].value
         end
       end
-      
+
       local ok, stats = pcall(vim.loop.fs_stat, file_path)
       if not ok or not stats then
         file_size_cache[file_path] = { value = false, timestamp = os.time() }
         return false
       end
-      
+
       local is_large = stats.size > max_size
       file_size_cache[file_path] = { value = is_large, timestamp = os.time() }
       return is_large
@@ -319,17 +357,17 @@ return {
     local function get_journal_files()
       local journal_path = get_obsidian_path("journal")
       local cache_key = "journal_files"
-      
+
       -- Check cache first
       if markdown_files_cache[cache_key] and (os.time() - markdown_files_cache[cache_key].timestamp) < 300 then
         return markdown_files_cache[cache_key].files
       end
-      
+
       local files = {}
-      
+
       -- Try multiple file finding methods with fallbacks
       local success = false
-      
+
       if vim.fn.executable("rg") == 1 then
         local handle = io.popen('rg --files --glob "*.md" "' .. journal_path .. '" 2>/dev/null')
         if handle then
@@ -340,7 +378,11 @@ return {
           success = true
         end
       elseif is_windows() or is_wsl() then
-        local handle = io.popen('powershell.exe -command "Get-ChildItem -Path \'' .. journal_path .. '\' -Filter *.md -Recurse | Select-Object -ExpandProperty FullName" 2>/dev/null')
+        local handle = io.popen(
+          "powershell.exe -command \"Get-ChildItem -Path '"
+            .. journal_path
+            .. "' -Filter *.md -Recurse | Select-Object -ExpandProperty FullName\" 2>/dev/null"
+        )
         if handle then
           for file in handle:lines() do
             table.insert(files, file)
@@ -358,17 +400,21 @@ return {
           success = true
         end
       end
-      
+
       -- Fallback to lua-based file search if external commands fail
       if not success then
         local function find_md_files_recursive(path, results)
           local handle = vim.loop.fs_scandir(path)
-          if not handle then return end
-          
+          if not handle then
+            return
+          end
+
           while true do
             local name, type = vim.loop.fs_scandir_next(handle)
-            if not name then break end
-            
+            if not name then
+              break
+            end
+
             local full_path = path .. (is_windows() and "\\" or "/") .. name
             if type == "directory" then
               find_md_files_recursive(full_path, results)
@@ -377,16 +423,16 @@ return {
             end
           end
         end
-        
+
         find_md_files_recursive(journal_path, files)
       end
-      
+
       -- Cache the result
       markdown_files_cache[cache_key] = {
         files = files,
-        timestamp = os.time()
+        timestamp = os.time(),
       }
-      
+
       return files
     end
 
@@ -533,11 +579,15 @@ return {
         task_debounce_timer:stop()
         task_debounce_timer:close()
       end
-      
+
       task_debounce_timer = vim.uv.new_timer()
-      task_debounce_timer:start(100, 0, vim.schedule_wrap(function()
-        update_tasks()
-      end))
+      task_debounce_timer:start(
+        100,
+        0,
+        vim.schedule_wrap(function()
+          update_tasks()
+        end)
+      )
     end
 
     -- ============================================================================
@@ -546,27 +596,29 @@ return {
 
     -- Check and setup git credentials for Windows
     local function setup_git_credentials()
-      if not is_windows() then return true end
-      
+      if not is_windows() then
+        return true
+      end
+
       local vault_path = get_vault_path()
-      
+
       -- Check if git credentials are configured
       local credential_check = vim.fn.system("git config --get credential.helper")
       if vim.v.shell_error == 0 and credential_check:gsub("%s", "") ~= "" then
         return true
       end
-      
+
       -- Try to setup Windows credential manager
       vim.fn.system("git config --global credential.helper manager")
-      vim.fn.system("git config --global credential.manager \"manager-core\"")
-      
+      vim.fn.system('git config --global credential.manager "manager-core"')
+
       return true
     end
 
     -- Simplified git operations using vim.fn.system for better Windows compatibility
     local function perform_git_operations(operation, callback)
       local vault_path = get_vault_path()
-      
+
       -- Setup credentials on Windows
       if not setup_git_credentials() then
         vim.schedule(function()
@@ -617,7 +669,7 @@ return {
           git_command("add .")
           git_command('commit -m "Auto-commit: ' .. os.date("%Y-%m-%d %H:%M:%S") .. '"')
           local push_ok, push_output = git_command("push")
-          
+
           if push_ok then
             -- Silent success
           else
@@ -627,7 +679,6 @@ return {
             end
           end
           callback(push_ok)
-
         elseif operation == "pull" then
           local pull_ok, pull_output = git_command("pull")
           if pull_ok then
@@ -649,11 +700,15 @@ return {
         git_debounce_timer:stop()
         git_debounce_timer:close()
       end
-      
+
       git_debounce_timer = vim.uv.new_timer()
-      git_debounce_timer:start(2000, 0, vim.schedule_wrap(function()
-        perform_git_operations("push", function(_) end)
-      end))
+      git_debounce_timer:start(
+        2000,
+        0,
+        vim.schedule_wrap(function()
+          perform_git_operations("push", function(_) end)
+        end)
+      )
     end
 
     -- ============================================================================
@@ -720,8 +775,6 @@ return {
       create_note_with_template(date)
     end
 
-
-
     -- Function to open URLs with system default application
     local function open_with_system_app()
       local file_path = vim.fn.expand("<cfile>")
@@ -731,7 +784,7 @@ return {
       end
 
       local open_cmd = nil
-      
+
       if is_mac() then
         open_cmd = { "open", file_path }
       elseif is_wsl() then
@@ -791,12 +844,14 @@ return {
       callback = function()
         local file_path = vim.fn.expand("%:p")
         local file_name = vim.fn.expand("%:t")
-        
+
         -- Check if file is in vault using the vault path OR if it's a known obsidian file
-        if file_path:find(vault_path, 1, true) or 
-           file_path:lower():find("obsidian") or
-           file_name == "todo.md" or
-           file_name == "tasks.md" then
+        if
+          file_path:find(vault_path, 1, true)
+          or file_path:lower():find("obsidian")
+          or file_name == "todo.md"
+          or file_name == "tasks.md"
+        then
           schedule_git_push()
         end
       end,
@@ -856,7 +911,7 @@ return {
       callback = function(args)
         if vim.bo[args.buf].filetype == "markdown" then
           local bufnr = args.buf
-          
+
           -- Check if highlighting is already set up for this buffer
           if vim.b[bufnr].obsidian_highlighting_setup then
             return
@@ -866,7 +921,11 @@ return {
             vim.cmd([[syntax match markdownTaskListDone /^\s*[-*]\s\[x\].*$/]])
           end)
 
-          vim.api.nvim_set_hl(0, "markdownTaskListDone", { fg = "#A88BFA", strikethrough = true, italic = true })
+          local accent_hl = vim.api.nvim_get_hl(0, { name = "@keyword" }) or {}
+          local accent = type(accent_hl.fg) == "number" and string.format("#%06x", accent_hl.fg)
+            or accent_hl.fg
+            or "#A88BFA"
+          vim.api.nvim_set_hl(0, "markdownTaskListDone", { fg = accent, strikethrough = true, italic = true })
           vim.cmd([[highlight link markdownTaskListDone markdownTaskListDone]])
 
           vim.b[bufnr].obsidian_highlighting_setup = true
@@ -935,12 +994,12 @@ return {
         vim.keymap.set("i", "<C-Space>", function()
           vim.cmd("lua require('todo-functions').toggle_task()")
         end, { desc = "Toggle task completion", buffer = true })
-        
+
         -- Add syntax highlighting for completed tasks
         vim.api.nvim_buf_call(0, function()
           vim.cmd([[syntax match TodoCompleted /^\s*- \[x\].*$/]])
         end)
-        
+
         vim.api.nvim_set_hl(0, "TodoCompleted", { strikethrough = true, fg = "#888888" })
         vim.cmd([[highlight link TodoCompleted TodoCompleted]])
       end,
@@ -976,9 +1035,21 @@ return {
     -- ============================================================================
 
     -- Custom commands with unique prefixes to avoid conflicts
-    vim.api.nvim_create_user_command("ObsDailyToday", create_daily_note_with_title, { desc = "Create today's daily note" })
-    vim.api.nvim_create_user_command("ObsDailyTomorrow", create_tomorrow_note_with_title, { desc = "Create tomorrow's daily note" })
-    vim.api.nvim_create_user_command("ObsDailyYesterday", create_yesterday_note_with_title, { desc = "Create yesterday's daily note" })
+    vim.api.nvim_create_user_command(
+      "ObsDailyToday",
+      create_daily_note_with_title,
+      { desc = "Create today's daily note" }
+    )
+    vim.api.nvim_create_user_command(
+      "ObsDailyTomorrow",
+      create_tomorrow_note_with_title,
+      { desc = "Create tomorrow's daily note" }
+    )
+    vim.api.nvim_create_user_command(
+      "ObsDailyYesterday",
+      create_yesterday_note_with_title,
+      { desc = "Create yesterday's daily note" }
+    )
     vim.api.nvim_create_user_command("ObsOpenVault", function()
       vim.cmd("edit " .. get_vault_path())
     end, { desc = "Open Obsidian vault folder" })
@@ -994,7 +1065,7 @@ return {
     vim.api.nvim_create_user_command("ObsToggleTask", function()
       vim.cmd("lua require('todo-functions').toggle_task()")
     end, { desc = "Toggle task completion" })
-    
+
     -- Open external terminal with today's journal
     vim.api.nvim_create_user_command("ObsExternalToday", function()
       local is_windows = vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1
@@ -1011,7 +1082,7 @@ return {
         vim.fn.system('gnome-terminal -- nvim "' .. vault_path .. '" &')
       end
     end, { desc = "Open external terminal with today's journal" })
-    
+
     -- Open external terminal with todo.md
     vim.api.nvim_create_user_command("ObsExternalTodo", function()
       local is_windows = vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1
@@ -1024,12 +1095,6 @@ return {
         vim.fn.system('gnome-terminal -- nvim "' .. vault_path .. '" &')
       end
     end, { desc = "Open external terminal with todo.md" })
-    
-
-    
-
-    
-
 
     -- ============================================================================
     -- KEY MAPPINGS (OBSIDIAN-SPECIFIC)
@@ -1040,15 +1105,13 @@ return {
       silent = true,
     })
 
-
-
     -- Remove end of buffer ~ from neotree panel (Obsidian styling)
     vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "none", fg = "#141317" })
   end,
 
   keys = {
     { "<leader>on", "<cmd>ObsidianNew<cr>", desc = "New Obsidian note" },
-    { "<leader>oo", "<cmd>ObsOpenVault<cr>", desc = "Open Obsidian folder" },
+    { "<leader>oo", "<cmd>ObsOpenTodo<cr>", desc = "Open todo list" },
     { "<leader>os", "<cmd>ObsidianSearch<cr>", desc = "Search Obsidian notes" },
     { "<leader>oq", "<cmd>ObsidianQuickSwitch<cr>", desc = "Quick Switch" },
     { "<leader>ob", "<cmd>ObsidianBacklinks<cr>", desc = "Show backlinks" },
@@ -1063,7 +1126,5 @@ return {
     { "<leader>ox", "<cmd>ObsToggleTask<cr>", desc = "Toggle task completion" },
     { "<leader>oe", "<cmd>ObsExternalToday<cr>", desc = "Open external terminal with today's journal" },
     { "<leader>oT", "<cmd>ObsExternalTodo<cr>", desc = "Open external terminal with todo.md" },
-
-
   },
 }
