@@ -170,6 +170,6 @@ vim.opt.viewdir = vim.fn.stdpath("data") .. "/views/bufs"
 
 -- UI elements
 vim.opt.numberwidth = 4
-vim.opt.signcolumn = "yes:2"
+vim.opt.signcolumn = "auto"
 vim.opt.cmdheight = 1 -- Smaller command line height
 vim.opt.showmode = false -- Don't show mode in command line

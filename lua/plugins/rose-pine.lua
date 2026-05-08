@@ -5,7 +5,7 @@ return {
   config = function()
     require("black-metal").setup({
       -- optional configuration here
-      theme = "gorgoroth",
+      theme = "emperor",
       cursorline_gutter = false,
     })
     require("black-metal").load()

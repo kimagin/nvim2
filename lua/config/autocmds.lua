@@ -180,7 +180,7 @@ local function is_view_safe(bufnr)
 
   -- Skip special buffer types that cause issues with views
   local skip_buftypes = { "quickfix", "help", "nofile", "terminal", "prompt" }
-  local skip_filetypes = { "gitcommit", "gitrebase", "neo-tree", "oil", "alpha" }
+  local skip_filetypes = { "gitcommit", "gitrebase", "snacks_picker_list", "oil", "alpha" }
 
   for _, bt in ipairs(skip_buftypes) do
     if buftype == bt then
@@ -518,8 +518,15 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- Remove end of buffer ~ from neotree panel
-vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "none", fg = "#141317" })
+-- Force redraw after dashboard opens to clear startup rendering artifacts
+vim.api.nvim_create_autocmd("UIEnter", {
+  once = true,
+  callback = function()
+    vim.schedule(function()
+      vim.cmd("redraw!")
+    end)
+  end,
+})
 
 -- ============================================================================
 -- CUSTOM KEYMAPS AND FUNCTIONS

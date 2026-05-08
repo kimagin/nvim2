@@ -44,7 +44,15 @@ return {
 ]],
       },
     },
+    explorer = {},
     lazygit = { enabled = true },
     indent = { enabled = false },
+    styles = {
+      dashboard = {
+        wo = {
+          foldcolumn = "0",
+        },
+      },
+    },
   },
 }

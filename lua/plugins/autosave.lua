@@ -13,7 +13,7 @@ return {
     local ignored_filetypes = {
       "",
       "TelescopePrompt",
-      "neo-tree",
+      "snacks_picker_list",
       "lazy",
       "mason",
       "oil",

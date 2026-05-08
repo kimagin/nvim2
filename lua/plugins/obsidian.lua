@@ -1104,9 +1104,6 @@ return {
       desc = "Open link under cursor with system app",
       silent = true,
     })
-
-    -- Remove end of buffer ~ from neotree panel (Obsidian styling)
-    vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "none", fg = "#141317" })
   end,
 
   keys = {
