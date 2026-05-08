@@ -1,9 +1,7 @@
 return {
   "MeanderingProgrammer/render-markdown.nvim",
   ft = "markdown",
-  dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-mini/mini.nvim" }, -- if you use the mini.nvim suite
-  -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
-  -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+  dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-mini/mini.nvim" },
   ---@module 'render-markdown'
   ---@type render.md.UserConfig
   opts = {
@@ -11,9 +9,6 @@ return {
     debounce = 150,
     preset = "none",
     render_modes = { "i", "n", "c", "o-pending" },
-    win_options = {
-      conceallevel = { rendered = 2 },
-    },
     anti_conceal = {
       -- This enables hiding any added text on the line the cursor is on
       enabled = true,
@@ -352,4 +347,9 @@ return {
       skip_heading = false,
     },
   },
+  config = function(_, opts)
+    require("render-markdown").setup(opts)
+    local state = require("render-markdown.state")
+    state.config.win_options.conceallevel = nil
+  end,
 }
