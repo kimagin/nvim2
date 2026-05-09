@@ -242,3 +242,8 @@ vim.api.nvim_create_autocmd("TermOpen", {
     vim.keymap.set("t", "<C-_>", "<Nop>", { buffer = 0, desc = "Disable Ctrl+Shift+- in terminal" })
   end,
 })
+
+-- Toggle render-markdown for current buffer
+vim.keymap.set("n", "<leader>uc", function()
+  require("render-markdown").buf_toggle()
+end, { desc = "Toggle render-markdown" })

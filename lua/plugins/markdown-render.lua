@@ -11,7 +11,7 @@ return {
     render_modes = { "i", "n", "c", "o-pending" },
     anti_conceal = {
       -- This enables hiding any added text on the line the cursor is on
-      enabled = true,
+      enabled = false,
       -- Which elements to always show, ignoring anti conceal behavior. Values can either be booleans
       -- to fix the behavior or string lists representing modes where anti conceal behavior will be
       -- ignored. Possible keys are:
@@ -347,9 +347,4 @@ return {
       skip_heading = false,
     },
   },
-  config = function(_, opts)
-    require("render-markdown").setup(opts)
-    local state = require("render-markdown.state")
-    state.config.win_options.conceallevel = nil
-  end,
 }
