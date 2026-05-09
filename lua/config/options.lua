@@ -18,6 +18,7 @@ vim.opt.pumblend = 0
 vim.opt.shortmess:append("I")
 vim.opt.showtabline = 0 -- Hide tabs
 vim.opt.wrap = true
+vim.opt.conceallevel = 3 -- Higher conceal for clean render-markdown display
 
 -- Cross-platform clipboard configuration
 vim.opt.clipboard = "unnamedplus"
