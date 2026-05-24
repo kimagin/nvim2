@@ -1,7 +1,8 @@
 return {
-  {
-    "nvim-telescope/telescope.nvim",
-    opts = function(_, opts)
+    {
+      "nvim-telescope/telescope.nvim",
+     cmd = "Telescope",
+     opts = function(_, opts)
       local actions = require("telescope.actions")
       local action_state = require("telescope.actions.state")
 

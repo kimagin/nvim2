@@ -13,6 +13,16 @@ vim.opt.splitkeep = "screen"
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_node_provider = 0
 
+-- Disable mini.indentscope on dashboard/special buffers
+-- Must be registered here (not in autocmds.lua) because the dashboard
+-- buffer is created during VimEnter, before VeryLazy fires.
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "snacks_dashboard", "alpha", "lazy" },
+  callback = function()
+    vim.b.miniindentscope_disable = true
+  end,
+})
+
 require("lazy").setup({
   spec = {
     -- add LazyVim and import its plugins
@@ -37,11 +47,11 @@ require("lazy").setup({
     rtp = {
       -- disable some rtp plugins
       disabled_plugins = {
-        "gzip",
-        -- "matchit",
-        -- "matchparen",
-        -- "netrwPlugin",
-        "tarPlugin",
+          "gzip",
+          "matchit",
+          "matchparen",
+          "netrwPlugin",
+          "tarPlugin",
         "tohtml",
         "tutor",
         "zipPlugin",

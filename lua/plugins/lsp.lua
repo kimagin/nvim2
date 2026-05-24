@@ -1,8 +1,9 @@
 return {
-  {
-    "neovim/nvim-lspconfig",
+    {
+      "neovim/nvim-lspconfig",
+     event = { "User LazyVimLoad", "BufReadPost", "BufNewFile" },
 
-    opts = {
+     opts = {
       servers = {
         -- Disabeling eslint
         eslint = false,

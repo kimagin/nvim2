@@ -1,8 +1,9 @@
 return {
-  "folke/noice.nvim",
-  optional = true,
+    "folke/noice.nvim",
+   optional = true,
+   event = "VeryLazy",
 
-  opts = {
+   opts = {
     presets = {
       inc_rename = true,
       bottom_search = true, -- use a classic bottom cmdline for search

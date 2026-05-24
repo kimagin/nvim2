@@ -4,7 +4,7 @@ return {
   event = "VeryLazy",
   opts = {
 
-    symbol = "│", -- You can change this to any symbol you prefer
+    symbol = "│",
 
     draw = {
       animation = function()
@@ -14,8 +14,8 @@ return {
       priority = 99,
     },
     options = {
-      try_as_border = true,
-      indent_at_cursor = true, -- Highlight only the current scope
+      try_as_border = false,
+      indent_at_cursor = true,
     },
   },
 }

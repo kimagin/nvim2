@@ -1,10 +1,10 @@
 return {
-  "saghen/blink.cmp",
-  dependencies = {
+    "saghen/blink.cmp",
+   event = "InsertEnter",
+   dependencies = {
     "rafamadriz/friendly-snippets",
     {
       "saghen/blink.compat",
-      opts = {},
       version = false,
     },
   },
@@ -60,7 +60,9 @@ return {
       documentation = {
         auto_show = true,
         auto_show_delay_ms = 200,
-        border = "single",
+        window = {
+          border = "single",
+        },
       },
     },
     sources = {

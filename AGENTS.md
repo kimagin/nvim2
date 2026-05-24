@@ -1,68 +1,57 @@
-# CRITICAL RULES - MUST FOLLOW
+# Neovim AGENTS
 
-## RESPONSES
+## CORE
 
-- Keep responses concise and to the point - unless the user asks otherwise.
-- Output code snippets in valid Lua specifically tailored for Neovim 0.9+.
+- Output valid Lua 0.9+.
+- NEVER modify `init.lua` — all config goes in `lua/` directory.
+- After Lua file changes, run `:Lazy sync` inside Neovim to apply.
+- Verify with `:checkhealth` and `:messages`.
 
-## LAZYVIM PHILOSOPHY & STRUCTURE
+## STRUCTURE
 
-- **Respect the structure:** Always place configuration files in their proper
-  LazyVim locations (`lua/config/options.lua`, `lua/config/keymaps.lua`,
-  `lua/config/autocmds.lua`, and `lua/plugins/*.lua`).
-- **Extend, don't overwrite:** When modifying default LazyVim plugins, use the
-  `opts` table to merge configurations rather than completely rewriting the
-  plugin setup, unless explicitly required.
-- **Lazy loading:** Maximize performance by lazy-loading plugins whenever
-  possible using `event = "VeryLazy"`, `ft`, `cmd`, or `keys`.
+- `lua/config/` — autocmds, keymaps, options, lazy bootstrap
+- `lua/plugins/` — per-plugin spec files (31 plugin configs)
+- `lua/todo-functions.lua` — custom todo module
+- LazyVim v8 with extras: copilot, blink, telescope, astro, json, tailwind, toml, yaml, mini-surround, mini-hipatterns, snacks_explorer
 
-## PLANNING MODE
+## PLUGIN PATTERN
 
-- Always ask clarifying questions regarding the user's workflow, primary
-  programming languages, and keybind preferences.
-- Never assume LSP requirements, linters, or formatters—ask before adding them
-  to `mason.nvim` or `nvim-lspconfig`.
-- Use deep-dive sub-agents to assist with researching Neovim plugins, their
-  dependencies, and current GitHub issues.
-- Use deep-dive sub-agents to review the plan's compatibility with the existing
-  LazyVim setup before presenting it to the user.
+- Always return a table/list of tables. Use `opts` merge, never full rewrites.
+- Lazy load via `event`, `ft`, `cmd`, or `keys`.
 
-## CHANGE / EDIT MODE
+## REPO-SPECIFIC CONFIG
 
-- Never implement features yourself when possible - use sub-agents!
-- Identify changes from the plan that can be implemented in parallel (e.g., UI
-  tweaks vs. LSP configuration), and use sub-agents to implement them
-  efficiently.
-- When using sub-agents to implement features, act as a coordinator only.
-- Use the best model for the task - premium models for complex tasks (like
-  writing custom Lua functions or fixing LSP bugs) and mid-tier models for
-  simpler tasks (like updating keymap descriptions).
-- After completing Lua file modifications, always ensure valid Lua syntax. If
-  available, run `stylua` for formatting and `luacheck` for linting.
+**Todo Functions**
+- `require("todo-functions").open_todo()`, `add_task("urgent"|"task")`, `toggle_task()`
+- Todo path: `~/Developments/obsidian/todo.md` (Mac/Linux), `~/Documents/Obsidian/todo.md` (Windows)
 
-## PLUGIN & CONFIGURATION CHANGES
+**Auto Save**
+- Saves ALL modified buffers (not just current).
+- Toggle with `:AutoSaveToggle` command.
+- Notifications timestamped, shown at top.
 
-- Whenever you add or modify a plugin, ensure it follows the `lazy.nvim` plugin
-  specification (returning a table or list of tables).
-- After making structural changes to plugins, always remind the user to run
-  `:Lazy sync` or `:Lazy restore` inside Neovim.
-- NEVER instruct the user to modify the core `~/.config/nvim/init.lua` file
-  unless absolutely necessary; changes belong in the `lua/` directory.
+**Formatters (conform.nvim)**
+- Stylua: 2 spaces, 120 col width (`stylua.toml`)
+- markdown → `deno_fmt`
+- javascript, typescript, astro → `prettierd`
 
-## TESTING
+**LSP (lua/plugins/lsp.lua)**
+- ESLint server disabled (`eslint = false`)
+- TailwindCSS extended filetypes: blade, clojure, django-html, htmldjango, erb, eruby, gohtml, gohtmltmpl, haml, liquid, mustache, njk, nunjucks, php, razor, slim, twig, templ
+- vtsls: formatting enabled via custom `setup` hook using `snacks.util lsp on`
+- Diagnostics: signs active (empty text), virtual text off, underline on, severity sorted
 
-- Never assume your Lua scripts simply work, always verify!
-- Since Neovim requires a running instance to test UI/LSP features fully,
-  explicitly ask the user to reload Neovim, check `:messages` for errors, or run
-  `:checkhealth` to verify tool installations.
-- If writing complex custom Lua logic, utilize available Neovim testing
-  frameworks (like `plenary.busted`) if installed in the project.
+**Caching (lua/config/autocmds.lua)**
+- 300-second periodic cache cleanup via `vim.uv` timer
+- View files stored in `~/.local/share/nvim/views/bufs`
+- Auto-sets local CWD to project root on BufEnter
 
-## UI DESIGN & QUALITY OF LIFE (QoL)
+**Markdown**
+- Custom navigation keymaps: `[l`/`]l` for links, `[t`/`]t` for tasks
+- Task highlighting with strikethrough
+- Line numbers disabled, signcolumn `yes:2`
 
-- Always adhere to NeoVim UI paradigms. Prioritize terminal-friendly visual
-  cues, consistent highlight groups, and readable contrast.
-- Ensure any additions to UI components (like Lualine, Bufferline, Noice, or
-  Telescope) match the aesthetic of the user's primary colorscheme.
-- Keep Quality of Life changes focused on reducing keystrokes, improving
-  discoverability (via `which-key`), and maintaining a clutter-free editor.
+## VERIFICATION
+
+- No test framework — verify by reloading Neovim and checking `:checkhealth` / `:messages`
+- Format with `stylua` using repo's `stylua.toml`

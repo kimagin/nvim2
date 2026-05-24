@@ -613,3 +613,29 @@ end, { desc = "Show Tree-sitter highlight group" })
 -- ============================================================================
 -- MODULE INITIALIZATION
 -- ============================================================================
+
+
+-- Theme nvim-notify to match black-metal emperor palette
+vim.api.nvim_create_autocmd("User", {
+  pattern = "VeryLazy",
+  callback = function()
+    if not package.loaded["nvim-notify"] then return end
+    local c = require("black-metal.palette").emperor
+    vim.api.nvim_set_hl(0, "NotifyBackground", { bg = c.bg })
+    vim.api.nvim_set_hl(0, "NotifyERRORIcon", { fg = c.diag_red })
+    vim.api.nvim_set_hl(0, "NotifyWARNIcon", { fg = c.diag_yellow })
+    vim.api.nvim_set_hl(0, "NotifyINFOIcon", { fg = c.diag_green })
+    vim.api.nvim_set_hl(0, "NotifyDEBUGIcon", { fg = c.comment })
+    vim.api.nvim_set_hl(0, "NotifyTRACEIcon", { fg = c.func })
+    vim.api.nvim_set_hl(0, "NotifyERRORBody", { fg = c.fg })
+    vim.api.nvim_set_hl(0, "NotifyWARNBody", { fg = c.fg })
+    vim.api.nvim_set_hl(0, "NotifyINFOBody", { fg = c.fg })
+    vim.api.nvim_set_hl(0, "NotifyDEBUGBody", { fg = c.fg })
+    vim.api.nvim_set_hl(0, "NotifyTRACEBody", { fg = c.fg })
+    vim.api.nvim_set_hl(0, "NotifyERRORTitle", { fg = c.diag_red })
+    vim.api.nvim_set_hl(0, "NotifyWARNTitle", { fg = c.diag_yellow })
+    vim.api.nvim_set_hl(0, "NotifyINFOTitle", { fg = c.diag_green })
+    vim.api.nvim_set_hl(0, "NotifyDEBUGTitle", { fg = c.comment })
+    vim.api.nvim_set_hl(0, "NotifyTRACETitle", { fg = c.func })
+  end,
+})
